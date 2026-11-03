@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Component copy and accessibility labels -->
+    <string name="ds_see_all">الكل</string>
+    <string name="ds_back">رجوع</string>
+    <string name="ds_backspace">امسح</string>
+    <string name="ds_quota_of">%1$s من %2$s</string>
+    <string name="ds_step_of">خطوة %1$s من %2$s</string>
+    <string name="ds_pin_progress">اتكتب %1$s من %2$s</string>
+    <string name="ds_duration">المدة %1$s</string>
+
+    <!-- Sample content used only by component showcases / previews -->
+    <string name="showcase_next">التالي</string>
+    <string name="showcase_start">يلا نبدأ</string>
+    <string name="showcase_enter">دخول</string>
+    <string name="showcase_go_home">ارجع للرئيسية</string>
+    <string name="showcase_play">شغّل</string>
+    <string name="showcase_open_child_mode">خلّصنا — افتح وضع الطفل</string>
+    <string name="showcase_watch_history">سجل المشاهدة</string>
+    <string name="showcase_subscription">الاشتراك</string>
+    <string name="showcase_again">تاني</string>
+    <string name="showcase_lock">قفل</string>
+    <string name="showcase_add_child">ضيف طفل</string>
+    <string name="showcase_close">اقفل</string>
+    <string name="showcase_child_1">يوسف</string>
+    <string name="showcase_child_2">مريم</string>
+    <string name="showcase_age_range">%1$s–%2$s سنين</string>
+    <string name="showcase_age_range_years">%1$s–%2$s سنة</string>
+    <string name="showcase_by_time">بالوقت</string>
+    <string name="showcase_letters">الحروف</string>
+    <string name="showcase_numbers">الأرقام</string>
+    <string name="showcase_quran">قرآن وأدعية</string>
+    <string name="showcase_manners">أخلاق وسلوك</string>
+    <string name="showcase_science">علوم وطبيعة</string>
+    <string name="showcase_stories">حواديت</string>
+    <string name="showcase_glyph_letters">أ ب</string>
+    <string name="showcase_new_today">جديد النهارده</string>
+    <string name="showcase_video_moon">ليه القمر بيتغير شكله؟</string>
+    <string name="showcase_video_morning_dua">دعاء الصباح</string>
+    <string name="showcase_video_count_fruits">نعد الفواكه لحد ٥</string>
+    <string name="showcase_video_letter_baa">أغنية حرف الباء</string>
+    <string name="showcase_video_rabbit">الأرنب والسلحفاة</string>
+    <!-- Placeholder only: replace with the official YouTube brand asset before release (CLAUDE.md rule 6). -->
+    <string name="showcase_youtube_placeholder">YouTube</string>
+    <string name="showcase_remove_favorite">شيل من المفضلة</string>
+    <string name="showcase_one_left">فاضلك فيديو واحد</string>
+    <string name="showcase_empty_title">لسه مفيش مفضلة</string>
+    <string name="showcase_empty_message">دوس على القلب في أي فيديو عشان تلاقيه هنا بسرعة.</string>
+    <string name="showcase_type_sample">أهلاً يا بطل! فاضلك ٣ فيديوهات النهارده</string>
+</resources>
