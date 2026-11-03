@@ -1,6 +1,9 @@
 rootProject.name = "ClipKid"
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             mavenContent {
@@ -29,3 +32,14 @@ dependencyResolutionManagement {
 
 include(":androidApp")
 include(":shared")
+
+include(":core:model")
+include(":core:domain")
+include(":core:data")
+include(":core:designsystem")
+include(":core:player")
+include(":core:billing")
+
+include(":feature:onboarding")
+include(":feature:child")
+include(":feature:parent")
