@@ -1,48 +1,40 @@
 package com.mahmoud.clipkid
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.network.ktor3.KtorNetworkFetcherFactory
+import coil3.request.crossfade
+import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
+import com.mahmoud.clipkid.core.designsystem.theme.ProvideRtl
+import com.mahmoud.clipkid.navigation.ClipKidNavHost
 
-import clipkid.shared.generated.resources.Res
-import clipkid.shared.generated.resources.compose_multiplatform
-
+/**
+ * App root shared by Android and iOS.
+ * RTL is forced here for the whole app; Arabic copy lives in the default `values/strings.xml`
+ * and every text style carries the `ar-EG` locale (see ClipKidTypography).
+ */
 @Composable
-@Preview
 fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
+    setSingletonImageLoaderFactory { context ->
+        // Thumbnails only; Coil's memory + HTTP cache is the only image cache (CLAUDE.md rule 5).
+        ImageLoader.Builder(context)
+            .components { add(KtorNetworkFetcherFactory()) }
+            .crossfade(true)
+            .build()
+    }
+    ProvideRtl {
+        ClipKidTheme {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(ClipKidTheme.colors.background),
+            ) {
+                ClipKidNavHost()
             }
         }
     }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Temporary component gallery (Phase 0) -->
+    <string name="gallery_title">معرض المكونات</string>
+    <string name="gallery_subtitle">شاشة مؤقتة لمراجعة نظام التصميم على أندرويد و iOS</string>
+    <string name="gallery_colors">الألوان</string>
+    <string name="gallery_typography">الخطوط والأرقام</string>
+    <string name="gallery_primary_button">زرار أساسي</string>
+    <string name="gallery_secondary_button">زرار ثانوي</string>
+    <string name="gallery_icon_button">زرار أيقونة كبير</string>
+    <string name="gallery_chip">شيبس</string>
+    <string name="gallery_segmented">اختيار متقسم</string>
+    <string name="gallery_toggle">مفتاح تشغيل</string>
+    <string name="gallery_video_card">كارت فيديو</string>
+    <string name="gallery_collection_cover">غلاف كوليكشن</string>
+    <string name="gallery_shelf">رف</string>
+    <string name="gallery_quota_dots">نقط الحد اليومي</string>
+    <string name="gallery_pin_pad">لوحة الرقم السري</string>
+    <string name="gallery_step_progress">خطوات الإعداد</string>
+    <string name="gallery_empty_state">حالة فاضية</string>
+</resources>
