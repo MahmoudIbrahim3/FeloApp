@@ -82,10 +82,10 @@ class PlayerViewModel(
             combine(catalog.observeVideos(), catalog.observeCollections(), favorites.observeFavorites(childId), ended) {
                 videos, collections, favs, isEnded ->
                 val video = videos.firstOrNull { it.youtubeId == youtubeId }
-                if (video == null) {
+                val collection = video?.let { v -> collections.firstOrNull { it.id == v.collectionId } }
+                if (video == null || collection == null) {
                     PlayerUiState.Unavailable
                 } else {
-                    val collection = collections.first { it.id == video.collectionId }
                     PlayerUiState.Ready(
                         video = video,
                         collectionTitle = collection.titleAr,
@@ -116,7 +116,8 @@ class PlayerViewModel(
     private fun simulateEnd() {
         val id = eventId ?: return
         val ready = _state.value as? PlayerUiState.Ready ?: return
-        if (ready.ended) return
+        // Checked on the flag itself: the UI state can lag behind a second tap.
+        if (ended.value) return
         ended.value = true
         viewModelScope.launch {
             updateProgress(id, ready.video.durationSec, completed = true)
