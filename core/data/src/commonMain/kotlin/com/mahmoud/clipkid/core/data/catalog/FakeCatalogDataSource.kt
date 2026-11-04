@@ -1,0 +1,167 @@
+package com.mahmoud.clipkid.core.data.catalog
+
+import com.mahmoud.clipkid.core.model.AgeBand
+import com.mahmoud.clipkid.core.model.AgeBand.A10_12
+import com.mahmoud.clipkid.core.model.AgeBand.A2_3
+import com.mahmoud.clipkid.core.model.AgeBand.A4_6
+import com.mahmoud.clipkid.core.model.AgeBand.A7_9
+import com.mahmoud.clipkid.core.model.Collection
+import com.mahmoud.clipkid.core.model.CoverMark
+import com.mahmoud.clipkid.core.model.CoverStyle
+import com.mahmoud.clipkid.core.model.Video
+import kotlin.time.Instant
+
+/**
+ * Hand-written catalog used while `DataConfig.useFakeCatalog` is true: the 6 collections from
+ * CLAUDE.md with 9 videos each.
+ *
+ * Every YouTube id is an 11-character placeholder `REPLACE_<letter><nn>` (L letters, N numbers,
+ * Q Quran & duas, M manners, C science, T stories). Search for `REPLACE_` to swap in real,
+ * reviewed videos. Thumbnails will not load until then.
+ */
+class FakeCatalogDataSource : CatalogRemoteDataSource {
+    override suspend fun fetchCatalog(): RemoteCatalog = RemoteCatalog(COLLECTIONS, VIDEOS)
+
+    companion object {
+        private val REFRESHED_AT = Instant.parse("2026-11-01T00:00:00Z")
+
+        // Shared tags (Arabic display labels) so Up Next can suggest across collections.
+        private const val ANIMALS = "الحيوانات"
+        private const val FOOD = "الأكل"
+        private const val SONGS = "أغاني"
+        private const val MORNING = "الصباح"
+        private const val BEDTIME = "النوم"
+        private const val SHORT_SURAHS = "سور قصيرة"
+        private const val DUAS = "أدعية"
+        private const val SPACE = "الفضاء"
+        private const val NATURE = "الطبيعة"
+        private const val HYGIENE = "النضافة"
+
+        private val SMALL = setOf(A2_3, A4_6)
+        private val YOUNG = setOf(A2_3, A4_6, A7_9)
+        private val ALL = AgeBand.entries.toSet()
+        private val OLDER = setOf(A4_6, A7_9, A10_12)
+
+        val COLLECTIONS: List<Collection> = listOf(
+            collection("letters", "الحروف", 0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ ب"), SMALL, 1),
+            collection("numbers", "الأرقام", 0xFFD6E8FF, 0xFF1A4FB5, CoverMark.Glyph("١٢٣"), YOUNG, 2),
+            collection("quran-duas", "قرآن وأدعية", 0xFFD9F2E4, 0xFF1F7A4A, CoverMark.Icon("book"), ALL, 3),
+            collection("manners", "أخلاق وسلوك", 0xFFFFDCD6, 0xFFB23A26, CoverMark.Icon("heart"), YOUNG, 4),
+            collection("science", "علوم", 0xFFE6DEFF, 0xFF5B3DC4, CoverMark.Icon("leaf"), OLDER, 5),
+            collection("stories", "حواديت", 0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon"), OLDER, 6),
+        )
+
+        val VIDEOS: List<Video> = buildList {
+            videos(
+                "letters", 'L', SMALL,
+                "أغنية حرف الألف" to listOf(SONGS),
+                "أغنية حرف الباء" to listOf(SONGS),
+                "حرف التاء والتفاحة" to listOf(FOOD),
+                "حرف الثاء والثعلب" to listOf(ANIMALS),
+                "حرف الجيم والجمل" to listOf(ANIMALS),
+                "حرف الحاء والحصان" to listOf(ANIMALS),
+                "حرف الخاء والخروف" to listOf(ANIMALS, SONGS),
+                "حرف الدال والديك" to listOf(ANIMALS, MORNING),
+                "حرف الذال والذرة" to listOf(FOOD),
+            )
+            videos(
+                "numbers", 'N', YOUNG,
+                "نعد من ١ لـ ٥" to listOf(SONGS),
+                "نعد من ٦ لـ ١٠" to listOf(SONGS),
+                "نعد الحيوانات في المزرعة" to listOf(ANIMALS),
+                "الأشكال حوالينا" to emptyList(),
+                "نجمع بالتفاح" to listOf(FOOD),
+                "الكبير والصغير" to listOf(ANIMALS),
+                "نعد بالعشرات" to emptyList(),
+                "الساعة كام؟" to listOf(MORNING),
+                "نعد النجوم" to listOf(SPACE, BEDTIME),
+            )
+            videos(
+                "quran-duas", 'Q', ALL,
+                "سورة الفاتحة" to listOf(SHORT_SURAHS),
+                "سورة الإخلاص" to listOf(SHORT_SURAHS),
+                "سورة الفلق" to listOf(SHORT_SURAHS),
+                "سورة الناس" to listOf(SHORT_SURAHS),
+                "سورة الكوثر" to listOf(SHORT_SURAHS),
+                "دعاء الصباح" to listOf(DUAS, MORNING),
+                "دعاء قبل النوم" to listOf(DUAS, BEDTIME),
+                "دعاء قبل الأكل" to listOf(DUAS, FOOD),
+                "دعاء الخروج من البيت" to listOf(DUAS),
+            )
+            videos(
+                "manners", 'M', YOUNG,
+                "نقول شكراً ومن فضلك" to emptyList(),
+                "نغسل إيدينا" to listOf(HYGIENE, FOOD),
+                "نرتب أوضتنا" to emptyList(),
+                "نساعد ماما" to emptyList(),
+                "الصدق حلو" to emptyList(),
+                "نسلّم على الناس" to listOf(MORNING),
+                "نشارك لعبنا" to emptyList(),
+                "نرفق بالحيوان" to listOf(ANIMALS),
+                "نغسل سناننا قبل النوم" to listOf(HYGIENE, BEDTIME),
+            )
+            videos(
+                "science", 'C', OLDER,
+                "ليه القمر بيتغير شكله؟" to listOf(SPACE),
+                "الكواكب حوالين الشمس" to listOf(SPACE),
+                "رحلة نقطة المية" to listOf(NATURE),
+                "النبات بيكبر إزاي؟" to listOf(NATURE, FOOD),
+                "الحيوانات اللي بتطير" to listOf(ANIMALS, NATURE),
+                "جسمنا من جوه" to listOf(HYGIENE),
+                "ليه السما زرقا؟" to listOf(NATURE),
+                "المغناطيس العجيب" to emptyList(),
+                "البركان بيثور إزاي؟" to listOf(NATURE),
+            )
+            videos(
+                "stories", 'T', OLDER,
+                "الأرنب والسلحفاة" to listOf(ANIMALS),
+                "الأسد والفأر" to listOf(ANIMALS),
+                "النملة والجرادة" to listOf(ANIMALS),
+                "النجمة الصغيرة" to listOf(BEDTIME, SPACE),
+                "جحا وحماره" to listOf(ANIMALS),
+                "الولد الصادق" to emptyList(),
+                "الشجرة الكريمة" to listOf(NATURE),
+                "رحلة السمكة الصغيرة" to listOf(ANIMALS, NATURE),
+                "الديك الشجاع" to listOf(ANIMALS, MORNING),
+            )
+        }
+
+        private fun collection(
+            id: String,
+            title: String,
+            bg: Long,
+            fg: Long,
+            mark: CoverMark,
+            bands: Set<AgeBand>,
+            sortOrder: Int,
+        ) = Collection(id, id, title, CoverStyle(bg, fg, mark), bands, sortOrder, isPremium = false)
+
+        private fun MutableList<Video>.videos(
+            collectionId: String,
+            code: Char,
+            bands: Set<AgeBand>,
+            vararg titlesAndTags: Pair<String, List<String>>,
+        ) {
+            titlesAndTags.forEachIndexed { index, (title, tags) ->
+                val number = index + 1
+                val youtubeId = "REPLACE_$code${number.toString().padStart(2, '0')}"
+                add(
+                    Video(
+                        youtubeId = youtubeId,
+                        collectionId = collectionId,
+                        titleAr = title,
+                        // 2:00 to 6:40, varied so duration badges and minute limits look realistic.
+                        durationSec = 120 + ((number * 47 + code.code * 13) % 280),
+                        thumbnailUrl = "https://i.ytimg.com/vi/$youtubeId/hqdefault.jpg",
+                        tags = tags,
+                        ageBands = bands,
+                        sortOrder = number,
+                        madeForKids = true,
+                        embeddable = true,
+                        refreshedAt = REFRESHED_AT,
+                    ),
+                )
+            }
+        }
+    }
+}
