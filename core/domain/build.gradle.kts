@@ -13,6 +13,7 @@ kotlin {
         commonTest.dependencies {
             // Checks the exact JSON sent when a parent hides a video.
             implementation(libs.kotlinx.serialization.json)
+            implementation(projects.core.testing)
         }
     }
 }

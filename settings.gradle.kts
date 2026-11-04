@@ -39,6 +39,7 @@ include(":core:data")
 include(":core:designsystem")
 include(":core:player")
 include(":core:billing")
+include(":core:testing")
 
 include(":feature:onboarding")
 include(":feature:child")
