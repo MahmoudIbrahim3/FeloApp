@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home -->
+    <string name="child_greeting">أهلاً يا بطل!</string>
+    <string name="child_home_lock_description">للأهل بس</string>
+    <string name="child_home_collections">الكوليكشنز</string>
+    <string name="child_home_new_today">جديد النهارده</string>
+    <string name="child_home_continue_label">كمّل اتفرج</string>
+    <string name="child_home_play">شغّل</string>
+    <string name="child_home_tablet_quota_title">فيديوهات النهارده</string>
+    <string name="child_home_empty_title">مفيش فيديوهات دلوقتي</string>
+    <string name="child_home_empty_message">جرّب تاني بعد شوية.</string>
+    <string name="child_loading">بنحمّل الفيديوهات...</string>
+
+    <!-- Quota -->
+    <string name="child_quota_pill">%1$s من %2$s</string>
+    <string name="child_quota_minutes_pill">%1$s من %2$s دقيقة</string>
+    <string name="child_quota_remaining_one">فاضلك فيديو واحد</string>
+    <string name="child_quota_remaining_many">فاضلك %1$s فيديو</string>
+    <string name="child_quota_minutes_remaining">فاضلك %1$s دقيقة</string>
+    <string name="child_quota_none">خلصت فيديوهات النهارده</string>
+
+    <!-- Collection -->
+    <string name="child_collection_meta">%1$s فيديو · سن %2$s</string>
+    <string name="child_collection_progress">%1$s من %2$s</string>
+    <string name="child_collection_empty_title">المجموعة دي لسه فاضية</string>
+    <string name="child_collection_empty_message">هنضيف فيديوهات قريب.</string>
+    <string name="child_status_watched">اتفرجت عليه</string>
+    <string name="child_status_in_progress">كمّل من مكانك</string>
+    <string name="child_status_new">جديد</string>
+
+    <!-- Player -->
+    <string name="child_back">رجوع</string>
+    <string name="child_favorite_add">ضيف للمفضلة</string>
+    <string name="child_favorite_remove">شيل من المفضلة</string>
+    <string name="child_player_placeholder">هنا الفيديو هيشتغل</string>
+    <string name="child_player_simulate_end">خلص الفيديو (تجربة)</string>
+    <string name="child_player_unavailable">الفيديو ده مش متاح دلوقتي</string>
+
+    <!-- Up Next -->
+    <string name="child_upnext_title">تتفرج على إيه دلوقتي؟</string>
+    <string name="child_upnext_finished">خلصته!</string>
+    <string name="child_upnext_replay">تاني</string>
+    <string name="child_upnext_next_in">اللي بعده في %1$s</string>
+    <string name="child_upnext_tag">ولا حاجة عن %1$s؟</string>
+    <string name="child_upnext_home">ارجع للرئيسية</string>
+
+    <!-- DoneToday -->
+    <string name="child_done_title">برافو يا بطل!</string>
+    <string name="child_done_subtitle">خلصت فيديوهات النهارده</string>
+    <string name="child_done_next">نتقابل بكرة بفيديوهات جديدة</string>
+    <string name="child_done_home">ارجع للرئيسية</string>
+    <string name="child_done_ask_parent">عايز تكمّل؟ اسأل بابا أو ماما</string>
+
+    <!-- Favorites -->
+    <string name="child_favorites_title">المفضلة</string>
+    <string name="child_favorites_subtitle">الفيديوهات اللي حبيتها</string>
+    <string name="child_favorites_note">الفيديو من المفضلة بيتحسب من فيديوهات النهارده</string>
+    <string name="child_favorites_empty_title">لسه مفيش مفضلة</string>
+    <string name="child_favorites_empty_message">دوس على القلب في أي فيديو عشان تحفظه هنا.</string>
+
+    <!-- Gate (stub) -->
+    <string name="child_gate_title">للأهل بس</string>
+    <string name="child_gate_message">الصفحة دي لبابا وماما. هتتعمل في مرحلة لاحقة.</string>
+
+    <!-- Tabs -->
+    <string name="child_nav_home">الرئيسية</string>
+    <string name="child_nav_favorites">المفضلة</string>
+</resources>
