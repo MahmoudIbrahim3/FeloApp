@@ -4,6 +4,10 @@ import com.mahmoud.clipkid.core.data.catalog.CatalogRemoteDataSource
 import com.mahmoud.clipkid.core.data.catalog.FakeCatalogDataSource
 import com.mahmoud.clipkid.core.data.di.DataConfig
 import com.mahmoud.clipkid.core.data.di.inMemoryPlatformDataModule
+import com.mahmoud.clipkid.core.domain.parent.CreateAdultChallengeUseCase
+import com.mahmoud.clipkid.core.domain.parent.ParentSession
+import com.mahmoud.clipkid.core.domain.parent.ResetPinUseCase
+import com.mahmoud.clipkid.core.domain.parent.UnlockWithPinUseCase
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideoReporter
@@ -12,21 +16,28 @@ import com.mahmoud.clipkid.core.domain.repository.IdGenerator
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
+import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
+import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetCollectionUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetFavoritesUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.RefreshCatalogIfStaleUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
+import com.mahmoud.clipkid.core.domain.usecase.UpdateChildSettingsUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateWatchProgressUseCase
-import org.koin.core.KoinApplication
-import org.koin.dsl.koinApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import org.koin.core.KoinApplication
+import org.koin.dsl.koinApplication
 
 class KoinGraphTest {
 
@@ -76,6 +87,18 @@ class KoinGraphTest {
             koin.get<HideVideoUseCase>(),
             koin.get<ToggleFavoriteUseCase>(),
             koin.get<RefreshCatalogIfStaleUseCase>(),
+            // Phase 2 (child screens) and Phase 3 (onboarding, gate, parent mode).
+            koin.get<GetCollectionUseCase>(),
+            koin.get<GetFavoritesUseCase>(),
+            koin.get<GetCollectionsForAgeUseCase>(),
+            koin.get<AddChildUseCase>(),
+            koin.get<CompleteOnboardingUseCase>(),
+            koin.get<UpdateChildSettingsUseCase>(),
+            koin.get<GetWeeklyActivityUseCase>(),
+            koin.get<UnlockWithPinUseCase>(),
+            koin.get<ResetPinUseCase>(),
+            koin.get<CreateAdultChallengeUseCase>(),
+            koin.get<ParentSession>(),
         ).forEach { assertTrue(it !is Unit) }
     }
 

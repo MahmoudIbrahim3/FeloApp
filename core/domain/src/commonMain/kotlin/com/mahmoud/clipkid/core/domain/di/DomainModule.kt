@@ -6,8 +6,10 @@ import com.mahmoud.clipkid.core.domain.parent.ResetPinUseCase
 import com.mahmoud.clipkid.core.domain.parent.UnlockWithPinUseCase
 import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
 import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetCollectionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetFavoritesUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
@@ -43,6 +45,8 @@ val domainModule: Module = module {
     factoryOf(::GrantExtraVideosUseCase)
     factoryOf(::HideVideoUseCase)
     factoryOf(::ToggleFavoriteUseCase)
+    factoryOf(::GetCollectionUseCase)
+    factoryOf(::GetFavoritesUseCase)
     factory { RefreshCatalogIfStaleUseCase(get(), get()) }
 
     // Onboarding and parent mode
