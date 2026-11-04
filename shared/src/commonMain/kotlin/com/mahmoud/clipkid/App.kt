@@ -11,6 +11,7 @@ import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.crossfade
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.ProvideRtl
+import com.mahmoud.clipkid.core.designsystem.theme.ProvideWindowSize
 import com.mahmoud.clipkid.navigation.ClipKidNavHost
 
 /**
@@ -34,7 +35,9 @@ fun App() {
                     .fillMaxSize()
                     .background(ClipKidTheme.colors.background),
             ) {
-                ClipKidNavHost()
+                ProvideWindowSize {
+                    ClipKidNavHost()
+                }
             }
         }
     }
