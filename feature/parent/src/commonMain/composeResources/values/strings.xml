@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shared -->
+    <string name="parent_back">رجوع</string>
+    <string name="parent_close">اقفل</string>
+
+    <!-- Gate (Gate.png) -->
+    <string name="gate_parents_only">للأهل بس</string>
+    <string name="gate_pin_title">اكتب الرقم السري</string>
+    <string name="gate_enter">دخول</string>
+    <string name="gate_forgot">نسيت الرقم السري؟</string>
+    <plurals name="gate_wrong_pin">
+        <item quantity="zero">رقم غلط.</item>
+        <item quantity="one">رقم غلط. فاضلك محاولة واحدة.</item>
+        <item quantity="two">رقم غلط. فاضلك محاولتين.</item>
+        <item quantity="few">رقم غلط. فاضلك %1$s محاولات.</item>
+        <item quantity="many">رقم غلط. فاضلك %1$s محاولة.</item>
+        <item quantity="other">رقم غلط. فاضلك %1$s محاولة.</item>
+    </plurals>
+    <string name="gate_locked_title">استنى شوية</string>
+    <string name="gate_locked_message">كتبت الرقم غلط كذا مرة. جرّب تاني بعد %1$s</string>
+    <string name="gate_adult_title">سؤال للكبار</string>
+    <string name="gate_adult_message">اكتب ناتج الضرب علشان تعمل رقم سري جديد.</string>
+    <string name="gate_adult_question">%1$s × %2$s = ؟</string>
+    <string name="gate_adult_answer_label">الإجابة</string>
+    <string name="gate_adult_wrong">إجابة غلط. جرّب السؤال الجديد.</string>
+    <string name="gate_confirm">تأكيد</string>
+    <string name="gate_new_pin_title">اعمل رقم سري جديد</string>
+    <string name="gate_new_pin_confirm_title">اكتبه تاني</string>
+    <string name="gate_new_pin_mismatch">الرقمين مش زي بعض. ابدأ تاني.</string>
+    <string name="gate_next">التالي</string>
+    <string name="gate_save">احفظ</string>
+
+    <!-- Dashboard (Parent.png) -->
+    <string name="dash_title">لوحة الأهل</string>
+    <string name="dash_subtitle">محمية بالـ PIN</string>
+    <string name="dash_lock">ارجع لوضع الطفل</string>
+    <string name="dash_child_chip">%1$s · %2$s</string>
+    <string name="dash_add_child">ضيف طفل</string>
+    <string name="dash_today">النهارده</string>
+    <string name="dash_minutes_of">دقيقة من %1$s</string>
+    <string name="dash_videos_of">من %1$s فيديوهات</string>
+    <string name="dash_minutes_watched">%1$s دقيقة</string>
+    <plurals name="dash_videos_watched">
+        <item quantity="zero">مفيش فيديوهات</item>
+        <item quantity="one">فيديو واحد</item>
+        <item quantity="two">فيديوهين</item>
+        <item quantity="few">%1$s فيديوهات</item>
+        <item quantity="many">%1$s فيديو</item>
+        <item quantity="other">%1$s فيديو</item>
+    </plurals>
+    <string name="dash_videos_used_of">%1$s من %2$s فيديوهات</string>
+    <string name="dash_grant_title">زوّد النهارده بس</string>
+    <string name="dash_grant_one_video">+١ فيديو</string>
+    <string name="dash_grant_three_videos">+٣ فيديوهات</string>
+    <string name="dash_grant_minutes">+%1$s دقيقة</string>
+    <string name="dash_granted">زودت %1$s النهارده</string>
+    <string name="dash_limit_title">الحد اليومي</string>
+    <string name="dash_limit_videos_caption">عدد الفيديوهات في اليوم</string>
+    <string name="dash_limit_minutes_caption">عدد الدقايق في اليوم</string>
+    <string name="dash_collections_title">الكوليكشنز المسموحة</string>
+    <string name="dash_collections_caption">مناسبة لسن %1$s</string>
+    <string name="dash_collection_premium">بالاشتراك</string>
+    <string name="dash_activity">سجل المشاهدة</string>
+    <string name="dash_subscription">الاشتراك</string>
+    <string name="dash_no_children">لسه مفيش أطفال. ضيف أول طفل.</string>
+
+    <!-- Activity (Activity.png) -->
+    <string name="act_title">سجل المشاهدة</string>
+    <string name="act_subtitle">%1$s · آخر ٧ أيام</string>
+    <string name="act_avg_label">متوسط اليوم</string>
+    <string name="act_avg_value">%1$s دقيقة</string>
+    <string name="act_week_videos">فيديوهات الأسبوع</string>
+    <string name="act_limit_minutes">الحد %1$s د</string>
+    <string name="act_limit_videos">الحد %1$s فيديو</string>
+    <string name="act_chart_description">آخر ٧ أيام: %1$s</string>
+    <string name="act_chart_day">%1$s %2$s</string>
+    <string name="act_list_separator">،</string>
+    <string name="act_today_title">اتفرج على إيه النهارده</string>
+    <string name="act_today_attribution">%1$s · الصور من YouTube</string>
+    <string name="act_today_empty">لسه متفرجش على حاجة النهارده.</string>
+    <string name="act_row_meta">%1$s · %2$s</string>
+    <string name="act_not_finished">لسه مخلصش</string>
+    <string name="act_time_am">%1$s ص</string>
+    <string name="act_time_pm">%1$s م</string>
+    <string name="act_hide">اخفيه</string>
+    <string name="act_hide_note">أي فيديو تخفيه مش هيظهر للطفل تاني، وبيوصلنا علشان نراجعه</string>
+    <string name="day_mon">اتنين</string>
+    <string name="day_tue">تلات</string>
+    <string name="day_wed">أربع</string>
+    <string name="day_thu">خميس</string>
+    <string name="day_fri">جمعة</string>
+    <string name="day_sat">سبت</string>
+    <string name="day_sun">أحد</string>
+
+    <!-- Grant sheet (after "عايز تكمّل؟") -->
+    <string name="grant_title">زوّد النهارده؟</string>
+    <string name="grant_message">%1$s خلّص فيديوهات النهارده. الزيادة للنهارده بس.</string>
+    <string name="grant_no">لأ، كفاية كده</string>
+
+    <!-- Subscription (billing phase) -->
+    <string name="sub_soon_title">الاشتراك قريب</string>
+    <string name="sub_soon_message">هنضيف الاشتراك قريب. لحد دلوقتي كل حاجة شغالة زي ما هي.</string>
+</resources>
