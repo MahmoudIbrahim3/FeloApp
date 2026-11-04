@@ -6,10 +6,13 @@ import androidx.datastore.preferences.core.edit
 import com.mahmoud.clipkid.core.data.prefs.PreferenceKeys
 import com.mahmoud.clipkid.core.data.secure.PinHasher
 import com.mahmoud.clipkid.core.data.secure.SecureStore
+import com.mahmoud.clipkid.core.domain.parent.PinLockout
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
+import kotlin.time.Instant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -38,6 +41,22 @@ internal class DataStoreSettingsRepository(
     override suspend fun verifyPin(pin: String): Boolean {
         val stored = secureStore.get(PIN_HASH_KEY) ?: return false
         return withContext(Dispatchers.Default) { pinHasher.verify(pin, stored) }
+    }
+
+    override suspend fun getPinLockout(): PinLockout {
+        val p = prefs.data.first()
+        return PinLockout(
+            failedAttempts = p[PreferenceKeys.PinFailedAttempts] ?: 0,
+            lockedUntil = p[PreferenceKeys.PinLockedUntil]?.let { Instant.fromEpochMilliseconds(it) },
+        )
+    }
+
+    override suspend fun setPinLockout(lockout: PinLockout) {
+        prefs.edit {
+            it[PreferenceKeys.PinFailedAttempts] = lockout.failedAttempts
+            val until = lockout.lockedUntil
+            if (until == null) it.remove(PreferenceKeys.PinLockedUntil) else it[PreferenceKeys.PinLockedUntil] = until.toEpochMilliseconds()
+        }
     }
 
     override val onboardingDone: Flow<Boolean> =

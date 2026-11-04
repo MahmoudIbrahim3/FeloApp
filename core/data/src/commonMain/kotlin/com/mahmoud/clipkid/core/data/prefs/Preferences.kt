@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +23,10 @@ internal object PreferenceKeys {
     /** Mirrors "a PIN hash exists in SecureStore" so it can be observed. The hash itself never lives here. */
     val PinSet = booleanPreferencesKey("pin_set")
     val CatalogRefreshedAt = longPreferencesKey("catalog_refreshed_at")
+
+    /** Wrong-PIN lockout (see PinLockout): attempts in a row, and the lockout end in epoch ms. */
+    val PinFailedAttempts = intPreferencesKey("pin_failed_attempts")
+    val PinLockedUntil = longPreferencesKey("pin_locked_until")
 }
 
 /** One DataStore per file and process: create it once (Koin single). */

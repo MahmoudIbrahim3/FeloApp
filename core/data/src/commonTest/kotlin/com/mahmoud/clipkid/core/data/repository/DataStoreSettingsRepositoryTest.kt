@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.mahmoud.clipkid.core.data.prefs.InMemoryPreferencesDataStore
 import com.mahmoud.clipkid.core.data.secure.InMemorySecureStore
 import com.mahmoud.clipkid.core.data.secure.PinHasher
+import com.mahmoud.clipkid.core.domain.parent.PinLockout
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -13,6 +14,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 class DataStoreSettingsRepositoryTest {
 
@@ -54,6 +56,18 @@ class DataStoreSettingsRepositoryTest {
     fun pinMustBeDigits() = runTest {
         assertFailsWith<IllegalArgumentException> { settings.setPin("12a4") }
         assertFailsWith<IllegalArgumentException> { settings.setPin("") }
+    }
+
+    @Test
+    fun pinLockoutIsSavedAndCleared() = runTest {
+        assertEquals(PinLockout.None, settings.getPinLockout())
+
+        val until = Instant.fromEpochMilliseconds(1_793_800_000_000)
+        settings.setPinLockout(PinLockout(failedAttempts = 0, lockedUntil = until))
+        assertEquals(PinLockout(0, until), settings.getPinLockout())
+
+        settings.setPinLockout(PinLockout(failedAttempts = 3))
+        assertEquals(PinLockout(3, null), settings.getPinLockout())
     }
 
     @Test
