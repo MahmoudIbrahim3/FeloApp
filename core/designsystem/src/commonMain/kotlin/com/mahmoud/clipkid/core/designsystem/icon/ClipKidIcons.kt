@@ -8,12 +8,14 @@ import com.mahmoud.clipkid.core.designsystem.resources.ic_check
 import com.mahmoud.clipkid.core.designsystem.resources.ic_chevron_left
 import com.mahmoud.clipkid.core.designsystem.resources.ic_chevron_right
 import com.mahmoud.clipkid.core.designsystem.resources.ic_delete
+import com.mahmoud.clipkid.core.designsystem.resources.ic_eye_off
 import com.mahmoud.clipkid.core.designsystem.resources.ic_heart
 import com.mahmoud.clipkid.core.designsystem.resources.ic_heart_filled
 import com.mahmoud.clipkid.core.designsystem.resources.ic_house
 import com.mahmoud.clipkid.core.designsystem.resources.ic_image
 import com.mahmoud.clipkid.core.designsystem.resources.ic_info
 import com.mahmoud.clipkid.core.designsystem.resources.ic_leaf
+import com.mahmoud.clipkid.core.designsystem.resources.ic_list_filter
 import com.mahmoud.clipkid.core.designsystem.resources.ic_lock
 import com.mahmoud.clipkid.core.designsystem.resources.ic_moon
 import com.mahmoud.clipkid.core.designsystem.resources.ic_play
@@ -59,6 +61,10 @@ object ClipKidIcons {
     val Book = ClipKidIcon(Res.drawable.ic_book)
     val Leaf = ClipKidIcon(Res.drawable.ic_leaf)
     val Moon = ClipKidIcon(Res.drawable.ic_moon)
+    /** "اخفيه" on the Activity screen. */
+    val EyeOff = ClipKidIcon(Res.drawable.ic_eye_off)
+    /** Onboarding: "no endless suggestions". */
+    val ListFilter = ClipKidIcon(Res.drawable.ic_list_filter)
 
     /** Icons usable as a collection cover mark, keyed by `CoverMark.Icon.key`. */
     private val coverIcons: Map<String, ClipKidIcon> = mapOf(
