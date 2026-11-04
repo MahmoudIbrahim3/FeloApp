@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Welcome (Onboard.png) -->
+    <string name="onb_brand">ClipKid</string>
+    <string name="onb_mosaic_letter">أ</string>
+    <string name="onb_welcome_title">فيديوهات مفيدة لطفلك،\nمتنقية بإيد ولها آخر</string>
+    <string name="onb_welcome_subtitle">انت اللي بتحدد يتفرج على إيه وقد إيه.</string>
+    <string name="onb_welcome_point_reviewed">كل فيديو بيتراجع قبل ما يتعرض</string>
+    <string name="onb_welcome_point_limit">حد يومي انت اللي بتحدده</string>
+    <string name="onb_welcome_point_no_feed">من غير دوامة اقتراحات مالهاش آخر</string>
+    <string name="onb_start">يلا نبدأ</string>
+    <string name="onb_welcome_caption">الإعداد ده للأهل — بياخد دقيقة</string>
+
+    <!-- Shared -->
+    <string name="onb_step_of">خطوة %1$s من %2$s</string>
+    <string name="onb_back">رجوع</string>
+    <string name="onb_next">التالي</string>
+
+    <!-- PIN (SetPin.png) -->
+    <string name="onb_pin_title">اعمل رقم سري للأهل</string>
+    <string name="onb_pin_subtitle">هتحتاجه علشان تفتح الإعدادات. خليه رقم الطفل ميعرفوش.</string>
+    <string name="onb_pin_confirm_title">اكتب الرقم السري تاني</string>
+    <string name="onb_pin_confirm_subtitle">علشان نتأكد إنه مظبوط.</string>
+    <string name="onb_pin_mismatch">الرقمين مش زي بعض. ابدأ تاني من الأول.</string>
+
+    <!-- Child (ChildSetup.png) -->
+    <string name="onb_child_title">مين هيتفرج؟</string>
+    <string name="onb_child_subtitle">اسم دلع يكفي. مش محتاجين أي بيانات تانية.</string>
+    <string name="onb_child_name_label">اسم الطفل</string>
+    <string name="onb_child_name_placeholder">مثلاً: يوسف</string>
+    <string name="onb_child_avatar_label">اختار صورة</string>
+    <string name="onb_child_age_label">السن</string>
+    <string name="onb_child_age_hint">السن بيحدد الكوليكشنز اللي هتظهر.</string>
+
+    <!-- Collections + limit (SetupCollections.png) -->
+    <string name="onb_collections_title">يتفرج على إيه؟</string>
+    <string name="onb_collections_subtitle">دي الكوليكشنز المناسبة لسن %1$s. تقدر تغيرها بعدين.</string>
+    <string name="onb_collections_empty">مفيش كوليكشنز للسن ده دلوقتي.</string>
+    <string name="onb_limit_title">الحد اليومي</string>
+    <string name="onb_limit_videos_caption">عدد الفيديوهات في اليوم</string>
+    <string name="onb_limit_minutes_caption">عدد الدقايق في اليوم</string>
+    <string name="onb_finish">خلّصنا — افتح وضع الطفل</string>
+    <string name="onb_finish_caption">التطبيق هيفضل على وضع الطفل لحد ما تكتب الرقم السري</string>
+    <string name="onb_add_child_finish">ضيف الطفل</string>
+    <string name="onb_save_failed">محصلش حفظ. جرّب تاني.</string>
+</resources>
