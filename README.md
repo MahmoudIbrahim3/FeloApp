@@ -53,6 +53,21 @@ All versions are in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 
 Font licenses (OFL) and the Lucide icon license (ISC) are in `core/designsystem/licenses`.
 
+## Domain and data
+
+- `core:domain` holds the product rules as pure use cases (`GetHomeFeedUseCase`,
+  `GetDailyQuotaUseCase`, `StartWatchUseCase`, `GetUpNextUseCase`, …). Every one takes a
+  `kotlin.time.Clock` and a `TimeZone`; "today" is the local calendar day and Flows re-emit at
+  local midnight. `VisibleCatalog` is the single place for age band / allowed / hidden filtering.
+- `core:data` implements the repositories with Room 3 (bundled SQLite, schema in
+  `core/data/schemas`), DataStore Preferences and a `SecureStore` (Android Keystore / iOS
+  Keychain) holding only a PBKDF2 hash of the parent PIN.
+- The catalog currently comes from `FakeCatalogDataSource` (`DataConfig.useFakeCatalog = true`).
+  Its YouTube ids are placeholders: search for `REPLACE_` to swap in real, reviewed videos.
+- Tests: `core/domain/src/commonTest` (use cases with hand-written fakes),
+  `core/data/src/commonTest` and `core/data/src/iosTest` (Room repositories on a real in-memory
+  database; they need the iOS simulator).
+
 ## Build and run
 
 - Android app: `./gradlew :androidApp:installDebug`, or run `androidApp` from Android Studio.
@@ -60,3 +75,4 @@ Font licenses (OFL) and the Lucide icon license (ISC) are in `core/designsystem/
   Xcode builds the `Shared` framework through `:shared:embedAndSignAppleFrameworkForXcode`.
 - All checks (unit tests on Android host and iOS simulator, Android lint):
   `./gradlew check`
+- iOS simulator tests only: `./gradlew iosSimulatorArm64Test` (macOS only).

@@ -1,10 +1,47 @@
 package com.mahmoud.clipkid.di
 
+import com.mahmoud.clipkid.core.data.catalog.CatalogRemoteDataSource
+import com.mahmoud.clipkid.core.data.catalog.FakeCatalogDataSource
+import com.mahmoud.clipkid.core.data.di.DataConfig
+import com.mahmoud.clipkid.core.data.di.inMemoryPlatformDataModule
+import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
+import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
+import com.mahmoud.clipkid.core.domain.repository.HiddenVideoReporter
+import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
+import com.mahmoud.clipkid.core.domain.repository.IdGenerator
+import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
+import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
+import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
+import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
+import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
+import com.mahmoud.clipkid.core.domain.usecase.RefreshCatalogIfStaleUseCase
+import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
+import com.mahmoud.clipkid.core.domain.usecase.UpdateWatchProgressUseCase
+import org.koin.core.KoinApplication
 import org.koin.dsl.koinApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class KoinGraphTest {
+
+    /** The real graph with platform storage swapped for in-memory storage (no Android Context in host tests). */
+    private fun withGraph(block: KoinApplication.() -> Unit) {
+        val app = koinApplication {
+            allowOverride(true)
+            modules(appModules + inMemoryPlatformDataModule())
+        }
+        try {
+            app.block()
+        } finally {
+            app.close()
+        }
+    }
 
     @Test
     fun everyGradleModuleContributesOneKoinModule() {
@@ -14,13 +51,37 @@ class KoinGraphTest {
     }
 
     @Test
-    fun graphLoads() {
-        val app = koinApplication { modules(appModules) }
-        try {
-            // Resolving every definition catches missing bindings once modules gain content.
-            app.koin.getAll<Any>()
-        } finally {
-            app.close()
-        }
+    fun graphLoads() = withGraph {
+        // Resolving every definition catches missing bindings.
+        koin.getAll<Any>()
+    }
+
+    @Test
+    fun repositoriesAndUseCasesResolve() = withGraph {
+        listOf(
+            koin.get<CatalogRepository>(),
+            koin.get<ProfileRepository>(),
+            koin.get<WatchHistoryRepository>(),
+            koin.get<FavoritesRepository>(),
+            koin.get<HiddenVideosRepository>(),
+            koin.get<SettingsRepository>(),
+            koin.get<HiddenVideoReporter>(),
+            koin.get<IdGenerator>(),
+            koin.get<GetHomeFeedUseCase>(),
+            koin.get<GetDailyQuotaUseCase>(),
+            koin.get<StartWatchUseCase>(),
+            koin.get<GetUpNextUseCase>(),
+            koin.get<UpdateWatchProgressUseCase>(),
+            koin.get<GrantExtraVideosUseCase>(),
+            koin.get<HideVideoUseCase>(),
+            koin.get<ToggleFavoriteUseCase>(),
+            koin.get<RefreshCatalogIfStaleUseCase>(),
+        ).forEach { assertTrue(it !is Unit) }
+    }
+
+    @Test
+    fun fakeCatalogIsOnForNow() = withGraph {
+        assertTrue(koin.get<DataConfig>().useFakeCatalog)
+        assertIs<FakeCatalogDataSource>(koin.get<CatalogRemoteDataSource>())
     }
 }
