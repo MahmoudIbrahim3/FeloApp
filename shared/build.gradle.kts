@@ -38,5 +38,9 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
+        commonTest.dependencies {
+            // Fakes for the cross-feature test (dashboard change → child Home).
+            implementation(projects.core.testing)
+        }
     }
 }

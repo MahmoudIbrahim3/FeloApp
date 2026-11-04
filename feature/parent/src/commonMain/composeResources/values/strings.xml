@@ -49,7 +49,6 @@
         <item quantity="many">%1$s فيديو</item>
         <item quantity="other">%1$s فيديو</item>
     </plurals>
-    <string name="dash_videos_used_of">%1$s من %2$s فيديوهات</string>
     <string name="dash_grant_title">زوّد النهارده بس</string>
     <string name="dash_grant_one_video">+١ فيديو</string>
     <string name="dash_grant_three_videos">+٣ فيديوهات</string>

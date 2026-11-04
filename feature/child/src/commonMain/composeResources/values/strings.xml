@@ -59,10 +59,6 @@
     <string name="child_favorites_empty_title">لسه مفيش مفضلة</string>
     <string name="child_favorites_empty_message">دوس على القلب في أي فيديو عشان تحفظه هنا.</string>
 
-    <!-- Gate (stub) -->
-    <string name="child_gate_title">للأهل بس</string>
-    <string name="child_gate_message">الصفحة دي لبابا وماما. هتتعمل في مرحلة لاحقة.</string>
-
     <!-- Tabs -->
     <string name="child_nav_home">الرئيسية</string>
     <string name="child_nav_favorites">المفضلة</string>
