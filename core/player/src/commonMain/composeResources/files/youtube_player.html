@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <!-- YouTube identifies the app by the Referer (the base URL the native view loads this page with). -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <style>
+    /* Layout of our own page only: the player iframe fills it. Nothing is drawn over the player. */
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+    #player { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+  </style>
+</head>
+<body>
+<div id="player"></div>
+<script>
+  // Filled in by the app (JSON): { videoId, origin, startSec }.
+  var CONFIG = __CLIPKID_CONFIG__;
+  var player = null;
+  var tickTimer = null;
+
+  function send(message) {
+    var json = JSON.stringify(message);
+    if (window.ClipKidAndroid && window.ClipKidAndroid.postMessage) {
+      window.ClipKidAndroid.postMessage(json);
+    } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clipkid) {
+      window.webkit.messageHandlers.clipkid.postMessage(json);
+    }
+  }
+
+  function currentTime() {
+    try { return (player && player.getCurrentTime) ? (player.getCurrentTime() || 0) : 0; } catch (e) { return 0; }
+  }
+
+  function duration() {
+    try { return (player && player.getDuration) ? (player.getDuration() || 0) : 0; } catch (e) { return 0; }
+  }
+
+  function stopTick() {
+    if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+  }
+
+  function startTick() {
+    stopTick();
+    tickTimer = setInterval(function () { send({ type: 'tick', time: currentTime() }); }, 5000);
+  }
+
+  window.onYouTubeIframeAPIReady = function () {
+    player = new YT.Player('player', {
+      width: '100%',
+      height: '100%',
+      videoId: CONFIG.videoId,
+      playerVars: {
+        rel: 0,
+        playsinline: 1,
+        enablejsapi: 1,
+        origin: CONFIG.origin,
+        start: CONFIG.startSec
+      },
+      events: {
+        onReady: function () {
+          send({ type: 'ready', duration: duration(), time: currentTime() });
+        },
+        onStateChange: function (event) {
+          if (event.data === 1) { startTick(); } else { stopTick(); }
+          send({ type: 'state', state: event.data, time: currentTime(), duration: duration() });
+        },
+        onError: function (event) {
+          stopTick();
+          send({ type: 'error', code: event.data });
+        }
+      }
+    });
+  };
+
+  // Commands from the app. Playback only starts from a child's tap (the video they chose).
+  window.clipkid = {
+    play: function () { if (player && player.playVideo) { player.playVideo(); } },
+    pause: function () { if (player && player.pauseVideo) { player.pauseVideo(); } },
+    seekTo: function (seconds) { if (player && player.seekTo) { player.seekTo(seconds, true); } }
+  };
+
+  (function loadApi() {
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    tag.onerror = function () { send({ type: 'error', code: -1 }); };
+    document.head.appendChild(tag);
+  })();
+</script>
+</body>
+</html>
