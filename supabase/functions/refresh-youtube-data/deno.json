@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "test": "deno test youtube_test.ts"
+  },
+  "lint": {
+    "rules": { "exclude": ["no-explicit-any"] }
+  }
+}
