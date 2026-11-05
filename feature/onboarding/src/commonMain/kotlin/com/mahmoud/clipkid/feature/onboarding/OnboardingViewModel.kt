@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mahmoud.clipkid.core.designsystem.component.AvatarColors
 import com.mahmoud.clipkid.core.domain.parent.PIN_LENGTH
+import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
 import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.DailyLimitOptions
@@ -14,6 +15,7 @@ import com.mahmoud.clipkid.core.domain.usecase.isValidNickname
 import com.mahmoud.clipkid.core.model.AgeBand
 import com.mahmoud.clipkid.core.model.Collection
 import com.mahmoud.clipkid.core.model.DailyLimit
+import com.mahmoud.clipkid.core.model.isFull
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -46,10 +48,8 @@ data class PinStep(
     val isComplete: Boolean get() = entered.length == PIN_LENGTH
 }
 
-data class CollectionOption(val collection: Collection, val selected: Boolean) {
-    /** Premium collections need a subscription (billing phase): shown, but never on. */
-    val locked: Boolean get() = collection.isPremium
-}
+/** [locked]: a premium collection without the subscription; shown with a star, never on. */
+data class CollectionOption(val collection: Collection, val selected: Boolean, val locked: Boolean = false)
 
 data class OnboardingUiState(
     val mode: OnboardingMode,
@@ -112,11 +112,12 @@ class OnboardingViewModel(
     private val getCollectionsForAge: GetCollectionsForAgeUseCase,
     private val completeOnboarding: CompleteOnboardingUseCase,
     private val addChild: AddChildUseCase,
+    billing: BillingRepository,
 ) : ViewModel() {
 
     private val form = MutableStateFlow(OnboardingUiState(mode = mode))
 
-    /** Explicit choices; null = the default for the age band (everything except premium). */
+    /** Explicit choices; null = the default for the age band (everything, premium only when subscribed). */
     private val selection = MutableStateFlow<Set<String>?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -125,9 +126,17 @@ class OnboardingViewModel(
         .distinctUntilChanged()
         .flatMapLatest { band -> if (band == null) flowOf(emptyList()) else getCollectionsForAge(band) }
 
-    val state: StateFlow<OnboardingUiState> = combine(form, available, selection) { f, collections, chosen ->
-        val selectedIds = chosen ?: GetCollectionsForAgeUseCase.defaultSelection(collections)
-        f.copy(collections = collections.map { CollectionOption(it, it.id in selectedIds && !it.isPremium) })
+    /** Unknown counts as free here, so the first run never waits for the store. */
+    private val isFull: Flow<Boolean> = billing.entitlement.map { it.isFull }.distinctUntilChanged()
+
+    val state: StateFlow<OnboardingUiState> = combine(form, available, selection, isFull) { f, collections, chosen, full ->
+        val selectedIds = chosen ?: GetCollectionsForAgeUseCase.defaultSelection(collections, full)
+        f.copy(
+            collections = collections.map {
+                val locked = it.isPremium && !full
+                CollectionOption(it, it.id in selectedIds && !locked, locked)
+            },
+        )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, form.value)
 
     private val effectChannel = Channel<OnboardingEffect>(Channel.BUFFERED)

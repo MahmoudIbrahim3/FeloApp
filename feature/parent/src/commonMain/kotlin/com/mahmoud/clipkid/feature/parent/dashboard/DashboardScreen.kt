@@ -66,6 +66,7 @@ import com.mahmoud.clipkid.feature.parent.resources.Res
 import com.mahmoud.clipkid.feature.parent.resources.dash_activity
 import com.mahmoud.clipkid.feature.parent.resources.dash_add_child
 import com.mahmoud.clipkid.feature.parent.resources.dash_child_chip
+import com.mahmoud.clipkid.feature.parent.resources.dash_child_locked
 import com.mahmoud.clipkid.feature.parent.resources.dash_collection_premium
 import com.mahmoud.clipkid.feature.parent.resources.dash_collections_caption
 import com.mahmoud.clipkid.feature.parent.resources.dash_collections_title
@@ -81,6 +82,7 @@ import com.mahmoud.clipkid.feature.parent.resources.dash_lock
 import com.mahmoud.clipkid.feature.parent.resources.dash_minutes_of
 import com.mahmoud.clipkid.feature.parent.resources.dash_minutes_watched
 import com.mahmoud.clipkid.feature.parent.resources.dash_no_children
+import com.mahmoud.clipkid.feature.parent.resources.dash_subscribed
 import com.mahmoud.clipkid.feature.parent.resources.dash_subscription
 import com.mahmoud.clipkid.feature.parent.resources.dash_subtitle
 import com.mahmoud.clipkid.feature.parent.resources.dash_title
@@ -146,7 +148,7 @@ private fun Header(onLock: () -> Unit) {
 
 @Composable
 private fun Content(state: DashboardUiState.Content, onEvent: (DashboardEvent) -> Unit) {
-    ChildSwitcher(state.children, state.selected.id, onEvent)
+    ChildSwitcher(state, onEvent)
     TodayCard(state.quota, onGrant = { onEvent(DashboardEvent.GrantExtra(it)) })
     Card {
         CardHeader(
@@ -177,23 +179,37 @@ private fun Content(state: DashboardUiState.Content, onEvent: (DashboardEvent) -
         LinkCard(ClipKidIcons.Chart, ClipKidTheme.colors.primary, stringResource(Res.string.dash_activity), Modifier.weight(1f)) {
             onEvent(DashboardEvent.ActivityClicked)
         }
-        LinkCard(ClipKidIcons.Star, ClipKidTheme.colors.accent, stringResource(Res.string.dash_subscription), Modifier.weight(1f)) {
-            onEvent(DashboardEvent.SubscriptionClicked)
+        if (state.isSubscribed) {
+            LinkCard(ClipKidIcons.Check, ClipKidTheme.colors.success, stringResource(Res.string.dash_subscribed), Modifier.weight(1f)) {
+                onEvent(DashboardEvent.SubscriptionClicked)
+            }
+        } else {
+            LinkCard(ClipKidIcons.Star, ClipKidTheme.colors.accent, stringResource(Res.string.dash_subscription), Modifier.weight(1f)) {
+                onEvent(DashboardEvent.SubscriptionClicked)
+            }
         }
     }
 }
 
+/** Child chips. Free plan: children after the first carry a lock and open the paywall. */
 @Composable
-private fun ChildSwitcher(children: List<ChildProfile>, selectedId: String, onEvent: (DashboardEvent) -> Unit) {
+private fun ChildSwitcher(state: DashboardUiState.Content, onEvent: (DashboardEvent) -> Unit) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.sm), verticalAlignment = Alignment.CenterVertically) {
-        items(children, key = { it.id }) { child ->
+        items(state.children, key = { it.id }) { child ->
+            val locked = child.id in state.lockedChildIds
+            val label = stringResource(Res.string.dash_child_chip, child.nickname, ageBandLabel(child.ageBand))
+            val lockedLabel = stringResource(Res.string.dash_child_locked, label)
             Chip(
-                text = stringResource(Res.string.dash_child_chip, child.nickname, ageBandLabel(child.ageBand)),
-                selected = child.id == selectedId,
+                text = label,
+                selected = child.id == state.selected.id,
                 onClick = { onEvent(DashboardEvent.SelectChild(child.id)) },
+                leadingIcon = if (locked) ClipKidIcons.Lock else null,
+                modifier = if (locked) Modifier.semantics { contentDescription = lockedLabel } else Modifier,
             )
         }
-        item { AddChildButton { onEvent(DashboardEvent.AddChildClicked) } }
+        if (state.addChild != AddChildAction.Hidden) {
+            item { AddChildButton { onEvent(DashboardEvent.AddChildClicked) } }
+        }
     }
 }
 
@@ -284,11 +300,15 @@ private fun grantedAmount(videos: Int, minutesMode: Boolean): String =
         pluralStringResource(Res.plurals.dash_videos_watched, videos, videos.toArabicDigits())
     }
 
+/** One collection switch. A locked (premium) row is one button that opens the paywall. */
 @Composable
 private fun CollectionRow(toggle: CollectionToggle, onChange: (Boolean) -> Unit) {
     val colors = ClipKidTheme.colors
     Row(
-        Modifier.fillMaxWidth().defaultMinSize(minHeight = 56.dp),
+        Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 56.dp)
+            .then(if (toggle.locked) Modifier.clickable(role = Role.Button) { onChange(true) } else Modifier),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -356,8 +376,10 @@ private val previewContent = DashboardUiState.Content(
     quota = GetDailyQuotaUseCase.computeQuota(DailyLimit.Minutes(30), 0, emptyList()).copy(used = 18 * 60, videosWatched = 2, secondsWatched = 18 * 60),
     collections = listOf(
         CollectionToggle(Collection("letters", "letters", PREVIEW_COLLECTION, CoverStyle(0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ")), setOf(AgeBand.A4_6), 1), true),
-        CollectionToggle(Collection("stories", "stories", PREVIEW_COLLECTION, CoverStyle(0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon")), setOf(AgeBand.A4_6), 2, isPremium = true), false),
+        CollectionToggle(Collection("stories", "stories", PREVIEW_COLLECTION, CoverStyle(0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon")), setOf(AgeBand.A4_6), 2, isPremium = true), false, locked = true),
     ),
+    lockedChildIds = setOf("c2"),
+    addChild = AddChildAction.Subscribe,
 )
 
 @Preview

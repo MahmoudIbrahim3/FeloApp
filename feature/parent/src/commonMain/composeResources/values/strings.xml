@@ -62,6 +62,8 @@
     <string name="dash_collection_premium">بالاشتراك</string>
     <string name="dash_activity">سجل المشاهدة</string>
     <string name="dash_subscription">الاشتراك</string>
+    <string name="dash_subscribed">إنت مشترك</string>
+    <string name="dash_child_locked">%1$s · مقفول، محتاج الاشتراك</string>
     <string name="dash_no_children">لسه مفيش أطفال. ضيف أول طفل.</string>
 
     <!-- Activity (Activity.png) -->
@@ -98,6 +100,61 @@
     <string name="grant_no">لأ، كفاية كده</string>
 
     <!-- Subscription (billing phase) -->
-    <string name="sub_soon_title">الاشتراك قريب</string>
-    <string name="sub_soon_message">هنضيف الاشتراك قريب. لحد دلوقتي كل حاجة شغالة زي ما هي.</string>
+    <!-- Paywall (Paywall.png). Every price comes from the store; %1$s is always store-formatted. -->
+    <string name="paywall_close">اقفل</string>
+    <string name="paywall_restore">استرجاع الاشتراك</string>
+    <string name="paywall_badge">ClipKid كامل</string>
+    <string name="paywall_title">افتح كل الكوليكشنز لكل ولادك</string>
+    <string name="paywall_benefit_collections">كل الكوليكشنز لكل الأعمار</string>
+    <string name="paywall_benefit_children">لحد %1$s أطفال بإعدادات منفصلة</string>
+    <string name="paywall_benefit_new">كوليكشنز جديدة بتنزل باستمرار</string>
+    <string name="paywall_plan_annual">سنوي</string>
+    <string name="paywall_plan_monthly">شهري</string>
+    <string name="paywall_per_month">%1$s / شهر</string>
+    <string name="paywall_save">وفّر ٪%1$s</string>
+    <plurals name="paywall_cta_trial">
+        <item quantity="zero">جرّب %1$s يوم بلاش</item>
+        <item quantity="one">جرّب يوم بلاش</item>
+        <item quantity="two">جرّب يومين بلاش</item>
+        <item quantity="few">جرّب %1$s أيام بلاش</item>
+        <item quantity="many">جرّب %1$s يوم بلاش</item>
+        <item quantity="other">جرّب %1$s يوم بلاش</item>
+    </plurals>
+    <string name="paywall_cta_subscribe">اشترك دلوقتي</string>
+    <string name="paywall_cta_busy">لحظة…</string>
+    <string name="paywall_after_trial_year">بعد التجربة %1$s في السنة.</string>
+    <string name="paywall_after_trial_month">بعد التجربة %1$s في الشهر.</string>
+    <string name="paywall_price_year">%1$s في السنة.</string>
+    <string name="paywall_price_month">%1$s في الشهر.</string>
+    <string name="paywall_renew_play">الاشتراك بيتجدد تلقائي، وتقدر تلغيه في أي وقت من Google Play.</string>
+    <string name="paywall_renew_app_store">الدفع بيتسحب من حساب Apple لما تأكد. الاشتراك بيتجدد تلقائي إلا لو لغيته قبل نهاية المدة بـ٢٤ ساعة على الأقل من إعدادات حسابك.</string>
+    <plurals name="paywall_free_tier">
+        <item quantity="zero">المجاني: طفل واحد.</item>
+        <item quantity="one">المجاني: كوليكشن واحد وطفل واحد.</item>
+        <item quantity="two">المجاني: كوليكشنين وطفل واحد.</item>
+        <item quantity="few">المجاني: %1$s كوليكشنز وطفل واحد.</item>
+        <item quantity="many">المجاني: %1$s كوليكشن وطفل واحد.</item>
+        <item quantity="other">المجاني: %1$s كوليكشن وطفل واحد.</item>
+    </plurals>
+    <string name="paywall_terms">شروط الاستخدام</string>
+    <string name="paywall_privacy">سياسة الخصوصية</string>
+    <string name="paywall_loading">بنجيب الأسعار من المتجر…</string>
+    <string name="paywall_unavailable_title">الاشتراك مش متاح دلوقتي</string>
+    <string name="paywall_unavailable_message">اتأكد إن النت شغال وإنك داخل على حسابك في المتجر، وجرّب تاني.</string>
+    <string name="paywall_retry">جرّب تاني</string>
+    <string name="paywall_msg_pending">الدفع لسه بيتراجع. أول ما يتأكد هيتفتح كل حاجة لوحدها.</string>
+    <string name="paywall_msg_nothing_to_restore">مالقيناش اشتراك قبل كده على الحساب ده.</string>
+    <string name="paywall_msg_network">مفيش نت. اتأكد من الاتصال وجرّب تاني.</string>
+    <string name="paywall_msg_not_allowed">الشراء مقفول على الجهاز ده. اتأكد من إعدادات المشتريات.</string>
+    <string name="paywall_msg_not_available">الباقة دي مش متاحة دلوقتي. جرّب تاني بعدين.</string>
+    <string name="paywall_msg_already_owned">الحساب ده مشترك بالفعل. دوس على «استرجاع الاشتراك».</string>
+    <string name="paywall_msg_failed">حصلت مشكلة. جرّب تاني.</string>
+    <string name="paywall_subscribed_title">إنت مشترك في ClipKid كامل</string>
+    <string name="paywall_welcome_title">أهلاً بيك في ClipKid كامل!</string>
+    <string name="paywall_welcome_message">كل الكوليكشنز اتفتحت لولادك. تقدر تقفل أي كوليكشن من لوحة الأهل.</string>
+    <string name="paywall_trial_status">إنت في التجربة المجانية.</string>
+    <string name="paywall_renews_on">بيتجدد يوم %1$s.</string>
+    <string name="paywall_ends_on">شغال لحد يوم %1$s.</string>
+    <string name="paywall_manage">إدارة الاشتراك</string>
+    <string name="paywall_done">تمام</string>
 </resources>
