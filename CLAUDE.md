@@ -6,7 +6,7 @@ ClipKid is a curated video app for children aged 2–12, Arabic-first (Egyptian 
 - Parents set a daily limit (N videos or N minutes). No infinite feed, no autoplay, no countdowns.
 - One app, two modes: Child mode (default) and Parent mode behind a PIN gate.
 - v1 has no accounts and no login. All settings and history live on the device.
-- Revenue: subscription via RevenueCat. Free tier = [3] collections and 1 child profile. No ads, ever.
+- Revenue: subscription via RevenueCat (entitlement `full_access`, offering `default` with `$rc_monthly` + `$rc_annual`). Free tier = the collections with `is_premium = false` (the backend decides) and 1 child profile; full = all collections and up to 4 child profiles. No ads, ever.
 
 ## Non-negotiable rules (YouTube, Google Families, Apple Kids)
 1. Never download, cache, store or play YouTube audio/video outside the official embedded player. No background playback, no offline playback, no audio-only.
@@ -61,6 +61,9 @@ Rules: features depend only on core modules, never on each other. Navigation liv
 - Up Next = 1 primary choice (next video in the same collection) + up to 2 by shared tag. Exclude videos watched today and hidden videos. Never more than 3 choices.
 - A child only sees collections allowed for their profile AND matching their age band. Hidden videos never appear for that child.
 - When a parent hides a video, send `{youtubeId, reason: "parent_hidden"}` to the backend with no device, user or child identifiers.
+- Subscriptions: premium collections show a lock badge in child mode; tapping one opens the "اسأل بابا أو ماما" screen, never the paywall. The paywall is only reachable in parent mode (after the PIN). Prices, periods and trials come only from the store.
+- A new subscription (purchase or restore) switches on, for every child, the premium collections of their age band. Expiry never changes settings or history: premium content locks again and only the first (oldest) child stays usable; the others keep everything and come back with the subscription.
+- RevenueCat runs with an anonymous app user id only: never `logIn`, attributes, device identifiers, integrations or store in-app messages.
 
 ## UI and design
 - RTL everywhere. Display numbers with Arabic-Indic digits.
