@@ -75,6 +75,7 @@ Rules: features depend only on core modules, never on each other. Navigation liv
 
 ## How to work
 - Start every phase in plan mode and wait for approval.
-- Small commits with clear messages. Run `./gradlew check` and build the iOS target before saying a phase is done.
+- Small commits with clear messages.
+- Never compile, build, run or test the project (no `./gradlew`, no Xcode builds, no SDK or Gradle downloads). Only implement the code. Mahmoud runs `./gradlew check` and the iOS build himself and reports any errors back.
 - Never add a dependency without saying why. Never add tracking, analytics or crash SDKs without asking.
 - When unsure about a product rule, ask instead of guessing.
