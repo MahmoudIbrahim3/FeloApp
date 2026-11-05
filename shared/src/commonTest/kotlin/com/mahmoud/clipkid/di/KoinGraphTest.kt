@@ -1,5 +1,7 @@
 package com.mahmoud.clipkid.di
 
+import com.mahmoud.clipkid.core.billing.di.noStoreBillingModule
+import com.mahmoud.clipkid.core.billing.fake.NoStoreBillingRepository
 import com.mahmoud.clipkid.core.data.catalog.CatalogRemoteDataSource
 import com.mahmoud.clipkid.core.data.catalog.FakeCatalogDataSource
 import com.mahmoud.clipkid.core.data.di.DataConfig
@@ -8,17 +10,19 @@ import com.mahmoud.clipkid.core.domain.parent.CreateAdultChallengeUseCase
 import com.mahmoud.clipkid.core.domain.parent.ParentSession
 import com.mahmoud.clipkid.core.domain.parent.ResetPinUseCase
 import com.mahmoud.clipkid.core.domain.parent.UnlockWithPinUseCase
+import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
-import com.mahmoud.clipkid.core.domain.repository.VideoReporter
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.IdGenerator
+import com.mahmoud.clipkid.core.domain.repository.NetworkMonitor
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
+import com.mahmoud.clipkid.core.domain.repository.VideoReporter
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
-import com.mahmoud.clipkid.core.domain.repository.NetworkMonitor
 import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
 import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
+import com.mahmoud.clipkid.core.domain.usecase.EnablePremiumCollectionsUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
@@ -29,6 +33,7 @@ import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ObserveAccessUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ReportVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
 import com.mahmoud.clipkid.core.domain.usecase.SyncCatalogUseCase
@@ -44,11 +49,14 @@ import org.koin.dsl.koinApplication
 
 class KoinGraphTest {
 
-    /** The real graph with platform storage swapped for in-memory storage (no Android Context in host tests). */
+    /**
+     * The real graph with platform storage swapped for in-memory storage and billing without a
+     * store (no Android Context in host tests, never RevenueCat).
+     */
     private fun withGraph(block: KoinApplication.() -> Unit) {
         val app = koinApplication {
             allowOverride(true)
-            modules(appModules + inMemoryPlatformDataModule())
+            modules(appModules + inMemoryPlatformDataModule() + noStoreBillingModule())
         }
         try {
             app.block()
@@ -106,7 +114,16 @@ class KoinGraphTest {
             koin.get<ReportVideoUseCase>(),
             koin.get<NetworkMonitor>(),
             koin.get<ParentSession>(),
+            // Phase 6 (subscriptions).
+            koin.get<BillingRepository>(),
+            koin.get<ObserveAccessUseCase>(),
+            koin.get<EnablePremiumCollectionsUseCase>(),
         ).forEach { assertTrue(it !is Unit) }
+    }
+
+    @Test
+    fun testsNeverConfigureRevenueCat() = withGraph {
+        assertIs<NoStoreBillingRepository>(koin.get<BillingRepository>())
     }
 
     @Test

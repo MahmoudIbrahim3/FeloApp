@@ -1,11 +1,12 @@
 package com.mahmoud.clipkid.feature.child.testing
 
 import com.mahmoud.clipkid.core.domain.testing.Catalog
+import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeCatalogRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeFavoritesRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeHiddenVideosRepository
-import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeNetworkMonitor
+import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeVideoReporter
 import com.mahmoud.clipkid.core.domain.testing.FakeWatchHistoryRepository
 import com.mahmoud.clipkid.core.domain.testing.KUWAIT
@@ -57,13 +58,14 @@ class ChildFixture(scope: TestScope, profile: ChildProfile = child(DailyLimit.Vi
     val hidden = FakeHiddenVideosRepository()
     val favorites = FakeFavoritesRepository()
     val ids = SequentialIdGenerator()
+    val billing = FakeBillingRepository()
 
     val quota = GetDailyQuotaUseCase(profiles, history, clock, KUWAIT)
-    val homeFeed = GetHomeFeedUseCase(catalog, profiles, history, hidden, clock, KUWAIT)
+    val homeFeed = GetHomeFeedUseCase(catalog, profiles, history, hidden, clock, KUWAIT, billing)
     val startWatch = StartWatchUseCase(profiles, history, ids, clock, KUWAIT)
     val updateProgress = UpdateWatchProgressUseCase(history)
     val toggleFavorite = ToggleFavoriteUseCase(favorites, clock)
-    val upNext = GetUpNextUseCase(catalog, profiles, history, hidden, quota, clock, KUWAIT)
+    val upNext = GetUpNextUseCase(catalog, profiles, history, hidden, quota, clock, KUWAIT, billing)
     val reporter = FakeVideoReporter()
     val resumePosition = GetResumePositionUseCase(history, clock, KUWAIT)
     val reportVideo = ReportVideoUseCase(reporter)

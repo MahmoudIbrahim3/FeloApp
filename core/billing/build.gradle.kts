@@ -20,9 +20,6 @@ kotlin {
             // androidContext() to tell debug from release builds.
             implementation(libs.koin.android)
         }
-        commonTest.dependencies {
-            implementation(projects.core.testing)
-        }
         // purchases-kmp's iOS API is generated Kotlin/Native bindings (RevenueCat install docs).
         iosMain {
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")

@@ -1,6 +1,8 @@
 package com.mahmoud.clipkid.core.domain.usecase
 
 import com.mahmoud.clipkid.core.domain.testing.CHILD
+import com.mahmoud.clipkid.core.domain.testing.FULL
+import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeCatalogRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeSettingsRepository
@@ -9,8 +11,6 @@ import com.mahmoud.clipkid.core.domain.testing.child
 import com.mahmoud.clipkid.core.domain.testing.collection
 import com.mahmoud.clipkid.core.model.AgeBand
 import com.mahmoud.clipkid.core.model.DailyLimit
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -18,6 +18,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 
 class ChildSetupUseCasesTest {
 
@@ -30,7 +32,8 @@ class ChildSetupUseCasesTest {
     private val catalog = FakeCatalogRepository(collections, emptyList())
     private val profiles = FakeProfileRepository()
     private val settings = FakeSettingsRepository()
-    private val addChild = AddChildUseCase(profiles, settings, SequentialIdGenerator("kid-"), catalog)
+    private val billing = FakeBillingRepository()
+    private val addChild = AddChildUseCase(profiles, settings, SequentialIdGenerator("kid-"), catalog, billing)
 
     private fun newChild(nickname: String = "  ليلى ", allowed: Set<String> = setOf("letters", "numbers")) = NewChild(
         nickname = nickname,
@@ -45,7 +48,8 @@ class ChildSetupUseCasesTest {
         val forAge = GetCollectionsForAgeUseCase(catalog)(AgeBand.A4_6).first()
 
         assertEquals(listOf("letters", "numbers", "stories"), forAge.map { it.id })
-        assertEquals(setOf("letters", "numbers"), GetCollectionsForAgeUseCase.defaultSelection(forAge))
+        assertEquals(setOf("letters", "numbers"), GetCollectionsForAgeUseCase.defaultSelection(forAge, isFull = false))
+        assertEquals(setOf("letters", "numbers", "stories"), GetCollectionsForAgeUseCase.defaultSelection(forAge, isFull = true))
     }
 
     @Test
@@ -94,7 +98,7 @@ class ChildSetupUseCasesTest {
     @Test
     fun dashboardChangesTheLimitAndTheCollections() = runTest {
         profiles.upsert(child(limit = DailyLimit.Videos(3), allowed = setOf("letters")))
-        val update = UpdateChildSettingsUseCase(profiles, catalog)
+        val update = UpdateChildSettingsUseCase(profiles, catalog, billing)
 
         update.setDailyLimit(CHILD, DailyLimit.Minutes(30))
         assertTrue(update.setCollectionAllowed(CHILD, "numbers", allowed = true))
@@ -108,10 +112,34 @@ class ChildSetupUseCasesTest {
     @Test
     fun dashboardCannotTurnOnPremiumOrUnknownCollections() = runTest {
         profiles.upsert(child(allowed = setOf("letters")))
-        val update = UpdateChildSettingsUseCase(profiles, catalog)
+        val update = UpdateChildSettingsUseCase(profiles, catalog, billing)
 
         assertFalse(update.setCollectionAllowed(CHILD, "stories", allowed = true))
         assertFalse(update.setCollectionAllowed(CHILD, "nope", allowed = true))
         assertEquals(setOf("letters"), profiles.getProfile(CHILD)?.allowedCollectionIds)
+    }
+
+    @Test
+    fun withTheSubscriptionPremiumCanBeAddedAndTurnedOn() = runTest {
+        billing.entitlement.value = FULL
+        val id = addChild(newChild(allowed = setOf("letters", "stories")))
+        assertEquals(setOf("letters", "stories"), profiles.getProfile(id)?.allowedCollectionIds)
+
+        val update = UpdateChildSettingsUseCase(profiles, catalog, billing)
+        assertTrue(update.setCollectionAllowed(id, "stories", allowed = false))
+        assertTrue(update.setCollectionAllowed(id, "stories", allowed = true))
+    }
+
+    @Test
+    fun freeAllowsOneChildAndFullAllowsFour() = runTest {
+        addChild(newChild(nickname = "١"))
+        val free = assertFailsWith<ChildLimitReachedException> { addChild(newChild(nickname = "٢")) }
+        assertEquals(1, free.max)
+
+        billing.entitlement.value = FULL
+        repeat(3) { addChild(newChild(nickname = "ب$it")) }
+        val full = assertFailsWith<ChildLimitReachedException> { addChild(newChild(nickname = "٥")) }
+        assertEquals(4, full.max)
+        assertEquals(4, profiles.observeProfiles().first().size)
     }
 }

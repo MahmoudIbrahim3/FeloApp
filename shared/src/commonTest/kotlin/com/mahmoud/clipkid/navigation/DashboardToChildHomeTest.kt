@@ -2,6 +2,7 @@ package com.mahmoud.clipkid.navigation
 
 import com.mahmoud.clipkid.core.domain.testing.CHILD
 import com.mahmoud.clipkid.core.domain.testing.Catalog
+import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeHiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeSettingsRepository
@@ -15,16 +16,17 @@ import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ObserveAccessUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateChildSettingsUseCase
 import com.mahmoud.clipkid.core.model.DailyLimit
 import com.mahmoud.clipkid.feature.child.home.HomeUiState
 import com.mahmoud.clipkid.feature.child.home.HomeViewModel
 import com.mahmoud.clipkid.feature.parent.dashboard.DashboardEvent
 import com.mahmoud.clipkid.feature.parent.dashboard.DashboardViewModel
-import kotlinx.coroutines.test.runCurrent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlinx.coroutines.test.runCurrent
 
 /** Acceptance: a change on the parent dashboard shows on child Home at once, with no restart. */
 class DashboardToChildHomeTest {
@@ -37,15 +39,17 @@ class DashboardToChildHomeTest {
         val history = FakeWatchHistoryRepository()
         val settings = FakeSettingsRepository(pin = "2468", onboardingDone = true, activeChildId = CHILD)
         val quota = GetDailyQuotaUseCase(profiles, history, clock, KUWAIT)
+        val billing = FakeBillingRepository()
 
-        val home = HomeViewModel(CHILD, GetHomeFeedUseCase(catalog, profiles, history, FakeHiddenVideosRepository(), clock, KUWAIT), quota)
+        val home = HomeViewModel(CHILD, GetHomeFeedUseCase(catalog, profiles, history, FakeHiddenVideosRepository(), clock, KUWAIT, billing), quota)
         val dashboard = DashboardViewModel(
             profiles,
             settings,
             quota,
             GetCollectionsForAgeUseCase(catalog),
-            UpdateChildSettingsUseCase(profiles, catalog),
+            UpdateChildSettingsUseCase(profiles, catalog, billing),
             GrantExtraVideosUseCase(history, clock, KUWAIT),
+            ObserveAccessUseCase(billing, profiles),
         )
         runCurrent()
         fun homeContent() = assertIs<HomeUiState.Content>(home.state.value)

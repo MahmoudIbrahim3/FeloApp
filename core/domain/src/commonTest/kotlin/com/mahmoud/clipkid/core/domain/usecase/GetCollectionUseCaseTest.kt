@@ -2,23 +2,24 @@ package com.mahmoud.clipkid.core.domain.usecase
 
 import com.mahmoud.clipkid.core.domain.testing.CHILD
 import com.mahmoud.clipkid.core.domain.testing.Catalog
+import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeFavoritesRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeHiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeWatchHistoryRepository
-import com.mahmoud.clipkid.core.domain.testing.KUWAIT
 import com.mahmoud.clipkid.core.domain.testing.FixedClock
+import com.mahmoud.clipkid.core.domain.testing.KUWAIT
 import com.mahmoud.clipkid.core.domain.testing.child
 import com.mahmoud.clipkid.core.domain.testing.event
 import com.mahmoud.clipkid.core.domain.testing.kuwait
 import com.mahmoud.clipkid.core.model.ChildProfile
 import com.mahmoud.clipkid.core.model.Favorite
 import com.mahmoud.clipkid.core.model.HiddenVideo
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 
 class VideoStatusTest {
 
@@ -62,6 +63,7 @@ class GetCollectionUseCaseTest {
             history = history,
             hidden = hidden,
             clock = FixedClock(now),
+            billing = FakeBillingRepository(),
         )
 
     @Test
@@ -120,6 +122,7 @@ class GetFavoritesUseCaseTest {
             profiles = FakeProfileRepository(child()),
             favorites = favorites,
             hidden = FakeHiddenVideosRepository(),
+            billing = FakeBillingRepository(),
         )
 
         val items: List<FavoriteItem> = useCase(CHILD).first()

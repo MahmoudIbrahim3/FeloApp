@@ -1,6 +1,8 @@
 package com.mahmoud.clipkid.feature.onboarding
 
 import app.cash.turbine.test
+import com.mahmoud.clipkid.core.domain.testing.FULL
+import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeCatalogRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeSettingsRepository
@@ -12,15 +14,15 @@ import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.model.AgeBand
 import com.mahmoud.clipkid.core.model.DailyLimit
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runCurrent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 
 class OnboardingViewModelTest {
 
@@ -35,13 +37,15 @@ class OnboardingViewModelTest {
     )
     private val profiles = FakeProfileRepository()
     private val settings = FakeSettingsRepository()
-    private val addChild = AddChildUseCase(profiles, settings, SequentialIdGenerator("kid-"), catalog)
+    private val billing = FakeBillingRepository()
+    private val addChild = AddChildUseCase(profiles, settings, SequentialIdGenerator("kid-"), catalog, billing)
 
     private fun TestScope.viewModel(mode: OnboardingMode = OnboardingMode.FirstRun) = OnboardingViewModel(
         mode,
         GetCollectionsForAgeUseCase(catalog),
         CompleteOnboardingUseCase(settings, addChild),
         addChild,
+        billing,
     ).also { runCurrent() }
 
     private fun OnboardingViewModel.typePin(pin: String) {
@@ -188,5 +192,21 @@ class OnboardingViewModelTest {
         }
         assertTrue(settings.verifyPin("1111"))
         assertFalse(settings.onboardingDone.first())
+    }
+
+    @Test
+    fun withTheSubscriptionPremiumIsPreSelectedAndCanBeToggled() = runViewModelTest {
+        billing.entitlement.value = FULL
+        val vm = viewModel(OnboardingMode.AddChild)
+        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
+        runCurrent()
+
+        val options = vm.state.value.collections
+        assertEquals(listOf(true, true, true), options.map { it.selected })
+        assertFalse(options.last().locked)
+
+        vm.onEvent(OnboardingEvent.CollectionToggled("stories", on = false))
+        runCurrent()
+        assertFalse(vm.state.value.collections.last().selected)
     }
 }

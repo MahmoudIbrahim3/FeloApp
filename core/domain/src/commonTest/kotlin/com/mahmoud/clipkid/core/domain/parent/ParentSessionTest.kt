@@ -2,16 +2,18 @@ package com.mahmoud.clipkid.core.domain.parent
 
 import com.mahmoud.clipkid.core.domain.testing.TestClock
 import com.mahmoud.clipkid.core.domain.testing.kuwait
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.runCurrent
-import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 
 class ParentSessionTest {
 
@@ -82,5 +84,41 @@ class ParentSessionTest {
         advanceTimeBy(100.seconds)
         runCurrent()
         assertTrue(session.isUnlocked.value)
+    }
+
+    @Test
+    fun appStoppedLocksUnlessAStoreSheetIsOpen() = runTest {
+        val session = session()
+        session.unlock()
+        val purchase = CompletableDeferred<Unit>()
+        val flow = launch { session.holdForStoreFlow { purchase.await() } }
+        runCurrent()
+
+        session.onAppStopped()
+        assertTrue(session.isUnlocked.value, "Play's billing screen or a bank page must not close parent mode")
+
+        purchase.complete(Unit)
+        flow.join()
+        session.onAppStopped()
+        assertFalse(session.isUnlocked.value)
+    }
+
+    @Test
+    fun aLongPurchaseDoesNotHitTheIdleTimeout() = runTest {
+        val session = session()
+        session.unlock()
+        val purchase = CompletableDeferred<Unit>()
+        val flow = launch { session.holdForStoreFlow { purchase.await() } }
+        runCurrent()
+
+        advanceTimeBy(5.minutes)
+        runCurrent()
+        assertTrue(session.isUnlocked.value)
+
+        purchase.complete(Unit)
+        flow.join()
+        advanceTimeBy(2.minutes + 1.seconds)
+        runCurrent()
+        assertFalse(session.isUnlocked.value, "the countdown starts again when the store sheet closes")
     }
 }
