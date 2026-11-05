@@ -5,17 +5,22 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.mahmoud.clipkid.core.domain.parent.CreateAdultChallengeUseCase
+import com.mahmoud.clipkid.core.domain.parent.ParentSession
 import com.mahmoud.clipkid.core.domain.parent.ResetPinUseCase
 import com.mahmoud.clipkid.core.domain.parent.UnlockWithPinUseCase
+import com.mahmoud.clipkid.core.domain.repository.BillingRepository
+import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
 import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
 import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
+import com.mahmoud.clipkid.core.domain.usecase.EnablePremiumCollectionsUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ObserveAccessUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateChildSettingsUseCase
 import com.mahmoud.clipkid.feature.onboarding.OnboardingMode
 import com.mahmoud.clipkid.feature.onboarding.OnboardingViewModel
@@ -23,6 +28,7 @@ import com.mahmoud.clipkid.feature.parent.activity.ActivityViewModel
 import com.mahmoud.clipkid.feature.parent.dashboard.DashboardViewModel
 import com.mahmoud.clipkid.feature.parent.gate.GateViewModel
 import com.mahmoud.clipkid.feature.parent.grant.GrantViewModel
+import com.mahmoud.clipkid.feature.parent.paywall.PaywallViewModel
 import kotlin.time.Clock
 import org.koin.mp.KoinPlatform
 
@@ -42,6 +48,7 @@ fun rememberOnboardingViewModel(owner: ViewModelStoreOwner, mode: OnboardingMode
                     getCollectionsForAge = koin.get<GetCollectionsForAgeUseCase>(),
                     completeOnboarding = koin.get<CompleteOnboardingUseCase>(),
                     addChild = koin.get<AddChildUseCase>(),
+                    billing = koin.get<BillingRepository>(),
                 )
             }
         },
@@ -81,6 +88,25 @@ fun rememberDashboardViewModel(): DashboardViewModel {
                     getCollectionsForAge = koin.get<GetCollectionsForAgeUseCase>(),
                     updateChild = koin.get<UpdateChildSettingsUseCase>(),
                     grantExtras = koin.get<GrantExtraVideosUseCase>(),
+                    observeAccess = koin.get<ObserveAccessUseCase>(),
+                )
+            }
+        },
+    )
+}
+
+@Composable
+fun rememberPaywallViewModel(): PaywallViewModel {
+    val koin = KoinPlatform.getKoin()
+    return viewModel(
+        key = "paywall",
+        factory = viewModelFactory {
+            initializer {
+                PaywallViewModel(
+                    billing = koin.get<BillingRepository>(),
+                    catalog = koin.get<CatalogRepository>(),
+                    enablePremium = koin.get<EnablePremiumCollectionsUseCase>(),
+                    session = koin.get<ParentSession>(),
                 )
             }
         },

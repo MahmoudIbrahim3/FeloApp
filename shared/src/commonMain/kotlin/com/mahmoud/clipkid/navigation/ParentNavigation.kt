@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -31,7 +32,8 @@ import com.mahmoud.clipkid.feature.parent.gate.GateEffect
 import com.mahmoud.clipkid.feature.parent.gate.GateRoute
 import com.mahmoud.clipkid.feature.parent.grant.GrantEffect
 import com.mahmoud.clipkid.feature.parent.grant.GrantRoute
-import com.mahmoud.clipkid.feature.parent.subscription.SubscriptionSoonScreen
+import com.mahmoud.clipkid.feature.parent.paywall.PaywallEffect
+import com.mahmoud.clipkid.feature.parent.paywall.PaywallRoute
 
 /** True for every destination inside [ParentGraph] (dashboard, activity, add child, ...). */
 internal fun NavBackStackEntry.isInParentMode(): Boolean =
@@ -128,7 +130,19 @@ internal fun NavGraphBuilder.parentGraph(nav: NavHostController, session: Parent
             }
         }
         composable<SubscriptionDest> {
-            ParentScreen(session) { SubscriptionSoonScreen(onBack = { nav.popBackStack() }) }
+            val uriHandler = LocalUriHandler.current
+            ParentScreen(session) {
+                PaywallRoute(
+                    viewModel = rememberPaywallViewModel(),
+                    onEffect = { effect ->
+                        when (effect) {
+                            PaywallEffect.Close -> nav.popBackStack()
+                            // Store, terms, privacy: the parent is already past the PIN here.
+                            is PaywallEffect.OpenUrl -> uriHandler.openUri(effect.url)
+                        }
+                    },
+                )
+            }
         }
         composable<GrantDest> { entry ->
             val dest = entry.toRoute<GrantDest>()

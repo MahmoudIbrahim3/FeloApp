@@ -1,6 +1,7 @@
 package com.mahmoud.clipkid.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -15,7 +16,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.mahmoud.clipkid.core.domain.parent.ParentSession
+import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
+import com.mahmoud.clipkid.core.domain.usecase.ObserveAccessUseCase
+import com.mahmoud.clipkid.feature.child.askparent.AskParentScreen
 import com.mahmoud.clipkid.feature.child.collection.CollectionEffect
 import com.mahmoud.clipkid.feature.child.collection.CollectionRoute
 import com.mahmoud.clipkid.feature.child.common.ChildTab
@@ -50,6 +54,8 @@ fun ClipKidNavHost() {
     val nav = rememberNavController()
     val session = remember { koin.get<ParentSession>() }
     val settings = remember { koin.get<SettingsRepository>() }
+    val billing = remember { koin.get<BillingRepository>() }
+    val observeAccess = remember { koin.get<ObserveAccessUseCase>() }
     val scope = rememberCoroutineScope()
     val uriHandler = LocalUriHandler.current
 
@@ -97,8 +103,25 @@ fun ClipKidNavHost() {
     }
 
     ParentModeGuard(nav, session, onLeave = ::showChildHome)
-    // Leaving the app (home button, app switcher) closes parent mode.
-    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { session.lock() }
+    // Leaving the app (home button, app switcher) closes parent mode, except while a store
+    // purchase sheet started from the paywall is open (it can send the app to the background).
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { session.onAppStopped() }
+    // Back in the foreground: renewals, cancellations and refunds show up at once.
+    LifecycleEventEffect(Lifecycle.Event.ON_START) { scope.launch { billing.refresh() } }
+
+    // Free again with more than one child: child mode moves to the first child. The other
+    // profiles keep their settings and history and come back with the subscription.
+    LaunchedEffect(observeAccess) {
+        observeAccess().collect { access ->
+            val active = settings.activeChildId.first() ?: return@collect
+            val first = access.firstChildId ?: return@collect
+            if (access.isChildLocked(active) && !session.isUnlocked.value) {
+                settings.setActiveChildId(first)
+                val inChildMode = nav.currentBackStackEntry?.let { !it.isInParentMode() && !it.destination.hasRoute<GateDest>() } == true
+                if (inChildMode) goHome(first)
+            }
+        }
+    }
 
     val startDestination: Any = when (start) {
         AppStart.Onboarding -> OnboardingGraph
@@ -129,6 +152,7 @@ fun ClipKidNavHost() {
                             PlayerDest(dest.childId, effect.youtubeId, effect.source),
                         )
                         is HomeEffect.OpenCollection -> nav.navigate(CollectionDest(dest.childId, effect.collectionId))
+                        HomeEffect.OpenAskParent -> nav.navigate(AskParentDest(dest.childId)) { launchSingleTop = true }
                         HomeEffect.OpenGate -> nav.navigate(GateDest(GatePurpose.ParentDashboard))
                     }
                 },
@@ -206,6 +230,14 @@ fun ClipKidNavHost() {
                         UpNextEffect.Home -> goHome(dest.childId)
                     }
                 },
+            )
+        }
+
+        composable<AskParentDest> {
+            AskParentScreen(
+                onBack = { nav.popBackStack() },
+                // The paywall only ever opens behind the PIN.
+                onParents = { nav.navigate(GateDest(GatePurpose.Paywall)) },
             )
         }
 

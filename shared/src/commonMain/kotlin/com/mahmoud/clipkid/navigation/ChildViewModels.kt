@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
 import com.mahmoud.clipkid.core.domain.repository.NetworkMonitor
@@ -90,6 +91,7 @@ fun rememberPlayerViewModel(childId: String, youtubeId: String, source: WatchSou
                     toggleFavorite = koin.get<ToggleFavoriteUseCase>(),
                     catalog = koin.get<CatalogRepository>(),
                     favorites = koin.get<FavoritesRepository>(),
+                    billing = koin.get<BillingRepository>(),
                 )
             }
         },
