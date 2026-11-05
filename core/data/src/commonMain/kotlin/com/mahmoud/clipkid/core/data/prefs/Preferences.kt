@@ -24,6 +24,9 @@ internal object PreferenceKeys {
     val PinSet = booleanPreferencesKey("pin_set")
     val CatalogRefreshedAt = longPreferencesKey("catalog_refreshed_at")
 
+    /** Which catalog sync format the cache was built with; a different value forces a full resync. */
+    val CatalogSyncVersion = intPreferencesKey("catalog_sync_version")
+
     /** Wrong-PIN lockout (see PinLockout): attempts in a row, and the lockout end in epoch ms. */
     val PinFailedAttempts = intPreferencesKey("pin_failed_attempts")
     val PinLockedUntil = longPreferencesKey("pin_locked_until")

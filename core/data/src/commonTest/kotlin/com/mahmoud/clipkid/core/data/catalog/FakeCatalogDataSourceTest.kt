@@ -1,14 +1,20 @@
 package com.mahmoud.clipkid.core.data.catalog
 
+import com.mahmoud.clipkid.core.model.Collection
 import com.mahmoud.clipkid.core.model.CoverMark
+import com.mahmoud.clipkid.core.model.Video
 import kotlinx.coroutines.test.runTest
+import kotlin.time.Clock
+import kotlin.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class FakeCatalogDataSourceTest {
 
-    private val catalog = FakeCatalogDataSource.let { RemoteCatalog(it.COLLECTIONS, it.VIDEOS) }
+    private data class Catalog(val collections: List<Collection>, val videos: List<Video>)
+
+    private val catalog = FakeCatalogDataSource.let { Catalog(it.COLLECTIONS, it.VIDEOS) }
 
     @Test
     fun hasTheSixCollectionsFromClaudeMdWithTheirCoverColors() {
@@ -79,6 +85,21 @@ class FakeCatalogDataSourceTest {
 
     @Test
     fun fetchReturnsTheSameCatalog() = runTest {
-        assertEquals(catalog, FakeCatalogDataSource().fetchCatalog())
+        val source = FakeCatalogDataSource()
+        val manifest = source.fetchVideoManifest()
+        assertEquals(catalog.collections, source.fetchCollections())
+        assertEquals(catalog.videos.map { it.youtubeId }, manifest.map { it.youtubeId })
+        assertEquals(catalog.videos, source.fetchVideos(manifest.map { it.youtubeId }).map { it.video })
+    }
+
+    @Test
+    fun withAClock_videosAreStampedAsRefreshedNow() = runTest {
+        val now = Instant.parse("2027-03-01T10:00:00Z")
+        val source = FakeCatalogDataSource(clock = object : Clock { override fun now() = now })
+
+        val videos = source.fetchVideos(listOf("REPLACE_L01", "REPLACE_N02", "NOT_LISTED_"))
+
+        assertEquals(listOf("REPLACE_L01", "REPLACE_N02"), videos.map { it.video.youtubeId })
+        assertTrue(videos.all { it.video.refreshedAt == now })
     }
 }

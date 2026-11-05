@@ -5,10 +5,12 @@ import androidx.datastore.preferences.core.Preferences
 import com.mahmoud.clipkid.core.data.db.ClipKidDatabase
 import com.mahmoud.clipkid.core.data.db.buildClipKid
 import com.mahmoud.clipkid.core.data.db.fileDatabaseBuilder
+import com.mahmoud.clipkid.core.data.network.AndroidNetworkMonitor
 import com.mahmoud.clipkid.core.data.prefs.PREFERENCES_FILE_NAME
 import com.mahmoud.clipkid.core.data.prefs.createPreferencesDataStore
 import com.mahmoud.clipkid.core.data.secure.KeystoreSecureStore
 import com.mahmoud.clipkid.core.data.secure.SecureStore
+import com.mahmoud.clipkid.core.domain.repository.NetworkMonitor
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -19,4 +21,5 @@ actual val platformDataModule: Module = module {
         createPreferencesDataStore(androidContext().filesDir.resolve(PREFERENCES_FILE_NAME).absolutePath)
     }
     single<SecureStore> { KeystoreSecureStore(androidContext()) }
+    single<NetworkMonitor> { AndroidNetworkMonitor(androidContext()) }
 }

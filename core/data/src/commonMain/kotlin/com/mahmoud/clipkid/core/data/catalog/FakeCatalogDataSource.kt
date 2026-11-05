@@ -9,11 +9,12 @@ import com.mahmoud.clipkid.core.model.Collection
 import com.mahmoud.clipkid.core.model.CoverMark
 import com.mahmoud.clipkid.core.model.CoverStyle
 import com.mahmoud.clipkid.core.model.Video
+import kotlin.time.Clock
 import kotlin.time.Instant
 
 /**
- * Hand-written catalog used while `DataConfig.useFakeCatalog` is true: the 6 collections from
- * CLAUDE.md with 9 videos each.
+ * Hand-written catalog for tests, previews, and builds without Supabase config (see
+ * `DataConfig`): the 6 collections from CLAUDE.md with 9 videos each.
  *
  * Every YouTube id is an 11-character placeholder `REPLACE_<letter><nn>` (L letters, N numbers,
  * Q Quran & duas, M manners, C science, T stories). Search for `REPLACE_` to swap in real,
@@ -22,11 +23,29 @@ import kotlin.time.Instant
  * For testing the real player before the backend exists, put real ids in
  * [DEBUG_VIDEO_ID_OVERRIDES]: they replace the placeholder ids in catalog order.
  */
-class FakeCatalogDataSource : CatalogRemoteDataSource {
-    override suspend fun fetchCatalog(): RemoteCatalog = RemoteCatalog(COLLECTIONS, VIDEOS)
+class FakeCatalogDataSource(
+    /**
+     * When set, every fetch stamps the videos as refreshed now, so the app's 30-day rule never
+     * empties the fake catalog. Tests leave it null and get the fixed [VIDEOS].
+     */
+    private val clock: Clock? = null,
+) : CatalogRemoteDataSource {
+    override suspend fun fetchCollections(): List<Collection> = COLLECTIONS
+
+    override suspend fun fetchVideoManifest(): List<VideoStamp> = VIDEOS.map { VideoStamp(it.youtubeId, FAKE_UPDATED_AT) }
+
+    override suspend fun fetchVideos(youtubeIds: List<String>): List<RemoteVideo> {
+        val wanted = youtubeIds.toSet()
+        val now = clock?.now()
+        return VIDEOS.filter { it.youtubeId in wanted }
+            .map { RemoteVideo(if (now == null) it else it.copy(refreshedAt = now), FAKE_UPDATED_AT) }
+    }
 
     companion object {
         private val REFRESHED_AT = Instant.parse("2026-11-01T00:00:00Z")
+
+        /** The fake never changes, so every row has the same server stamp. */
+        const val FAKE_UPDATED_AT = "fake-v1"
 
         /**
          * Debug only (this whole catalog is a development fake). Real, embeddable, made-for-kids

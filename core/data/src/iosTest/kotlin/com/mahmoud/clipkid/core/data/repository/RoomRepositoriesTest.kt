@@ -8,6 +8,7 @@ import com.mahmoud.clipkid.core.data.prefs.InMemoryPreferencesDataStore
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ReportVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchResult
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpNextResult
@@ -43,9 +44,11 @@ class RoomRepositoriesTest {
     private val favorites = RoomFavoritesRepository(db.favoritesDao())
     private val hidden = RoomHiddenVideosRepository(db.hiddenVideosDao())
     private val prefs = InMemoryPreferencesDataStore()
-    private val catalog = OfflineFirstCatalogRepository(db.catalogDao(), FakeCatalogDataSource(), prefs)
-
     private val now = Instant.parse("2026-11-04T14:00:00Z")
+    private val fixedClock = object : Clock {
+        override fun now(): Instant = now
+    }
+    private val catalog = OfflineFirstCatalogRepository(db.catalogDao(), FakeCatalogDataSource(), prefs, fixedClock)
     private val child = ChildProfile("c1", "يوسف", 0xFFFFB627, AgeBand.A4_6, setOf("letters", "numbers"), DailyLimit.Videos(3))
 
     @AfterTest
@@ -162,7 +165,7 @@ class RoomRepositoriesTest {
         val upNext = GetUpNextUseCase(catalog, profiles, history, hidden, quota, clock, tz)
 
         assertIs<StartWatchResult.Allowed>(start("c1", "REPLACE_L01", WatchSource.Home))
-        HideVideoUseCase(hidden, favorites, NoOpVideoReporter, clock)("c1", "REPLACE_L02")
+        HideVideoUseCase(hidden, favorites, ReportVideoUseCase(NoOpVideoReporter), clock)("c1", "REPLACE_L02")
 
         val choices = assertIs<UpNextResult.Choices>(upNext("c1", "REPLACE_L01"))
         assertEquals("REPLACE_L03", choices.primary?.youtubeId)

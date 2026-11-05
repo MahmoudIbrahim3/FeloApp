@@ -89,4 +89,15 @@ data class CachedVideoEntity(
     @ColumnInfo(name = "made_for_kids") val madeForKids: Boolean,
     val embeddable: Boolean,
     @ColumnInfo(name = "refreshed_at") val refreshedAt: Long,
+    /**
+     * Added in v3 (Supabase sync): the server's `updated_at`, compared as a string to find changed
+     * rows. Rows from before v3 read as "" and are fetched again.
+     */
+    @ColumnInfo(name = "server_updated_at", defaultValue = "''") val serverUpdatedAt: String = "",
+)
+
+/** One cached video's id and server stamp, for the sync diff. */
+data class CachedVideoStamp(
+    @ColumnInfo(name = "youtube_id") val youtubeId: String,
+    @ColumnInfo(name = "server_updated_at") val serverUpdatedAt: String,
 )

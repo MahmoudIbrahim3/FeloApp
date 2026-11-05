@@ -132,15 +132,38 @@ abstract class CatalogDao {
     @Insert
     protected abstract suspend fun insertCollections(collections: List<CachedCollectionEntity>)
 
-    @Insert
-    protected abstract suspend fun insertVideos(videos: List<CachedVideoEntity>)
+    @Query("SELECT youtube_id, server_updated_at FROM cached_videos")
+    abstract suspend fun videoStamps(): List<CachedVideoStamp>
 
-    /** Replaces the whole cached catalog atomically, so observers never see half a catalog. */
+    @Upsert
+    protected abstract suspend fun upsertVideos(videos: List<CachedVideoEntity>)
+
+    @Query("DELETE FROM cached_videos WHERE youtube_id IN (:youtubeIds)")
+    protected abstract suspend fun deleteVideos(youtubeIds: List<String>)
+
+    /** YouTube data must not be kept longer than 30 days (rule 5). Returns the rows removed. */
+    @Query("DELETE FROM cached_videos WHERE refreshed_at < :before")
+    abstract suspend fun deleteVideosRefreshedBefore(before: Long): Int
+
+    /**
+     * Applies one sync in a single transaction: collections replaced whole (a small table), changed
+     * videos upserted, videos the backend no longer lists deleted. [fullResync] clears the videos first.
+     */
     @Transaction
-    open suspend fun replaceAll(collections: List<CachedCollectionEntity>, videos: List<CachedVideoEntity>) {
-        clearVideos()
+    open suspend fun applySync(
+        collections: List<CachedCollectionEntity>,
+        changedVideos: List<CachedVideoEntity>,
+        deletedVideoIds: List<String>,
+        fullResync: Boolean,
+    ) {
         clearCollections()
         insertCollections(collections)
-        insertVideos(videos)
+        if (fullResync) {
+            clearVideos()
+        } else {
+            // SQLite limits bound parameters per statement; stay well under it.
+            deletedVideoIds.chunked(500).forEach { deleteVideos(it) }
+        }
+        upsertVideos(changedVideos)
     }
 }

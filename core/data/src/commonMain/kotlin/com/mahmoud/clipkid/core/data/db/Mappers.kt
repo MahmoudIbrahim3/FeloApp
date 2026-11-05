@@ -100,7 +100,7 @@ internal fun CachedCollectionEntity.toModel() = Collection(
     isPremium = isPremium,
 )
 
-internal fun Video.toEntity() = CachedVideoEntity(
+internal fun Video.toEntity(serverUpdatedAt: String = "") = CachedVideoEntity(
     youtubeId = youtubeId,
     collectionId = collectionId,
     titleAr = titleAr,
@@ -112,6 +112,7 @@ internal fun Video.toEntity() = CachedVideoEntity(
     madeForKids = madeForKids,
     embeddable = embeddable,
     refreshedAt = refreshedAt.toEpochMilliseconds(),
+    serverUpdatedAt = serverUpdatedAt,
 )
 
 internal fun CachedVideoEntity.toModel() = Video(
