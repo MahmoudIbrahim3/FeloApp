@@ -14,7 +14,8 @@ interface WatchHistoryRepository {
 
     suspend fun record(event: WatchEvent)
 
-    suspend fun updateProgress(eventId: String, watchedSec: Int, completed: Boolean)
+    /** [watchedSec] = seconds actually played, [positionSec] = last playback position. */
+    suspend fun updateProgress(eventId: String, watchedSec: Int, positionSec: Int, completed: Boolean)
 
     /** Sum of extra videos granted to [childId] for [date]; 0 when none. */
     fun observeExtraVideos(childId: String, date: LocalDate): Flow<Int>

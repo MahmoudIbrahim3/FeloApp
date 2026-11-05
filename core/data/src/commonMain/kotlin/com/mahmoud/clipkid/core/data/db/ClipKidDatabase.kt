@@ -1,5 +1,6 @@
 package com.mahmoud.clipkid.core.data.db
 
+import androidx.room3.AutoMigration
 import androidx.room3.ConstructedBy
 import androidx.room3.Database
 import androidx.room3.RoomDatabase
@@ -18,8 +19,10 @@ import kotlinx.coroutines.IO
         CachedCollectionEntity::class,
         CachedVideoEntity::class,
     ],
-    version = 1,
+    // v2 (Phase 4): watch_events.position_sec for resume and progress bars.
+    version = 2,
     exportSchema = true,
+    autoMigrations = [AutoMigration(from = 1, to = 2)],
 )
 @ConstructedBy(ClipKidDatabaseConstructor::class)
 abstract class ClipKidDatabase : RoomDatabase() {

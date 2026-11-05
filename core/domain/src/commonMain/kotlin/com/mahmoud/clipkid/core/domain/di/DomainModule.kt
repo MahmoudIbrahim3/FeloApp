@@ -10,12 +10,14 @@ import com.mahmoud.clipkid.core.domain.usecase.GetCollectionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetFavoritesUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetResumePositionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.RefreshCatalogIfStaleUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ReportUnavailableVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateChildSettingsUseCase
@@ -47,6 +49,8 @@ val domainModule: Module = module {
     factoryOf(::ToggleFavoriteUseCase)
     factoryOf(::GetCollectionUseCase)
     factoryOf(::GetFavoritesUseCase)
+    factoryOf(::GetResumePositionUseCase)
+    factoryOf(::ReportUnavailableVideoUseCase)
     factory { RefreshCatalogIfStaleUseCase(get(), get()) }
 
     // Onboarding and parent mode

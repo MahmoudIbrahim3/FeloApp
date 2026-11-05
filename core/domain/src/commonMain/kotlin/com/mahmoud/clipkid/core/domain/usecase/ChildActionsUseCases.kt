@@ -1,13 +1,13 @@
 package com.mahmoud.clipkid.core.domain.usecase
 
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
-import com.mahmoud.clipkid.core.domain.repository.HiddenVideoReporter
+import com.mahmoud.clipkid.core.domain.repository.VideoReporter
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
 import com.mahmoud.clipkid.core.domain.time.today
 import com.mahmoud.clipkid.core.model.Favorite
 import com.mahmoud.clipkid.core.model.HiddenVideo
-import com.mahmoud.clipkid.core.model.HiddenVideoReport
+import com.mahmoud.clipkid.core.model.VideoReport
 import kotlinx.coroutines.CancellationException
 import kotlinx.datetime.TimeZone
 import kotlin.time.Clock
@@ -32,14 +32,14 @@ class GrantExtraVideosUseCase(
 class HideVideoUseCase(
     private val hidden: HiddenVideosRepository,
     private val favorites: FavoritesRepository,
-    private val reporter: HiddenVideoReporter,
+    private val reporter: VideoReporter,
     private val clock: Clock,
 ) {
     suspend operator fun invoke(childId: String, youtubeId: String) {
         hidden.hide(HiddenVideo(childId, youtubeId, clock.now()))
         favorites.remove(childId, youtubeId)
         try {
-            reporter.report(HiddenVideoReport(youtubeId = youtubeId))
+            reporter.report(VideoReport(youtubeId = youtubeId))
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {

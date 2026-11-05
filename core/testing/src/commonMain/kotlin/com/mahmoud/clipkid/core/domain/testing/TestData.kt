@@ -73,7 +73,8 @@ fun event(
     counts: Boolean = true,
     childId: String = CHILD,
     id: String = "$youtubeId@${startedAt.epochSeconds}",
-) = WatchEvent(id, childId, youtubeId, startedAt, watchedSec, completed, counts)
+    positionSec: Int = 0,
+) = WatchEvent(id, childId, youtubeId, startedAt, watchedSec, completed, counts, positionSec)
 
 const val ANIMALS = "الحيوانات"
 const val COLORS = "الألوان"

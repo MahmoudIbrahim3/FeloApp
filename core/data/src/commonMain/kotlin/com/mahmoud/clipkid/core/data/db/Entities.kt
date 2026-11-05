@@ -33,6 +33,8 @@ data class WatchEventEntity(
     @ColumnInfo(name = "watched_sec") val watchedSec: Int,
     val completed: Boolean,
     @ColumnInfo(name = "counts_toward_limit") val countsTowardLimit: Boolean,
+    /** Added in v2 (real player): last playback position. Old rows read as 0. */
+    @ColumnInfo(name = "position_sec", defaultValue = "0") val positionSec: Int = 0,
 )
 
 @Entity(tableName = "favorites", primaryKeys = ["child_id", "youtube_id"])

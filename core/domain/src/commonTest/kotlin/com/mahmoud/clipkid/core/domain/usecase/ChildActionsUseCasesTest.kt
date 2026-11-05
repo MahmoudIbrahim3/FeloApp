@@ -3,7 +3,7 @@ package com.mahmoud.clipkid.core.domain.usecase
 import com.mahmoud.clipkid.core.domain.testing.CHILD
 import com.mahmoud.clipkid.core.domain.testing.FakeCatalogRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeFavoritesRepository
-import com.mahmoud.clipkid.core.domain.testing.FakeHiddenVideoReporter
+import com.mahmoud.clipkid.core.domain.testing.FakeVideoReporter
 import com.mahmoud.clipkid.core.domain.testing.FakeHiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeWatchHistoryRepository
 import com.mahmoud.clipkid.core.domain.testing.FixedClock
@@ -12,7 +12,7 @@ import com.mahmoud.clipkid.core.domain.testing.OTHER_CHILD
 import com.mahmoud.clipkid.core.domain.testing.kuwait
 import com.mahmoud.clipkid.core.model.Favorite
 import com.mahmoud.clipkid.core.model.HiddenVideo
-import com.mahmoud.clipkid.core.model.HiddenVideoReport
+import com.mahmoud.clipkid.core.model.VideoReport
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
@@ -48,24 +48,24 @@ class ChildActionsUseCasesTest {
         val favorites = FakeFavoritesRepository()
         favorites.add(Favorite(CHILD, "L1", now))
         favorites.add(Favorite(OTHER_CHILD, "L1", now))
-        val reporter = FakeHiddenVideoReporter()
+        val reporter = FakeVideoReporter()
 
         HideVideoUseCase(hidden, favorites, reporter, clock)(CHILD, "L1")
 
         assertEquals(listOf(HiddenVideo(CHILD, "L1", now)), hidden.hidden.value)
         assertFalse(favorites.isFavorite(CHILD, "L1"))
         assertTrue(favorites.isFavorite(OTHER_CHILD, "L1"))
-        assertEquals(listOf(HiddenVideoReport("L1", "parent_hidden")), reporter.reports)
+        assertEquals(listOf(VideoReport("L1", "parent_hidden")), reporter.reports)
         assertEquals(
             """{"youtube_id":"L1","reason":"parent_hidden"}""",
-            Json { encodeDefaults = true }.encodeToString(HiddenVideoReport.serializer(), reporter.reports.single()),
+            Json { encodeDefaults = true }.encodeToString(VideoReport.serializer(), reporter.reports.single()),
         )
     }
 
     @Test
     fun hideVideo_staysHiddenWhenTheReportFails() = runTest {
         val hidden = FakeHiddenVideosRepository()
-        val reporter = FakeHiddenVideoReporter().apply { error = IllegalStateException("offline") }
+        val reporter = FakeVideoReporter().apply { error = IllegalStateException("offline") }
 
         HideVideoUseCase(hidden, FakeFavoritesRepository(), reporter, clock)(CHILD, "L1")
 

@@ -44,8 +44,8 @@ internal class RoomWatchHistoryRepository(private val dao: WatchHistoryDao) : Wa
 
     override suspend fun record(event: WatchEvent) = dao.insert(event.toEntity())
 
-    override suspend fun updateProgress(eventId: String, watchedSec: Int, completed: Boolean) =
-        dao.updateProgress(eventId, watchedSec, completed)
+    override suspend fun updateProgress(eventId: String, watchedSec: Int, positionSec: Int, completed: Boolean) =
+        dao.updateProgress(eventId, watchedSec, positionSec, completed)
 
     override fun observeExtraVideos(childId: String, date: LocalDate): Flow<Int> =
         dao.observeExtra(childId, date.toString()).map { it ?: 0 }.distinctUntilChanged()

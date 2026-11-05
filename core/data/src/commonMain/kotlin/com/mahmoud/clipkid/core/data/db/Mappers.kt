@@ -60,6 +60,7 @@ internal fun WatchEvent.toEntity() = WatchEventEntity(
     watchedSec = watchedSec,
     completed = completed,
     countsTowardLimit = countsTowardLimit,
+    positionSec = positionSec,
 )
 
 internal fun WatchEventEntity.toModel() = WatchEvent(
@@ -70,6 +71,7 @@ internal fun WatchEventEntity.toModel() = WatchEvent(
     watchedSec = watchedSec,
     completed = completed,
     countsTowardLimit = countsTowardLimit,
+    positionSec = positionSec,
 )
 
 internal fun Favorite.toEntity() = FavoriteEntity(childId, youtubeId, addedAt.toEpochMilliseconds())

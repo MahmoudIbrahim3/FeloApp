@@ -19,7 +19,10 @@ sealed interface StartWatchResult {
 }
 
 /**
- * Called when playback starts; a video counts when it starts.
+ * A video counts when playback starts. The player screen calls [canStart] when it opens (so the
+ * child goes straight to DoneToday at the limit) and [invoke] on the first real "playing" event
+ * from the YouTube player, which records the [WatchEvent]. A video that never starts playing
+ * (removed, not embeddable, offline) is never counted.
  *
  * Videos mode: the "تاني" replay on Up Next ([WatchSource.UpNextReplay]) of a video that already
  * counted today is free: it is recorded with `countsTowardLimit = false` and allowed even at the
@@ -35,21 +38,12 @@ class StartWatchUseCase(
     private val clock: Clock,
     private val timeZone: TimeZone,
 ) {
+    /** Whether [invoke] would allow this start right now. Records nothing. */
+    suspend fun canStart(childId: String, youtubeId: String, source: WatchSource): Boolean =
+        decide(childId, youtubeId, source) != null
+
     suspend operator fun invoke(childId: String, youtubeId: String, source: WatchSource): StartWatchResult {
-        val child = requireNotNull(profiles.getProfile(childId)) { "Unknown child $childId" }
-        val day = clock.todayRange(timeZone)
-        val todayEvents = history.getEvents(childId, day.start, day.end)
-
-        val freeReplay = source == WatchSource.UpNextReplay &&
-            child.dailyLimit is DailyLimit.Videos &&
-            todayEvents.any { it.youtubeId == youtubeId && it.countsTowardLimit }
-
-        if (!freeReplay) {
-            val extras = history.getExtraVideos(childId, day.date)
-            val quota = GetDailyQuotaUseCase.computeQuota(child.dailyLimit, extras, todayEvents)
-            if (quota.isReached) return StartWatchResult.LimitReached
-        }
-
+        val countsTowardLimit = decide(childId, youtubeId, source) ?: return StartWatchResult.LimitReached
         val event = WatchEvent(
             id = ids.newId(),
             childId = childId,
@@ -57,9 +51,25 @@ class StartWatchUseCase(
             startedAt = clock.now(),
             watchedSec = 0,
             completed = false,
-            countsTowardLimit = !freeReplay,
+            countsTowardLimit = countsTowardLimit,
         )
         history.record(event)
         return StartWatchResult.Allowed(event.id, event.countsTowardLimit)
+    }
+
+    /** null = limit reached; otherwise whether the start counts toward the limit. */
+    private suspend fun decide(childId: String, youtubeId: String, source: WatchSource): Boolean? {
+        val child = requireNotNull(profiles.getProfile(childId)) { "Unknown child $childId" }
+        val day = clock.todayRange(timeZone)
+        val todayEvents = history.getEvents(childId, day.start, day.end)
+
+        val freeReplay = source == WatchSource.UpNextReplay &&
+            child.dailyLimit is DailyLimit.Videos &&
+            todayEvents.any { it.youtubeId == youtubeId && it.countsTowardLimit }
+        if (freeReplay) return false
+
+        val extras = history.getExtraVideos(childId, day.date)
+        val quota = GetDailyQuotaUseCase.computeQuota(child.dailyLimit, extras, todayEvents)
+        return if (quota.isReached) null else true
     }
 }

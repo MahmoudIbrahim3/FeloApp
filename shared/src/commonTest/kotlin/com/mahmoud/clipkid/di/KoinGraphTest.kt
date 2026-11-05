@@ -10,7 +10,7 @@ import com.mahmoud.clipkid.core.domain.parent.ResetPinUseCase
 import com.mahmoud.clipkid.core.domain.parent.UnlockWithPinUseCase
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
-import com.mahmoud.clipkid.core.domain.repository.HiddenVideoReporter
+import com.mahmoud.clipkid.core.domain.repository.VideoReporter
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.IdGenerator
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
@@ -23,11 +23,13 @@ import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetFavoritesUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetResumePositionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.RefreshCatalogIfStaleUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ReportUnavailableVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateChildSettingsUseCase
@@ -76,7 +78,7 @@ class KoinGraphTest {
             koin.get<FavoritesRepository>(),
             koin.get<HiddenVideosRepository>(),
             koin.get<SettingsRepository>(),
-            koin.get<HiddenVideoReporter>(),
+            koin.get<VideoReporter>(),
             koin.get<IdGenerator>(),
             koin.get<GetHomeFeedUseCase>(),
             koin.get<GetDailyQuotaUseCase>(),
@@ -98,6 +100,9 @@ class KoinGraphTest {
             koin.get<UnlockWithPinUseCase>(),
             koin.get<ResetPinUseCase>(),
             koin.get<CreateAdultChallengeUseCase>(),
+            // Phase 4 (player).
+            koin.get<GetResumePositionUseCase>(),
+            koin.get<ReportUnavailableVideoUseCase>(),
             koin.get<ParentSession>(),
         ).forEach { assertTrue(it !is Unit) }
     }

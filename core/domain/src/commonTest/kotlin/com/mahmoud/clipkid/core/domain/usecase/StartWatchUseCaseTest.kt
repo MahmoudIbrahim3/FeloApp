@@ -148,7 +148,7 @@ class StartWatchUseCaseTest {
         val (start, _) = setUp(DailyLimit.Minutes(30))
         val first = assertIs<StartWatchResult.Allowed>(start(CHILD, "L1", WatchSource.Home))
 
-        UpdateWatchProgressUseCase(history)(first.eventId, watchedSec = 30 * 60, completed = true)
+        UpdateWatchProgressUseCase(history)(first.eventId, watchedSec = 30 * 60, positionSec = 30 * 60, completed = true)
 
         assertEquals(StartWatchResult.LimitReached, start(CHILD, "L1", WatchSource.UpNextReplay))
         assertEquals(StartWatchResult.LimitReached, start(CHILD, "L2", WatchSource.Home))
@@ -173,6 +173,20 @@ class StartWatchUseCaseTest {
         GrantExtraVideosUseCase(history, clock, KUWAIT)(CHILD, 1)
 
         assertIs<StartWatchResult.Allowed>(start(CHILD, "L2", WatchSource.Home))
+    }
+
+    @Test
+    fun canStart_recordsNothing_andFollowsTheSameRules() = runTest {
+        val (start, _) = setUp(DailyLimit.Videos(1))
+
+        assertEquals(true, start.canStart(CHILD, "L1", WatchSource.Home))
+        assertEquals(0, history.events.value.size)
+
+        start(CHILD, "L1", WatchSource.Home)
+        assertEquals(false, start.canStart(CHILD, "L2", WatchSource.Home))
+        // The free Up Next replay is still allowed at the limit.
+        assertEquals(true, start.canStart(CHILD, "L1", WatchSource.UpNextReplay))
+        assertEquals(1, history.events.value.size)
     }
 
     @Test

@@ -2,7 +2,7 @@ package com.mahmoud.clipkid.core.domain.testing
 
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
-import com.mahmoud.clipkid.core.domain.repository.HiddenVideoReporter
+import com.mahmoud.clipkid.core.domain.repository.VideoReporter
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.IdGenerator
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
@@ -11,7 +11,7 @@ import com.mahmoud.clipkid.core.model.ChildProfile
 import com.mahmoud.clipkid.core.model.Collection
 import com.mahmoud.clipkid.core.model.Favorite
 import com.mahmoud.clipkid.core.model.HiddenVideo
-import com.mahmoud.clipkid.core.model.HiddenVideoReport
+import com.mahmoud.clipkid.core.model.VideoReport
 import com.mahmoud.clipkid.core.model.Video
 import com.mahmoud.clipkid.core.model.WatchEvent
 import kotlinx.coroutines.flow.Flow
@@ -67,9 +67,11 @@ class FakeWatchHistoryRepository(events: List<WatchEvent> = emptyList()) : Watch
 
     override suspend fun record(event: WatchEvent) = events.update { it + event }
 
-    override suspend fun updateProgress(eventId: String, watchedSec: Int, completed: Boolean) =
+    override suspend fun updateProgress(eventId: String, watchedSec: Int, positionSec: Int, completed: Boolean) =
         events.update { all ->
-            all.map { if (it.id == eventId) it.copy(watchedSec = watchedSec, completed = completed) else it }
+            all.map {
+                if (it.id == eventId) it.copy(watchedSec = watchedSec, positionSec = positionSec, completed = completed) else it
+            }
         }
 
     override fun observeExtraVideos(childId: String, date: LocalDate): Flow<Int> =
@@ -113,11 +115,11 @@ class FakeHiddenVideosRepository(vararg hidden: HiddenVideo) : HiddenVideosRepos
     }
 }
 
-class FakeHiddenVideoReporter : HiddenVideoReporter {
-    val reports = mutableListOf<HiddenVideoReport>()
+class FakeVideoReporter : VideoReporter {
+    val reports = mutableListOf<VideoReport>()
     var error: Exception? = null
 
-    override suspend fun report(report: HiddenVideoReport) {
+    override suspend fun report(report: VideoReport) {
         error?.let { throw it }
         reports += report
     }

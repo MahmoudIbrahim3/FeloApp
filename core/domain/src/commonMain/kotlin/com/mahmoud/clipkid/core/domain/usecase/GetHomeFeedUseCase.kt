@@ -90,7 +90,7 @@ class GetHomeFeedUseCase(
                 .map { perVideo -> perVideo.maxBy { it.startedAt } }
                 .filter { !it.completed && it.watchedSec >= MIN_CONTINUE_SEC && it.youtubeId in byId }
                 .maxByOrNull { it.startedAt }
-                ?.let { ContinueWatching(byId.getValue(it.youtubeId), it.watchedSec) }
+                ?.let { ContinueWatching(byId.getValue(it.youtubeId), it.progressSec) }
         }
 
         /**

@@ -21,7 +21,7 @@ import kotlin.time.Instant
 sealed interface VideoStatus {
     data object New : VideoStatus
 
-    /** Started but not finished; [watchedSec] is the furthest point reached. */
+    /** Started but not finished; [watchedSec] is the furthest point reached (playback position). */
     data class InProgress(val watchedSec: Int) : VideoStatus
 
     data object Watched : VideoStatus
@@ -31,7 +31,7 @@ sealed interface VideoStatus {
         fun of(events: List<WatchEvent>): VideoStatus = when {
             events.isEmpty() -> New
             events.any { it.completed } -> Watched
-            else -> events.maxOf { it.watchedSec }.let { if (it > 0) InProgress(it) else New }
+            else -> events.maxOf { it.progressSec }.let { if (it > 0) InProgress(it) else New }
         }
     }
 }

@@ -8,7 +8,7 @@ import com.mahmoud.clipkid.core.data.db.ClipKidDatabase
 import com.mahmoud.clipkid.core.data.db.inMemoryClipKidDatabase
 import com.mahmoud.clipkid.core.data.prefs.InMemoryPreferencesDataStore
 import com.mahmoud.clipkid.core.data.repository.DataStoreSettingsRepository
-import com.mahmoud.clipkid.core.data.repository.NoOpHiddenVideoReporter
+import com.mahmoud.clipkid.core.data.repository.NoOpVideoReporter
 import com.mahmoud.clipkid.core.data.repository.OfflineFirstCatalogRepository
 import com.mahmoud.clipkid.core.data.repository.RoomFavoritesRepository
 import com.mahmoud.clipkid.core.data.repository.RoomHiddenVideosRepository
@@ -20,7 +20,7 @@ import com.mahmoud.clipkid.core.data.secure.PinHasher
 import com.mahmoud.clipkid.core.data.secure.SecureStore
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
-import com.mahmoud.clipkid.core.domain.repository.HiddenVideoReporter
+import com.mahmoud.clipkid.core.domain.repository.VideoReporter
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.IdGenerator
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
@@ -57,7 +57,7 @@ val dataModule: Module = module {
     single<FavoritesRepository> { RoomFavoritesRepository(get<ClipKidDatabase>().favoritesDao()) }
     single<HiddenVideosRepository> { RoomHiddenVideosRepository(get<ClipKidDatabase>().hiddenVideosDao()) }
     single<SettingsRepository> { DataStoreSettingsRepository(get(), get(), get()) }
-    single<HiddenVideoReporter> { NoOpHiddenVideoReporter }
+    single<VideoReporter> { NoOpVideoReporter }
     single<IdGenerator> { UuidIdGenerator }
 }
 

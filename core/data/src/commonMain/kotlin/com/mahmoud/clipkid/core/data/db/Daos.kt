@@ -65,8 +65,11 @@ abstract class WatchHistoryDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     abstract suspend fun insert(event: WatchEventEntity)
 
-    @Query("UPDATE watch_events SET watched_sec = :watchedSec, completed = :completed WHERE id = :id")
-    abstract suspend fun updateProgress(id: String, watchedSec: Int, completed: Boolean)
+    @Query(
+        "UPDATE watch_events SET watched_sec = :watchedSec, position_sec = :positionSec, completed = :completed " +
+            "WHERE id = :id",
+    )
+    abstract suspend fun updateProgress(id: String, watchedSec: Int, positionSec: Int, completed: Boolean)
 
     @Query("SELECT videos FROM extra_grants WHERE child_id = :childId AND date = :date")
     abstract fun observeExtra(childId: String, date: String): Flow<Int?>

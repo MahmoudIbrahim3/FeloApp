@@ -94,9 +94,10 @@ class RoomRepositoriesTest {
         history.record(event("e1", "V1", now))
         history.observeEvents("c1", now, now + 1.hours).test {
             assertEquals(0, awaitItem().single().watchedSec)
-            history.updateProgress("e1", watchedSec = 90, completed = true)
+            history.updateProgress("e1", watchedSec = 90, positionSec = 75, completed = true)
             val updated = awaitItem().single()
             assertEquals(90, updated.watchedSec)
+            assertEquals(75, updated.positionSec)
             assertTrue(updated.completed)
         }
     }
@@ -161,7 +162,7 @@ class RoomRepositoriesTest {
         val upNext = GetUpNextUseCase(catalog, profiles, history, hidden, quota, clock, tz)
 
         assertIs<StartWatchResult.Allowed>(start("c1", "REPLACE_L01", WatchSource.Home))
-        HideVideoUseCase(hidden, favorites, NoOpHiddenVideoReporter, clock)("c1", "REPLACE_L02")
+        HideVideoUseCase(hidden, favorites, NoOpVideoReporter, clock)("c1", "REPLACE_L02")
 
         val choices = assertIs<UpNextResult.Choices>(upNext("c1", "REPLACE_L01"))
         assertEquals("REPLACE_L03", choices.primary?.youtubeId)
