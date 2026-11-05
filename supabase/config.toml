@@ -1,0 +1,42 @@
+# Supabase CLI config for ClipKid (local development).
+# Only the settings ClipKid depends on are listed; everything else uses the CLI defaults.
+# Run `supabase init` once in a scratch folder to compare with the full default file if needed.
+project_id = "clipkid"
+
+[api]
+enabled = true
+port = 54321
+# Only `public` goes through the API. `internal` (run_youtube_refresh) stays private.
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 17
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+# v1 has no accounts. The app only uses the publishable (anon) key.
+enabled = false
+
+[storage]
+enabled = false
+
+[realtime]
+enabled = false
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+
+# Called by pg_cron with the x-refresh-secret header, not with a user JWT.
+[functions.refresh-youtube-data]
+verify_jwt = false

@@ -1,0 +1,9 @@
+# Supabase CLI local state
+.branches
+.temp
+# Function secrets for `supabase functions serve --env-file` (never commit)
+.env
+.env.*
+!.env.example
+functions/.env
+!functions/.env.example
