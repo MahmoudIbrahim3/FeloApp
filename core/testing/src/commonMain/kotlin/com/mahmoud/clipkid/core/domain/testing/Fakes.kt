@@ -5,6 +5,7 @@ import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
 import com.mahmoud.clipkid.core.domain.repository.VideoReporter
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.IdGenerator
+import com.mahmoud.clipkid.core.domain.repository.NetworkMonitor
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
 import com.mahmoud.clipkid.core.model.ChildProfile
@@ -128,4 +129,9 @@ class FakeVideoReporter : VideoReporter {
 class SequentialIdGenerator(private val prefix: String = "event-") : IdGenerator {
     private var next = 1
     override fun newId(): String = prefix + next++
+}
+
+/** Online unless a test says otherwise; flip [isOnline] to simulate losing the network. */
+class FakeNetworkMonitor(online: Boolean = true) : NetworkMonitor {
+    override val isOnline = MutableStateFlow(online)
 }

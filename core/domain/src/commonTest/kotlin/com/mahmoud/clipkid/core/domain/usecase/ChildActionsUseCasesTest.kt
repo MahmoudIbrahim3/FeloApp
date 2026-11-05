@@ -50,7 +50,7 @@ class ChildActionsUseCasesTest {
         favorites.add(Favorite(OTHER_CHILD, "L1", now))
         val reporter = FakeVideoReporter()
 
-        HideVideoUseCase(hidden, favorites, reporter, clock)(CHILD, "L1")
+        HideVideoUseCase(hidden, favorites, ReportVideoUseCase(reporter), clock)(CHILD, "L1")
 
         assertEquals(listOf(HiddenVideo(CHILD, "L1", now)), hidden.hidden.value)
         assertFalse(favorites.isFavorite(CHILD, "L1"))
@@ -67,7 +67,7 @@ class ChildActionsUseCasesTest {
         val hidden = FakeHiddenVideosRepository()
         val reporter = FakeVideoReporter().apply { error = IllegalStateException("offline") }
 
-        HideVideoUseCase(hidden, FakeFavoritesRepository(), reporter, clock)(CHILD, "L1")
+        HideVideoUseCase(hidden, FakeFavoritesRepository(), ReportVideoUseCase(reporter), clock)(CHILD, "L1")
 
         assertEquals(setOf("L1"), hidden.getHiddenIds(CHILD))
     }
@@ -84,42 +84,25 @@ class ChildActionsUseCasesTest {
     }
 
     @Test
-    fun refreshCatalog_whenNeverFetched() = runTest {
-        val catalog = FakeCatalogRepository()
+    fun syncCatalog_runsEveryTime_withoutAMaxAge() = runTest {
+        val catalog = FakeCatalogRepository().apply { lastRefreshed = now - 1.hours }
+        val sync = SyncCatalogUseCase(catalog, clock)
 
-        assertEquals(CatalogRefresh.Refreshed, RefreshCatalogIfStaleUseCase(catalog, clock)())
+        assertEquals(CatalogSync.Synced, sync())
+        assertEquals(CatalogSync.Synced, sync())
+        assertEquals(2, catalog.refreshCalls)
         assertEquals(now, catalog.lastRefreshed)
     }
 
     @Test
-    fun refreshCatalog_onlyWhenOlderThan24Hours() = runTest {
-        val catalog = FakeCatalogRepository().apply { lastRefreshed = now - 23.hours }
-        val refresh = RefreshCatalogIfStaleUseCase(catalog, clock)
-
-        assertEquals(CatalogRefresh.Fresh, refresh())
-        assertEquals(0, catalog.refreshCalls)
-
-        clock.instant = now + 1.hours
-        assertEquals(CatalogRefresh.Refreshed, refresh())
-        assertEquals(1, catalog.refreshCalls)
-    }
-
-    @Test
-    fun refreshCatalog_forceIgnoresAge() = runTest {
-        val catalog = FakeCatalogRepository().apply { lastRefreshed = now }
-
-        assertEquals(CatalogRefresh.Refreshed, RefreshCatalogIfStaleUseCase(catalog, clock)(force = true))
-    }
-
-    @Test
-    fun refreshCatalog_failureKeepsTheCache() = runTest {
+    fun syncCatalog_failureKeepsTheCache() = runTest {
         val old = now - 30.hours
         val catalog = FakeCatalogRepository().apply {
             lastRefreshed = old
             refreshError = IllegalStateException("offline")
         }
 
-        assertIs<CatalogRefresh.Failed>(RefreshCatalogIfStaleUseCase(catalog, clock)())
+        assertIs<CatalogSync.Failed>(SyncCatalogUseCase(catalog, clock)())
         assertEquals(old, catalog.lastRefreshed)
     }
 }

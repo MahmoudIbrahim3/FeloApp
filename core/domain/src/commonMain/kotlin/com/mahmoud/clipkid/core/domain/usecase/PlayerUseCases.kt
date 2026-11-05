@@ -40,25 +40,36 @@ class GetResumePositionUseCase(
     }
 }
 
-/** Why the player could not show a video. */
-enum class UnavailableReason { Removed, EmbedDisabled }
+/** Why a video is reported to the team for review. */
+enum class VideoReportReason {
+    /** A parent hid it for their child. */
+    ParentHidden,
+
+    /** Player error 100: removed or made private. */
+    Removed,
+
+    /** Player errors 101 / 150: the owner no longer allows embedding. */
+    EmbedDisabled,
+}
 
 /**
- * The player found a video removed (error 100) or no longer embeddable (101 / 150): tell the team
- * as `{youtubeId, reason}` only. Best-effort, like hiding a video.
+ * Tells the team about a video as `{youtubeId, reason}` only: no device, user or child
+ * identifiers (backend table `video_reports`). Best-effort: a failure (e.g. offline) is swallowed,
+ * the caller's own action (hide, "not available" screen) already applied.
  */
-class ReportUnavailableVideoUseCase(private val reporter: VideoReporter) {
-    suspend operator fun invoke(youtubeId: String, reason: UnavailableReason) {
+class ReportVideoUseCase(private val reporter: VideoReporter) {
+    suspend operator fun invoke(youtubeId: String, reason: VideoReportReason) {
         val code = when (reason) {
-            UnavailableReason.Removed -> VideoReport.REASON_VIDEO_REMOVED
-            UnavailableReason.EmbedDisabled -> VideoReport.REASON_EMBED_DISABLED
+            VideoReportReason.ParentHidden -> VideoReport.REASON_PARENT_HIDDEN
+            VideoReportReason.Removed -> VideoReport.REASON_VIDEO_REMOVED
+            VideoReportReason.EmbedDisabled -> VideoReport.REASON_EMBED_DISABLED
         }
         try {
             reporter.report(VideoReport(youtubeId = youtubeId, reason = code))
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
-            // Best-effort: the child already sees the friendly "not available" state.
+            // Best-effort: nothing on the device depends on the report arriving.
         }
     }
 }

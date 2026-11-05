@@ -3,35 +3,28 @@ package com.mahmoud.clipkid.core.domain.usecase
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import kotlinx.coroutines.CancellationException
 import kotlin.time.Clock
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 
-sealed interface CatalogRefresh {
-    /** The cache is younger than the max age; nothing was fetched. */
-    data object Fresh : CatalogRefresh
-    data object Refreshed : CatalogRefresh
+sealed interface CatalogSync {
+    data object Synced : CatalogSync
 
     /** Fetch failed (e.g. offline). The app keeps working from the cache. */
-    data class Failed(val cause: Throwable) : CatalogRefresh
+    data class Failed(val cause: Throwable) : CatalogSync
 }
 
-/** On app start: refresh the cached catalog when it is older than 24 h (or was never fetched). */
-class RefreshCatalogIfStaleUseCase(
+/**
+ * Syncs the cached catalog with the backend. Runs on every app start: only changed rows are
+ * downloaded, so it is cheap. The app start waits for it only when nothing is cached yet.
+ */
+class SyncCatalogUseCase(
     private val catalog: CatalogRepository,
     private val clock: Clock,
-    private val maxAge: Duration = 24.hours,
 ) {
-    suspend operator fun invoke(force: Boolean = false): CatalogRefresh {
-        val now = clock.now()
-        val last = catalog.lastRefreshedAt()
-        if (!force && last != null && now - last < maxAge) return CatalogRefresh.Fresh
-        return try {
-            catalog.refresh(now)
-            CatalogRefresh.Refreshed
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            CatalogRefresh.Failed(e)
-        }
+    suspend operator fun invoke(): CatalogSync = try {
+        catalog.refresh(clock.now())
+        CatalogSync.Synced
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        CatalogSync.Failed(e)
     }
 }

@@ -55,18 +55,19 @@ class GetResumePositionUseCaseTest {
     }
 }
 
-class ReportUnavailableVideoUseCaseTest {
+class ReportVideoUseCaseTest {
 
     @Test
     fun reportsOnlyTheIdAndReason() = runTest {
         val reporter = FakeVideoReporter()
-        val report = ReportUnavailableVideoUseCase(reporter)
+        val report = ReportVideoUseCase(reporter)
 
-        report("L1", UnavailableReason.Removed)
-        report("L2", UnavailableReason.EmbedDisabled)
+        report("L1", VideoReportReason.Removed)
+        report("L2", VideoReportReason.EmbedDisabled)
+        report("L3", VideoReportReason.ParentHidden)
 
         assertEquals(
-            listOf(VideoReport("L1", "video_removed"), VideoReport("L2", "embed_disabled")),
+            listOf(VideoReport("L1", "video_removed"), VideoReport("L2", "embed_disabled"), VideoReport("L3", "parent_hidden")),
             reporter.reports,
         )
     }
@@ -74,6 +75,6 @@ class ReportUnavailableVideoUseCaseTest {
     @Test
     fun aFailingReportIsSwallowed() = runTest {
         val reporter = FakeVideoReporter().apply { error = IllegalStateException("offline") }
-        ReportUnavailableVideoUseCase(reporter)("L1", UnavailableReason.Removed)
+        ReportVideoUseCase(reporter)("L1", VideoReportReason.Removed)
     }
 }

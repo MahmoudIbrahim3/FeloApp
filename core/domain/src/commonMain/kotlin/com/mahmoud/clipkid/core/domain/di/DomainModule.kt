@@ -16,9 +16,9 @@ import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
-import com.mahmoud.clipkid.core.domain.usecase.RefreshCatalogIfStaleUseCase
-import com.mahmoud.clipkid.core.domain.usecase.ReportUnavailableVideoUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ReportVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
+import com.mahmoud.clipkid.core.domain.usecase.SyncCatalogUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateChildSettingsUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateWatchProgressUseCase
@@ -50,8 +50,8 @@ val domainModule: Module = module {
     factoryOf(::GetCollectionUseCase)
     factoryOf(::GetFavoritesUseCase)
     factoryOf(::GetResumePositionUseCase)
-    factoryOf(::ReportUnavailableVideoUseCase)
-    factory { RefreshCatalogIfStaleUseCase(get(), get()) }
+    factoryOf(::ReportVideoUseCase)
+    factoryOf(::SyncCatalogUseCase)
 
     // Onboarding and parent mode
     factoryOf(::GetCollectionsForAgeUseCase)
