@@ -18,12 +18,26 @@ import kotlin.time.Instant
  * Every YouTube id is an 11-character placeholder `REPLACE_<letter><nn>` (L letters, N numbers,
  * Q Quran & duas, M manners, C science, T stories). Search for `REPLACE_` to swap in real,
  * reviewed videos. Thumbnails will not load until then.
+ *
+ * For testing the real player before the backend exists, put real ids in
+ * [DEBUG_VIDEO_ID_OVERRIDES]: they replace the placeholder ids in catalog order.
  */
 class FakeCatalogDataSource : CatalogRemoteDataSource {
     override suspend fun fetchCatalog(): RemoteCatalog = RemoteCatalog(COLLECTIONS, VIDEOS)
 
     companion object {
         private val REFRESHED_AT = Instant.parse("2026-11-01T00:00:00Z")
+
+        /**
+         * Debug only (this whole catalog is a development fake). Real, embeddable, made-for-kids
+         * YouTube ids that replace the `REPLACE_xx` placeholders in order: the first id goes to
+         * letters #1, the 10th to numbers #1, and so on. Each id must be 11 characters
+         * (`[A-Za-z0-9_-]`). Add one video with embedding disabled to see the "not available" state.
+         *
+         * TODO(Mahmoud): fill in before testing the player on a device. Keep it empty in commits
+         * that ship.
+         */
+        val DEBUG_VIDEO_ID_OVERRIDES: List<String> = emptyList()
 
         // Shared tags (Arabic display labels) so Up Next can suggest across collections.
         private const val ANIMALS = "الحيوانات"
@@ -51,7 +65,12 @@ class FakeCatalogDataSource : CatalogRemoteDataSource {
             collection("stories", "حواديت", 0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon"), OLDER, 6),
         )
 
-        val VIDEOS: List<Video> = buildList {
+        val VIDEOS: List<Video> = placeholderVideos().mapIndexed { index, video ->
+            val id = DEBUG_VIDEO_ID_OVERRIDES.getOrNull(index) ?: return@mapIndexed video
+            video.copy(youtubeId = id, thumbnailUrl = "https://i.ytimg.com/vi/$id/hqdefault.jpg")
+        }
+
+        private fun placeholderVideos(): List<Video> = buildList {
             videos(
                 "letters", 'L', SMALL,
                 "أغنية حرف الألف" to listOf(SONGS),

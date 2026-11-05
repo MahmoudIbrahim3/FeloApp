@@ -33,9 +33,15 @@
     <string name="child_back">رجوع</string>
     <string name="child_favorite_add">ضيف للمفضلة</string>
     <string name="child_favorite_remove">شيل من المفضلة</string>
-    <string name="child_player_placeholder">هنا الفيديو هيشتغل</string>
-    <string name="child_player_simulate_end">خلص الفيديو (تجربة)</string>
-    <string name="child_player_unavailable">الفيديو ده مش متاح دلوقتي</string>
+    <string name="child_player_unavailable">الفيديو ده مش متاح</string>
+    <string name="child_player_unavailable_message">اختار فيديو تاني تتفرج عليه.</string>
+    <string name="child_player_offline">مفيش نت دلوقتي</string>
+    <string name="child_player_offline_message">اتأكد إن النت شغال وجرّب تاني.</string>
+    <string name="child_player_retry">جرّب تاني</string>
+    <string name="child_player_go_back">ارجع</string>
+    <string name="child_player_rotate_hint">لف الموبايل بالعرض علشان تكبّر الفيديو</string>
+    <!-- Debug builds only: the YouTube error code under the "not available" message. -->
+    <string name="child_player_debug_error">كود الخطأ: %1$s</string>
 
     <!-- Up Next -->
     <string name="child_upnext_title">تتفرج على إيه دلوقتي؟</string>

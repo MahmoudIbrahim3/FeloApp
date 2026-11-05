@@ -180,6 +180,10 @@ fun ClipKidNavHost() {
                             popUpTo<PlayerDest> { inclusive = true }
                         }
                         PlayerEffect.Back -> nav.popBackStack()
+                        // Logo, title, "Watch on YouTube", end screen, ads: only past the gate.
+                        is PlayerEffect.OpenExternalLink -> nav.navigate(
+                            GateDest(GatePurpose.ExternalLink, childId = dest.childId, url = effect.url),
+                        )
                     }
                 },
             )

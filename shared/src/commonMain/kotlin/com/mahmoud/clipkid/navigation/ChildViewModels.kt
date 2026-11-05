@@ -1,6 +1,7 @@
 package com.mahmoud.clipkid.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
@@ -9,7 +10,9 @@ import com.mahmoud.clipkid.core.domain.usecase.GetCollectionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetFavoritesUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetResumePositionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ReportUnavailableVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateWatchProgressUseCase
@@ -76,8 +79,12 @@ fun rememberPlayerViewModel(childId: String, youtubeId: String, source: WatchSou
                     childId = childId,
                     youtubeId = youtubeId,
                     source = source,
+                    // Keeps the playback's event id and progress across the gate, rotation and process death.
+                    savedState = createSavedStateHandle(),
                     startWatch = koin.get<StartWatchUseCase>(),
                     updateProgress = koin.get<UpdateWatchProgressUseCase>(),
+                    getResumePosition = koin.get<GetResumePositionUseCase>(),
+                    reportUnavailable = koin.get<ReportUnavailableVideoUseCase>(),
                     toggleFavorite = koin.get<ToggleFavoriteUseCase>(),
                     catalog = koin.get<CatalogRepository>(),
                     favorites = koin.get<FavoritesRepository>(),
