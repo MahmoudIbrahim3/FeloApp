@@ -16,6 +16,7 @@ import com.mahmoud.clipkid.core.domain.repository.IdGenerator
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
+import com.mahmoud.clipkid.core.domain.repository.NetworkMonitor
 import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
 import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionUseCase
@@ -28,9 +29,9 @@ import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
-import com.mahmoud.clipkid.core.domain.usecase.RefreshCatalogIfStaleUseCase
-import com.mahmoud.clipkid.core.domain.usecase.ReportUnavailableVideoUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ReportVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
+import com.mahmoud.clipkid.core.domain.usecase.SyncCatalogUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateChildSettingsUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateWatchProgressUseCase
@@ -88,7 +89,7 @@ class KoinGraphTest {
             koin.get<GrantExtraVideosUseCase>(),
             koin.get<HideVideoUseCase>(),
             koin.get<ToggleFavoriteUseCase>(),
-            koin.get<RefreshCatalogIfStaleUseCase>(),
+            koin.get<SyncCatalogUseCase>(),
             // Phase 2 (child screens) and Phase 3 (onboarding, gate, parent mode).
             koin.get<GetCollectionUseCase>(),
             koin.get<GetFavoritesUseCase>(),
@@ -102,13 +103,14 @@ class KoinGraphTest {
             koin.get<CreateAdultChallengeUseCase>(),
             // Phase 4 (player).
             koin.get<GetResumePositionUseCase>(),
-            koin.get<ReportUnavailableVideoUseCase>(),
+            koin.get<ReportVideoUseCase>(),
+            koin.get<NetworkMonitor>(),
             koin.get<ParentSession>(),
         ).forEach { assertTrue(it !is Unit) }
     }
 
     @Test
-    fun fakeCatalogIsOnForNow() = withGraph {
+    fun testsAndPreviewsUseTheFakeCatalog_neverTheNetwork() = withGraph {
         assertTrue(koin.get<DataConfig>().useFakeCatalog)
         assertIs<FakeCatalogDataSource>(koin.get<CatalogRemoteDataSource>())
     }

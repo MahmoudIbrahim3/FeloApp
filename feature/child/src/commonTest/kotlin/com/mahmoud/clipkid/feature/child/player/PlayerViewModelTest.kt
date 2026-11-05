@@ -36,7 +36,8 @@ class PlayerViewModelTest {
         startWatch = f.startWatch,
         updateProgress = f.updateProgress,
         getResumePosition = f.resumePosition,
-        reportUnavailable = f.reportUnavailable,
+        reportVideo = f.reportVideo,
+        network = f.network,
         toggleFavorite = f.toggleFavorite,
         catalog = f.catalog,
         favorites = f.favorites,
@@ -82,7 +83,7 @@ class PlayerViewModelTest {
 
         val vm = PlayerViewModel(
             CHILD, "L1", WatchSource.Home, SavedStateHandle(), f.startWatch, f.updateProgress, f.resumePosition,
-            f.reportUnavailable, f.toggleFavorite, f.catalog, f.favorites,
+            f.reportVideo, f.network, f.toggleFavorite, f.catalog, f.favorites,
         )
         vm.effects.test {
             advanceUntilIdle()
@@ -187,6 +188,25 @@ class PlayerViewModelTest {
         assertNull(vm.slot.problem)
         assertTrue(vm.slot.visible)
         assertEquals(1, vm.slot.attempt)
+        assertEquals(0, f.history.events.value.size)
+    }
+
+    @Test
+    fun offlineWhenOpened_showsOfflineAtOnce_andRetriesWhenTheNetworkIsBack() = runViewModelTest {
+        val f = ChildFixture(this)
+        f.network.isOnline.value = false
+        val vm = viewModel(f)
+
+        assertEquals(PlayerProblem.Offline, vm.slot.problem)
+        assertFalse(vm.slot.visible)
+
+        f.network.isOnline.value = true
+        advanceUntilIdle()
+
+        assertNull(vm.slot.problem)
+        assertTrue(vm.slot.visible)
+        assertEquals(1, vm.slot.attempt)
+        assertTrue(vm.slot.autoPlay)
         assertEquals(0, f.history.events.value.size)
     }
 

@@ -5,6 +5,7 @@ import com.mahmoud.clipkid.core.domain.testing.FakeCatalogRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeFavoritesRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeHiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
+import com.mahmoud.clipkid.core.domain.testing.FakeNetworkMonitor
 import com.mahmoud.clipkid.core.domain.testing.FakeVideoReporter
 import com.mahmoud.clipkid.core.domain.testing.FakeWatchHistoryRepository
 import com.mahmoud.clipkid.core.domain.testing.KUWAIT
@@ -16,7 +17,7 @@ import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetResumePositionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
-import com.mahmoud.clipkid.core.domain.usecase.ReportUnavailableVideoUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ReportVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateWatchProgressUseCase
@@ -65,5 +66,6 @@ class ChildFixture(scope: TestScope, profile: ChildProfile = child(DailyLimit.Vi
     val upNext = GetUpNextUseCase(catalog, profiles, history, hidden, quota, clock, KUWAIT)
     val reporter = FakeVideoReporter()
     val resumePosition = GetResumePositionUseCase(history, clock, KUWAIT)
-    val reportUnavailable = ReportUnavailableVideoUseCase(reporter)
+    val reportVideo = ReportVideoUseCase(reporter)
+    val network = FakeNetworkMonitor()
 }

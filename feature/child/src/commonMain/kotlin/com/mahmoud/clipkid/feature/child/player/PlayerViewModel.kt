@@ -6,11 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
 import com.mahmoud.clipkid.core.domain.usecase.GetResumePositionUseCase
-import com.mahmoud.clipkid.core.domain.usecase.ReportUnavailableVideoUseCase
+import com.mahmoud.clipkid.core.domain.repository.NetworkMonitor
+import com.mahmoud.clipkid.core.domain.usecase.ReportVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchResult
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
-import com.mahmoud.clipkid.core.domain.usecase.UnavailableReason
+import com.mahmoud.clipkid.core.domain.usecase.VideoReportReason
 import com.mahmoud.clipkid.core.domain.usecase.UpdateWatchProgressUseCase
 import com.mahmoud.clipkid.core.model.CoverStyle
 import com.mahmoud.clipkid.core.model.Video
@@ -99,6 +100,9 @@ sealed interface PlayerEffect {
  *
  * The event id and progress live in [SavedStateHandle], so leaving for the parental gate,
  * rotation or process death never counts the same playback twice.
+ *
+ * Offline: with no network when the screen opens, "مفيش نت" shows at once (no player is
+ * created); when the network comes back, a fresh player is tried automatically.
  */
 class PlayerViewModel(
     private val childId: String,
@@ -108,7 +112,8 @@ class PlayerViewModel(
     private val startWatch: StartWatchUseCase,
     private val updateProgress: UpdateWatchProgressUseCase,
     private val getResumePosition: GetResumePositionUseCase,
-    private val reportUnavailable: ReportUnavailableVideoUseCase,
+    private val reportVideo: ReportVideoUseCase,
+    private val network: NetworkMonitor,
     private val toggleFavorite: ToggleFavoriteUseCase,
     private val catalog: CatalogRepository,
     private val favorites: FavoritesRepository,
@@ -160,6 +165,13 @@ class PlayerViewModel(
         }
 
         viewModelScope.launch { prepare() }
+
+        // Back online while showing "مفيش نت": try again with a fresh player.
+        viewModelScope.launch {
+            network.isOnline.collect { online ->
+                if (online && slot.value?.problem == PlayerProblem.Offline) retry()
+            }
+        }
     }
 
     private suspend fun prepare() {
@@ -174,7 +186,14 @@ class PlayerViewModel(
             val duration = catalog.observeVideos().first().firstOrNull { it.youtubeId == youtubeId }?.durationSec ?: 0
             getResumePosition(childId, youtubeId, duration, source).also { positionSec = it }
         }
-        slot.value = PlayerSlot(startSec, autoPlay = !alreadyStarted, visible = true, problem = null, attempt = 0)
+        val offline = !network.isOnline.value
+        slot.value = PlayerSlot(
+            startSec = startSec,
+            autoPlay = !alreadyStarted,
+            visible = !offline,
+            problem = if (offline) PlayerProblem.Offline else null,
+            attempt = 0,
+        )
     }
 
     fun onEvent(event: PlayerEvent) {
@@ -184,11 +203,13 @@ class PlayerViewModel(
                 saveProgress()
                 effectChannel.send(PlayerEffect.Back)
             }
-            PlayerEvent.RetryClicked -> slot.update {
-                it?.copy(problem = null, visible = true, attempt = it.attempt + 1, startSec = positionSec)
-            }
+            PlayerEvent.RetryClicked -> retry()
             is PlayerEvent.FromPlayer -> onPlayer(event.event)
         }
+    }
+
+    private fun retry() {
+        slot.update { it?.copy(problem = null, visible = true, attempt = it.attempt + 1, startSec = positionSec) }
     }
 
     private fun onPlayer(event: YouTubePlayerEvent) {
@@ -281,13 +302,13 @@ class PlayerViewModel(
         }
         slot.update { it?.copy(problem = problem, visible = false) }
         val reason = when (code) {
-            ERROR_REMOVED -> UnavailableReason.Removed
-            ERROR_NOT_EMBEDDABLE, ERROR_NOT_EMBEDDABLE_TOO -> UnavailableReason.EmbedDisabled
+            ERROR_REMOVED -> VideoReportReason.Removed
+            ERROR_NOT_EMBEDDABLE, ERROR_NOT_EMBEDDABLE_TOO -> VideoReportReason.EmbedDisabled
             else -> null
         }
         if (reason != null && !reported) {
             reported = true
-            viewModelScope.launch { reportUnavailable(youtubeId, reason) }
+            viewModelScope.launch { reportVideo(youtubeId, reason) }
         }
         persistLater()
     }

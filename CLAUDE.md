@@ -15,7 +15,7 @@ ClipKid is a curated video app for children aged 2–12, Arabic-first (Egyptian 
 4. Player params: `rel=0`, `playsinline=1`, `enablejsapi=1`, `origin` = the base URL. Never autoplay the next video.
 5. YouTube API data (title, thumbnail URL, duration, madeForKids, embeddable) is fetched by the backend only, stored max 30 days and refreshed by a scheduled job. The app caches images only through Coil/HTTP cache.
 6. Wherever a YouTube thumbnail or player is shown, show YouTube attribution using official brand assets.
-7. The YouTube Data API key never ships in the app. It lives only in Supabase Edge Function secrets.
+7. The YouTube Data API key never ships in the app. It lives only in Supabase Edge Function secrets. The app only has the Supabase URL and **publishable** key, from `local.properties` / env at build time (BuildKonfig), never committed.
 8. The app is child-directed: no third-party analytics, ads, attribution or tracking SDKs, no personalized anything, no YouTube write actions. Ask before adding ANY SDK that sends data off-device.
 9. Every external link, purchase, settings screen and “Watch on YouTube” escape route sits behind the parental gate.
 10. PIN is stored hashed (salt + SHA-256 at minimum) in secure storage (Android Keystore-backed / iOS Keychain).
@@ -38,12 +38,13 @@ ClipKid is a curated video app for children aged 2–12, Arabic-first (Egyptian 
 - `core:player` — expect/actual YouTube player.
 - `core:billing` — RevenueCat wrapper behind an interface.
 - `feature:onboarding`, `feature:child`, `feature:parent`.
+- `/supabase` — the backend, versioned with the app: SQL migrations (schema, RLS, pg_cron schedule), pgTAP tests, the `refresh-youtube-data` Edge Function, and `README.md` (setup and how to add a video).
 Rules: features depend only on core modules, never on each other. Navigation lives in `shared`.
 
 ## Architecture
 - MVVM + unidirectional data flow. Each screen: `XxxViewModel` exposes `StateFlow<XxxUiState>`, receives `XxxEvent` (sealed interface), emits one-off effects through a Channel.
 - Business rules live in use cases, not ViewModels or composables.
-- Catalog (collections + videos) is cached in Room and refreshed on app start when older than 24h. The app works from cache when offline (lists only; playback needs network).
+- Catalog (collections + videos) is cached in Room and synced with Supabase on every app start: only changed rows are downloaded (manifest of `youtube_id` + `updated_at`), and videos the backend no longer lists are deleted. Only a first launch with an empty cache waits for it. Cached YouTube data older than 30 days is never shown. The app works from cache when offline (lists only; playback needs network, and the player shows an offline state).
 
 ## Domain model
 - `AgeBand`: A2_3, A4_6, A7_9, A10_12
