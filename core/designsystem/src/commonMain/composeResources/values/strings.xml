@@ -13,6 +13,7 @@
     <string name="ds_age_years">%1$s–%2$s سنين</string>
     <string name="ds_age_years_ten_plus">%1$s–%2$s سنة</string>
     <string name="ds_premium">%1$s · بالاشتراك</string>
+    <string name="ds_locked">%1$s · مقفولة، محتاجة بابا أو ماما</string>
     <string name="ds_avatar_color">لون %1$s</string>
 
     <!-- Sample content used only by component showcases / previews -->
@@ -53,4 +54,11 @@
     <string name="showcase_empty_title">لسه مفيش مفضلة</string>
     <string name="showcase_empty_message">دوس على القلب في أي فيديو عشان تلاقيه هنا بسرعة.</string>
     <string name="showcase_type_sample">أهلاً يا بطل! فاضلك ٣ فيديوهات النهارده</string>
+    <!-- Showcase only: sample prices, never shown in the app (real prices come from the store). -->
+    <string name="showcase_plan_annual">سنوي</string>
+    <string name="showcase_plan_annual_price">١٢٫٠٠٠ د.ك</string>
+    <string name="showcase_plan_annual_detail">١٫٠٠٠ د.ك / شهر</string>
+    <string name="showcase_plan_badge">وفّر ٪٣٣</string>
+    <string name="showcase_plan_monthly">شهري</string>
+    <string name="showcase_plan_monthly_price">١٫٥٠٠ د.ك</string>
 </resources>

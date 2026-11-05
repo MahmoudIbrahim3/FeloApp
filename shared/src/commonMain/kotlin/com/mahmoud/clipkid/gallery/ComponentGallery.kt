@@ -20,30 +20,13 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.mahmoud.clipkid.shared.resources.Res
-import com.mahmoud.clipkid.shared.resources.gallery_chip
-import com.mahmoud.clipkid.shared.resources.gallery_collection_cover
-import com.mahmoud.clipkid.shared.resources.gallery_colors
-import com.mahmoud.clipkid.shared.resources.gallery_empty_state
-import com.mahmoud.clipkid.shared.resources.gallery_icon_button
-import com.mahmoud.clipkid.shared.resources.gallery_pin_pad
-import com.mahmoud.clipkid.shared.resources.gallery_primary_button
-import com.mahmoud.clipkid.shared.resources.gallery_quota_dots
-import com.mahmoud.clipkid.shared.resources.gallery_secondary_button
-import com.mahmoud.clipkid.shared.resources.gallery_segmented
-import com.mahmoud.clipkid.shared.resources.gallery_shelf
-import com.mahmoud.clipkid.shared.resources.gallery_step_progress
-import com.mahmoud.clipkid.shared.resources.gallery_subtitle
-import com.mahmoud.clipkid.shared.resources.gallery_title
-import com.mahmoud.clipkid.shared.resources.gallery_toggle
-import com.mahmoud.clipkid.shared.resources.gallery_typography
-import com.mahmoud.clipkid.shared.resources.gallery_video_card
 import com.mahmoud.clipkid.core.designsystem.component.ChipShowcase
 import com.mahmoud.clipkid.core.designsystem.component.CollectionCoverShowcase
 import com.mahmoud.clipkid.core.designsystem.component.ColorTokensShowcase
 import com.mahmoud.clipkid.core.designsystem.component.EmptyStateShowcase
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonLargeShowcase
 import com.mahmoud.clipkid.core.designsystem.component.PinPadShowcase
+import com.mahmoud.clipkid.core.designsystem.component.PlanCardShowcase
 import com.mahmoud.clipkid.core.designsystem.component.PrimaryButtonShowcase
 import com.mahmoud.clipkid.core.designsystem.component.QuotaDotsShowcase
 import com.mahmoud.clipkid.core.designsystem.component.SecondaryButtonShowcase
@@ -55,6 +38,25 @@ import com.mahmoud.clipkid.core.designsystem.component.ToggleShowcase
 import com.mahmoud.clipkid.core.designsystem.component.TypographyShowcase
 import com.mahmoud.clipkid.core.designsystem.component.VideoCardShowcase
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
+import com.mahmoud.clipkid.shared.resources.Res
+import com.mahmoud.clipkid.shared.resources.gallery_chip
+import com.mahmoud.clipkid.shared.resources.gallery_collection_cover
+import com.mahmoud.clipkid.shared.resources.gallery_colors
+import com.mahmoud.clipkid.shared.resources.gallery_empty_state
+import com.mahmoud.clipkid.shared.resources.gallery_icon_button
+import com.mahmoud.clipkid.shared.resources.gallery_pin_pad
+import com.mahmoud.clipkid.shared.resources.gallery_plan_card
+import com.mahmoud.clipkid.shared.resources.gallery_primary_button
+import com.mahmoud.clipkid.shared.resources.gallery_quota_dots
+import com.mahmoud.clipkid.shared.resources.gallery_secondary_button
+import com.mahmoud.clipkid.shared.resources.gallery_segmented
+import com.mahmoud.clipkid.shared.resources.gallery_shelf
+import com.mahmoud.clipkid.shared.resources.gallery_step_progress
+import com.mahmoud.clipkid.shared.resources.gallery_subtitle
+import com.mahmoud.clipkid.shared.resources.gallery_title
+import com.mahmoud.clipkid.shared.resources.gallery_toggle
+import com.mahmoud.clipkid.shared.resources.gallery_typography
+import com.mahmoud.clipkid.shared.resources.gallery_video_card
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -99,6 +101,7 @@ fun ComponentGallery(modifier: Modifier = Modifier) {
         section(Res.string.gallery_toggle) { ToggleShowcase() }
         section(Res.string.gallery_video_card) { VideoCardShowcase() }
         section(Res.string.gallery_collection_cover) { CollectionCoverShowcase() }
+        section(Res.string.gallery_plan_card) { PlanCardShowcase() }
         section(Res.string.gallery_shelf, edgeToEdge = true) { ShelfShowcase() }
         section(Res.string.gallery_quota_dots) { QuotaDotsShowcase() }
         section(Res.string.gallery_pin_pad) { PinPadShowcase() }
