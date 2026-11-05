@@ -1,13 +1,16 @@
 package com.mahmoud.clipkid.core.domain.usecase
 
+import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.IdGenerator
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
+import com.mahmoud.clipkid.core.domain.repository.isFullNow
 import com.mahmoud.clipkid.core.model.AgeBand
 import com.mahmoud.clipkid.core.model.ChildProfile
 import com.mahmoud.clipkid.core.model.Collection
 import com.mahmoud.clipkid.core.model.DailyLimit
+import com.mahmoud.clipkid.core.model.SubscriptionLimits
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -44,28 +47,45 @@ class GetCollectionsForAgeUseCase(private val catalog: CatalogRepository) {
         fun forAge(all: List<Collection>, ageBand: AgeBand): List<Collection> =
             all.filter { ageBand in it.ageBands }.sortedBy { it.sortOrder }
 
-        /** Onboarding pre-selects every collection of the age band except premium ones. */
-        fun defaultSelection(collections: List<Collection>): Set<String> =
-            collections.filterNot { it.isPremium }.map { it.id }.toSet()
+        /**
+         * A new child starts with every collection of the age band; premium ones only with the
+         * full subscription.
+         */
+        fun defaultSelection(collections: List<Collection>, isFull: Boolean): Set<String> =
+            collections.filter { isFull || !it.isPremium }.map { it.id }.toSet()
     }
 }
 
-/** Adds a child profile and makes it the active child (the one child mode shows). Returns its id. */
+/** Thrown by [AddChildUseCase] when the plan has no room for another child. */
+class ChildLimitReachedException(val max: Int) : IllegalStateException("At most $max child profiles")
+
+/**
+ * Adds a child profile and makes it the active child (the one child mode shows). Returns its id.
+ * Free allows 1 child, the full subscription 4 ([SubscriptionLimits]).
+ */
 class AddChildUseCase(
     private val profiles: ProfileRepository,
     private val settings: SettingsRepository,
     private val ids: IdGenerator,
     private val catalog: CatalogRepository,
+    private val billing: BillingRepository,
 ) {
     suspend operator fun invoke(child: NewChild): String {
         require(child.isValid) { "nickname must be 1..$NICKNAME_MAX_LENGTH characters" }
-        val premium = catalog.observeCollections().first().filter { it.isPremium }.map { it.id }.toSet()
+        val isFull = billing.isFullNow()
+        val max = SubscriptionLimits.maxChildren(isFull)
+        if (profiles.observeProfiles().first().size >= max) throw ChildLimitReachedException(max)
+        val premium = if (isFull) {
+            emptySet()
+        } else {
+            catalog.observeCollections().first().filter { it.isPremium }.map { it.id }.toSet()
+        }
         val profile = ChildProfile(
             id = ids.newId(),
             nickname = child.nickname.trim(),
             avatarColor = child.avatarColor,
             ageBand = child.ageBand,
-            // Premium collections need a subscription (billing phase); never enabled here.
+            // Premium collections only with the full subscription.
             allowedCollectionIds = child.allowedCollectionIds - premium,
             dailyLimit = child.dailyLimit,
         )
@@ -93,23 +113,24 @@ class CompleteOnboardingUseCase(
 
 /**
  * Dashboard changes to one child. Child mode observes the profile, so Home updates at once.
- * Premium collections cannot be turned on until billing exists.
+ * Premium collections can be turned on only with the full subscription.
  */
 class UpdateChildSettingsUseCase(
     private val profiles: ProfileRepository,
     private val catalog: CatalogRepository,
+    private val billing: BillingRepository,
 ) {
     suspend fun setDailyLimit(childId: String, limit: DailyLimit) {
         val child = profiles.getProfile(childId) ?: return
         if (child.dailyLimit != limit) profiles.upsert(child.copy(dailyLimit = limit))
     }
 
-    /** Returns false when the change was refused (premium collection, or unknown child). */
+    /** Returns false when the change was refused (premium collection without the subscription, or unknown child). */
     suspend fun setCollectionAllowed(childId: String, collectionId: String, allowed: Boolean): Boolean {
         val child = profiles.getProfile(childId) ?: return false
         if (allowed) {
             val collection = catalog.observeCollections().first().firstOrNull { it.id == collectionId }
-            if (collection == null || collection.isPremium) return false
+            if (collection == null || (collection.isPremium && !billing.isFullNow())) return false
         }
         val ids = if (allowed) child.allowedCollectionIds + collectionId else child.allowedCollectionIds - collectionId
         if (ids != child.allowedCollectionIds) profiles.upsert(child.copy(allowedCollectionIds = ids))

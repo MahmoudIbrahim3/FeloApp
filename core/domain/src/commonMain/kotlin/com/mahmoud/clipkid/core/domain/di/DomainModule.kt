@@ -6,16 +6,18 @@ import com.mahmoud.clipkid.core.domain.parent.ResetPinUseCase
 import com.mahmoud.clipkid.core.domain.parent.UnlockWithPinUseCase
 import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
 import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
+import com.mahmoud.clipkid.core.domain.usecase.EnablePremiumCollectionsUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetFavoritesUseCase
-import com.mahmoud.clipkid.core.domain.usecase.GetResumePositionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
+import com.mahmoud.clipkid.core.domain.usecase.GetResumePositionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ObserveAccessUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ReportVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
 import com.mahmoud.clipkid.core.domain.usecase.SyncCatalogUseCase
@@ -59,6 +61,10 @@ val domainModule: Module = module {
     factoryOf(::CompleteOnboardingUseCase)
     factoryOf(::UpdateChildSettingsUseCase)
     factoryOf(::GetWeeklyActivityUseCase)
+
+    // Subscriptions
+    factoryOf(::ObserveAccessUseCase)
+    factoryOf(::EnablePremiumCollectionsUseCase)
     factory { UnlockWithPinUseCase(get(), get()) }
     factoryOf(::ResetPinUseCase)
     factory { CreateAdultChallengeUseCase() }

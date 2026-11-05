@@ -1,10 +1,12 @@
 package com.mahmoud.clipkid.core.domain.usecase
 
 import com.mahmoud.clipkid.core.domain.catalog.VisibleCatalog
+import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
+import com.mahmoud.clipkid.core.domain.repository.observeIsFull
 import com.mahmoud.clipkid.core.model.ChildProfile
 import com.mahmoud.clipkid.core.model.Collection
 import com.mahmoud.clipkid.core.model.Video
@@ -27,15 +29,16 @@ class GetFavoritesUseCase(
     private val profiles: ProfileRepository,
     private val favorites: FavoritesRepository,
     private val hidden: HiddenVideosRepository,
+    private val billing: BillingRepository,
 ) {
     operator fun invoke(childId: String): Flow<List<FavoriteItem>> = combine(
-        profiles.observeProfile(childId).filterNotNull(),
+        combine(profiles.observeProfile(childId).filterNotNull(), billing.observeIsFull(), ::Pair),
         catalog.observeCollections(),
         catalog.observeVideos(),
         hidden.observeHiddenIds(childId),
         favorites.observeFavorites(childId),
-    ) { child, collections, videos, hiddenIds, favs ->
-        visibleFavorites(child, collections, videos, hiddenIds, favs.map { it.youtubeId })
+    ) { (child, isFull), collections, videos, hiddenIds, favs ->
+        visibleFavorites(child, collections, videos, hiddenIds, favs.map { it.youtubeId }, isFull)
     }
 
     companion object {
@@ -45,8 +48,9 @@ class GetFavoritesUseCase(
             videos: List<Video>,
             hiddenIds: Set<String>,
             favoriteIds: List<String>,
+            isFull: Boolean,
         ): List<FavoriteItem> {
-            val visible = VisibleCatalog.of(child, collections, videos, hiddenIds)
+            val visible = VisibleCatalog.of(child, collections, videos, hiddenIds, isFull)
             val byId = visible.videos.associateBy { it.youtubeId }
             val collectionById = visible.collections.associateBy { it.id }
             return favoriteIds.mapNotNull { id ->
