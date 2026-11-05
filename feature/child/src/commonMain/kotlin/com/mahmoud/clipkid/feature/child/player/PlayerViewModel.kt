@@ -3,16 +3,18 @@ package com.mahmoud.clipkid.feature.child.player
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
-import com.mahmoud.clipkid.core.domain.usecase.GetResumePositionUseCase
 import com.mahmoud.clipkid.core.domain.repository.NetworkMonitor
+import com.mahmoud.clipkid.core.domain.repository.observeIsFull
+import com.mahmoud.clipkid.core.domain.usecase.GetResumePositionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ReportVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchResult
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
-import com.mahmoud.clipkid.core.domain.usecase.VideoReportReason
 import com.mahmoud.clipkid.core.domain.usecase.UpdateWatchProgressUseCase
+import com.mahmoud.clipkid.core.domain.usecase.VideoReportReason
 import com.mahmoud.clipkid.core.model.CoverStyle
 import com.mahmoud.clipkid.core.model.Video
 import com.mahmoud.clipkid.core.model.WatchSource
@@ -117,6 +119,7 @@ class PlayerViewModel(
     private val toggleFavorite: ToggleFavoriteUseCase,
     private val catalog: CatalogRepository,
     private val favorites: FavoritesRepository,
+    private val billing: BillingRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<PlayerUiState>(PlayerUiState.Loading)
@@ -147,11 +150,14 @@ class PlayerViewModel(
                 catalog.observeCollections(),
                 favorites.observeFavorites(childId),
                 slot,
-            ) { videos, collections, favs, playerSlot ->
+                billing.observeIsFull(),
+            ) { videos, collections, favs, playerSlot, isFull ->
                 val video = videos.firstOrNull { it.youtubeId == youtubeId }
                 val collection = video?.let { v -> collections.firstOrNull { it.id == v.collectionId } }
                 when {
                     video == null || collection == null -> PlayerUiState.Unavailable
+                    // The subscription ended while this was open: premium never plays without it.
+                    collection.isPremium && !isFull -> PlayerUiState.Unavailable
                     playerSlot == null -> PlayerUiState.Loading
                     else -> PlayerUiState.Ready(
                         video = video,

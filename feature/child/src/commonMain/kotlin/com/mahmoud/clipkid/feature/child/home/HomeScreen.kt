@@ -159,11 +159,20 @@ fun HomeContent(
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = gutter),
                     horizontalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.md),
                 ) {
-                    items(state.collections, key = { it.id }) { collection ->
+                    items(state.covers, key = { it.collection.id }) { (collection, locked) ->
                         CollectionCover(
                             style = collection.cover,
                             title = collection.titleAr,
-                            onClick = { onEvent(HomeEvent.CollectionClicked(collection.id)) },
+                            locked = locked,
+                            onClick = {
+                                onEvent(
+                                    if (locked) {
+                                        HomeEvent.LockedCollectionClicked(collection.id)
+                                    } else {
+                                        HomeEvent.CollectionClicked(collection.id)
+                                    },
+                                )
+                            },
                         )
                     }
                 }
