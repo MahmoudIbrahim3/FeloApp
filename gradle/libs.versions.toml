@@ -30,6 +30,7 @@ coil = "3.6.3"
 ktor = "3.6.1"
 supabase = "3.9.0"
 buildKonfig = "0.23.0"
+revenuecat = "4.1.0"
 
 # Testing
 turbine = "1.2.1"
@@ -76,6 +77,9 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 # Supabase (catalog + anonymous reports; PostgREST only)
 supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabase" }
 supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
+
+# RevenueCat (subscriptions). Core only: no RevenueCat Paywalls UI, no Arrow/Result adapters.
+revenuecat-purchases-core = { module = "com.revenuecat.purchases:purchases-kmp-core", version.ref = "revenuecat" }
 
 # Testing
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
