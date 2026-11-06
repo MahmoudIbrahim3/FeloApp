@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -93,7 +94,8 @@ fun UpNextScreen(
 }
 
 @Composable
-private fun UpNextBody(state: UpNextUiState.Ready, onEvent: (UpNextEvent) -> Unit) {
+// ColumnScope: lays out directly in UpNextScreen's Column, so the bottom Spacer can push the home button down.
+private fun ColumnScope.UpNextBody(state: UpNextUiState.Ready, onEvent: (UpNextEvent) -> Unit) {
     val colors = ClipKidTheme.colors
     val finished = state.finished
 
