@@ -3,6 +3,7 @@ package com.mahmoud.clipkid.navigation
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
