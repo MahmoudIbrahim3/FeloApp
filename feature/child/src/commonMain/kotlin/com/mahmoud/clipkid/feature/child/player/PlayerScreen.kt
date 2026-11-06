@@ -97,6 +97,9 @@ fun PlayerScreen(
     ) {
         val phoneLandscape = maxWidth > maxHeight && maxHeight < PHONE_LANDSCAPE_MAX_HEIGHT
         val compactWidth = maxWidth < 600.dp
+        // Read here: inside the Column below, BoxWithConstraints' maxWidth/maxHeight aren't reachable
+        // implicitly (both scopes are @LayoutScopeMarker).
+        val portrait = maxHeight > maxWidth
         Column(Modifier.fillMaxSize()) {
             Row(
                 Modifier
@@ -120,7 +123,7 @@ fun PlayerScreen(
                     state = state,
                     onEvent = onEvent,
                     phoneLandscape = phoneLandscape,
-                    showRotateHint = !phoneLandscape && compactWidth && maxHeight > maxWidth,
+                    showRotateHint = !phoneLandscape && compactWidth && portrait,
                 )
             }
         }
