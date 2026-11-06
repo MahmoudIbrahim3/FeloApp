@@ -241,6 +241,8 @@ private fun BottomActions(state: PaywallUiState, onEvent: (PaywallEvent) -> Unit
     val colors = ClipKidTheme.colors
     val spacing = ClipKidTheme.spacing
     val plan = state.selectedPlan
+    // Local copy: Plan is from core:model, so Kotlin can't smart-cast plan.trial after a null check.
+    val trial = plan?.trial
     Column(Modifier.fillMaxWidth().padding(top = spacing.xs), verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
         state.message?.let { message ->
             Text(
@@ -254,7 +256,7 @@ private fun BottomActions(state: PaywallUiState, onEvent: (PaywallEvent) -> Unit
         PrimaryButton(
             text = when {
                 state.busy != null -> stringResource(Res.string.paywall_cta_busy)
-                plan?.trial != null -> trialLabel(plan.trial)
+                trial != null -> trialLabel(trial)
                 else -> stringResource(Res.string.paywall_cta_subscribe)
             },
             onClick = { onEvent(PaywallEvent.Subscribe) },
