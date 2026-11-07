@@ -85,8 +85,9 @@ class AddChildUseCase(
 }
 
 /**
- * The last onboarding step. Everything is saved here at once (PIN, child, active child,
- * "onboarding done"), so leaving onboarding halfway saves nothing. Returns the child id.
+ * The last onboarding step. Everything is saved here at once (PIN, the parent's consent, child,
+ * active child, "onboarding done"), so leaving onboarding halfway saves nothing. Returns the
+ * child id. Onboarding cannot reach this step without the consent step.
  */
 class CompleteOnboardingUseCase(
     private val settings: SettingsRepository,
@@ -94,6 +95,7 @@ class CompleteOnboardingUseCase(
 ) {
     suspend operator fun invoke(pin: String, child: NewChild): String {
         settings.setPin(pin)
+        settings.setConsentGiven(true)
         val id = addChild(child)
         settings.setOnboardingDone(true)
         return id

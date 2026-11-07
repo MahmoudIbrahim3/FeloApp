@@ -73,6 +73,13 @@ internal class DataStoreSettingsRepository(
         prefs.edit { if (id == null) it.remove(PreferenceKeys.ActiveChildId) else it[PreferenceKeys.ActiveChildId] = id }
     }
 
+    override val consentGiven: Flow<Boolean> =
+        prefs.data.map { it[PreferenceKeys.ConsentGiven] == true }.distinctUntilChanged()
+
+    override suspend fun setConsentGiven(given: Boolean) {
+        prefs.edit { it[PreferenceKeys.ConsentGiven] = given }
+    }
+
     companion object {
         internal const val PIN_HASH_KEY = "parent_pin_hash"
     }

@@ -23,4 +23,13 @@ interface SettingsRepository {
     val activeChildId: Flow<String?>
 
     suspend fun setActiveChildId(id: String?)
+
+    /**
+     * The parent agreed (onboarding, or the paywall for older installs) that videos play through
+     * YouTube's player and subscriptions go through Apple/Google and RevenueCat. Until then the app
+     * never talks to RevenueCat (Apple Kids: no device data to third parties without consent).
+     */
+    val consentGiven: Flow<Boolean>
+
+    suspend fun setConsentGiven(given: Boolean)
 }

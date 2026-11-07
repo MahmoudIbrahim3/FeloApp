@@ -5,7 +5,6 @@ import com.mahmoud.clipkid.core.data.catalog.FakeCatalogDataSource
 import com.mahmoud.clipkid.core.data.db.ClipKidDatabase
 import com.mahmoud.clipkid.core.data.db.inMemoryClipKidDatabase
 import com.mahmoud.clipkid.core.data.prefs.InMemoryPreferencesDataStore
-import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetUpNextUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
@@ -16,12 +15,8 @@ import com.mahmoud.clipkid.core.domain.usecase.UpNextResult
 import com.mahmoud.clipkid.core.model.AgeBand
 import com.mahmoud.clipkid.core.model.ChildProfile
 import com.mahmoud.clipkid.core.model.DailyLimit
-import com.mahmoud.clipkid.core.model.Entitlement
 import com.mahmoud.clipkid.core.model.Favorite
 import com.mahmoud.clipkid.core.model.HiddenVideo
-import com.mahmoud.clipkid.core.model.Offering
-import com.mahmoud.clipkid.core.model.Plan
-import com.mahmoud.clipkid.core.model.PurchaseOutcome
 import com.mahmoud.clipkid.core.model.WatchEvent
 import com.mahmoud.clipkid.core.model.WatchSource
 import kotlin.test.AfterTest
@@ -35,8 +30,6 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
@@ -169,7 +162,7 @@ class RoomRepositoriesTest {
         var id = 0
         val start = StartWatchUseCase(profiles, history, { "e${id++}" }, clock, tz)
         val quota = GetDailyQuotaUseCase(profiles, history, clock, tz)
-        val upNext = GetUpNextUseCase(catalog, profiles, history, hidden, quota, clock, tz, FreeBilling)
+        val upNext = GetUpNextUseCase(catalog, profiles, history, hidden, quota, clock, tz)
 
         assertIs<StartWatchResult.Allowed>(start("c1", "REPLACE_L01", WatchSource.Home))
         HideVideoUseCase(hidden, favorites, ReportVideoUseCase(NoOpVideoReporter), clock)("c1", "REPLACE_L02")
@@ -184,14 +177,4 @@ class RoomRepositoriesTest {
         assertEquals(UpNextResult.LimitReached, upNext("c1", "REPLACE_L03"))
         assertEquals(2, quota.current("c1")?.used)
     }
-}
-
-/** core:data has no core:testing dependency: a minimal always-free billing for the Up Next check. */
-private object FreeBilling : BillingRepository {
-    override val entitlement: StateFlow<Entitlement> = MutableStateFlow(Entitlement.Free)
-    override fun start() = Unit
-    override suspend fun offering(): Offering? = null
-    override suspend fun purchase(plan: Plan): PurchaseOutcome = PurchaseOutcome.Cancelled
-    override suspend fun restore(): PurchaseOutcome = PurchaseOutcome.NothingToRestore
-    override suspend fun refresh() = Unit
 }

@@ -11,11 +11,13 @@ class FakeSettingsRepository(
     pin: String? = null,
     onboardingDone: Boolean = false,
     activeChildId: String? = null,
+    consentGiven: Boolean = false,
 ) : SettingsRepository {
     val pin = MutableStateFlow(pin)
     val lockout = MutableStateFlow(PinLockout.None)
     private val done = MutableStateFlow(onboardingDone)
     private val active = MutableStateFlow(activeChildId)
+    val consent = MutableStateFlow(consentGiven)
     var verifyCalls: Int = 0
         private set
 
@@ -46,5 +48,11 @@ class FakeSettingsRepository(
 
     override suspend fun setActiveChildId(id: String?) {
         active.value = id
+    }
+
+    override val consentGiven: Flow<Boolean> = consent
+
+    override suspend fun setConsentGiven(given: Boolean) {
+        consent.value = given
     }
 }

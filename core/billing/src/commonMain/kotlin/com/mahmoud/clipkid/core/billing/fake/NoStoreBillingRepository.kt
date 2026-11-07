@@ -18,6 +18,8 @@ class NoStoreBillingRepository : BillingRepository {
     private val _entitlement = MutableStateFlow<Entitlement>(Entitlement.Free)
     override val entitlement: StateFlow<Entitlement> = _entitlement.asStateFlow()
 
+    override val isStarted: Boolean = false
+
     override fun start() = Unit
 
     override suspend fun offering(): Offering? = null

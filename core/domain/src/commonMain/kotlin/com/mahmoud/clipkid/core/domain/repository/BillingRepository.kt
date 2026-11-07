@@ -18,15 +18,26 @@ import kotlinx.coroutines.flow.map
  */
 interface BillingRepository {
     /**
-     * Current access. Starts as [Entitlement.Unknown] and becomes Free or Full as soon as the store
-     * answers (or fails). Updates by itself on purchase, renewal, cancellation, expiry and refund.
+     * Current access. Starts as [Entitlement.Unknown] only until the on-device cache is read (Free
+     * when nothing is cached), so it never waits for the store. Once [start]ed, it follows the
+     * store: purchase, renewal, cancellation, expiry and refund.
      */
     val entitlement: StateFlow<Entitlement>
 
-    /** Sets up the store connection. Called once at app start, on the main thread. */
+    /** True once [start] has set up the store connection in this process. */
+    val isStarted: Boolean
+
+    /**
+     * Sets up the store connection. Idempotent; call on the main thread. Only through
+     * [com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase], which checks the parent's
+     * consent first.
+     */
     fun start()
 
-    /** The `default` offering with live store prices, or null when it can't be loaded (offline, store problem). */
+    /**
+     * The `default` offering with live store prices, or null when it can't be loaded (offline,
+     * store problem, or not [start]ed).
+     */
     suspend fun offering(): Offering?
 
     /** Opens the store's purchase sheet. Call only from the paywall, which is behind the PIN. */
@@ -35,13 +46,13 @@ interface BillingRepository {
     /** Looks for an earlier subscription on this store account. */
     suspend fun restore(): PurchaseOutcome
 
-    /** Asks the store again (app back in the foreground). Never throws. */
+    /** Asks the store again. Does nothing before [start]. Never throws. */
     suspend fun refresh()
 }
 
 /**
- * Whether premium content is open. Waits for the first known entitlement, so a subscriber never
- * sees locks flash while the store answers.
+ * Whether the subscription is on. Waits for the first known entitlement (the on-device cache), so
+ * a subscriber never sees locks flash at launch.
  */
 fun BillingRepository.observeIsFull(): Flow<Boolean> =
     entitlement.filter { it != Entitlement.Unknown }.map { it.isFull }.distinctUntilChanged()

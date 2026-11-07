@@ -12,6 +12,7 @@ import com.mahmoud.clipkid.core.data.prefs.InMemoryPreferencesDataStore
 import com.mahmoud.clipkid.core.data.remote.SupabaseCatalogDataSource
 import com.mahmoud.clipkid.core.data.remote.SupabaseVideoReporter
 import com.mahmoud.clipkid.core.data.remote.createClipKidSupabase
+import com.mahmoud.clipkid.core.data.repository.DataStoreEntitlementCache
 import com.mahmoud.clipkid.core.data.repository.DataStoreSettingsRepository
 import com.mahmoud.clipkid.core.data.repository.NoOpVideoReporter
 import com.mahmoud.clipkid.core.data.repository.OfflineFirstCatalogRepository
@@ -30,6 +31,7 @@ import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.IdGenerator
 import com.mahmoud.clipkid.core.domain.repository.NetworkMonitor
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
+import com.mahmoud.clipkid.core.domain.repository.EntitlementCache
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
 import io.github.jan.supabase.SupabaseClient
@@ -88,6 +90,7 @@ val dataModule: Module = module {
     single<FavoritesRepository> { RoomFavoritesRepository(get<ClipKidDatabase>().favoritesDao()) }
     single<HiddenVideosRepository> { RoomHiddenVideosRepository(get<ClipKidDatabase>().hiddenVideosDao()) }
     single<SettingsRepository> { DataStoreSettingsRepository(get(), get(), get()) }
+    single<EntitlementCache> { DataStoreEntitlementCache(get()) }
     single<VideoReporter> { if (get<DataConfig>().usesSupabase) SupabaseVideoReporter(get()) else NoOpVideoReporter }
     single<IdGenerator> { UuidIdGenerator }
 }

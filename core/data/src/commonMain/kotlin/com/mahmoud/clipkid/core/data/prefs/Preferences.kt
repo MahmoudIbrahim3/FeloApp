@@ -30,6 +30,17 @@ internal object PreferenceKeys {
     /** Wrong-PIN lockout (see PinLockout): attempts in a row, and the lockout end in epoch ms. */
     val PinFailedAttempts = intPreferencesKey("pin_failed_attempts")
     val PinLockedUntil = longPreferencesKey("pin_locked_until")
+
+    /** The parent agreed to YouTube's player and the store/RevenueCat (see SettingsRepository.consentGiven). */
+    val ConsentGiven = booleanPreferencesKey("consent_given")
+
+    /** Last subscription status from the store (EntitlementCache). No ids: only what the UI shows. */
+    val EntitlementFull = booleanPreferencesKey("entitlement_full")
+    val EntitlementExpiresAt = longPreferencesKey("entitlement_expires_at")
+    val EntitlementWillRenew = booleanPreferencesKey("entitlement_will_renew")
+    val EntitlementTrial = booleanPreferencesKey("entitlement_trial")
+    val EntitlementStore = stringPreferencesKey("entitlement_store")
+    val EntitlementManagementUrl = stringPreferencesKey("entitlement_management_url")
 }
 
 /** One DataStore per file and process: create it once (Koin single). */

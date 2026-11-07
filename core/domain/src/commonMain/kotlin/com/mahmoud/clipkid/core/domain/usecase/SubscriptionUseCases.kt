@@ -2,8 +2,11 @@ package com.mahmoud.clipkid.core.domain.usecase
 
 import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
+import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
 import com.mahmoud.clipkid.core.domain.repository.observeIsFull
+import com.mahmoud.clipkid.core.model.Entitlement
 import com.mahmoud.clipkid.core.model.SubscriptionLimits
+import kotlin.time.Clock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -55,4 +58,46 @@ class ObserveAccessUseCase(
         }
 
     suspend fun current(): Access = invoke().first()
+}
+
+/**
+ * When the app may talk to the store (RevenueCat). Apple's Kids rules: no device information to
+ * third parties, even in sections for adults, unless the parent explicitly agreed.
+ *
+ * - Never before the parent's consent ([SettingsRepository.consentGiven]).
+ * - Parent mode (dashboard, paywall): connects and asks for the latest status.
+ * - Child mode: only to re-check a cached subscription whose period has ended, so a renewal
+ *   keeps it on and a cancellation turns it off. Otherwise child mode reads the on-device cache.
+ */
+class ConnectBillingUseCase(
+    private val billing: BillingRepository,
+    private val settings: SettingsRepository,
+    private val clock: Clock,
+) {
+    /** Parent mode. Returns false (and does nothing) when the parent has not agreed yet. */
+    suspend fun forParent(): Boolean {
+        if (!settings.consentGiven.first()) return false
+        connect()
+        return true
+    }
+
+    /** The paywall's consent card: records the parent's agreement, then connects. */
+    suspend fun agreeAndConnect() {
+        settings.setConsentGiven(true)
+        connect()
+    }
+
+    /** App start and back to the foreground: only when the cached subscription has ended. */
+    suspend fun ifSubscriptionEnded() {
+        val current = billing.entitlement.first { it != Entitlement.Unknown }
+        val endsAt = (current as? Entitlement.Full)?.expiresAt ?: return
+        if (endsAt > clock.now()) return
+        if (!settings.consentGiven.first()) return
+        connect()
+    }
+
+    private suspend fun connect() {
+        // start() loads the status itself; an already started connection is asked again.
+        if (billing.isStarted) billing.refresh() else billing.start()
+    }
 }

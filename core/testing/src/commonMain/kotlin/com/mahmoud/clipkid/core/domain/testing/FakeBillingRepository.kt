@@ -59,8 +59,11 @@ class FakeBillingRepository(
     var restoreCalls = 0
     var refreshCalls = 0
     var started = false
+    var startCalls = 0
+    override val isStarted: Boolean get() = started
 
     override fun start() {
+        startCalls++
         started = true
     }
 
@@ -78,7 +81,7 @@ class FakeBillingRepository(
     }
 
     override suspend fun refresh() {
-        refreshCalls++
+        if (started) refreshCalls++
     }
 
     private fun apply(outcome: PurchaseOutcome) {

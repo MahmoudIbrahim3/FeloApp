@@ -1,6 +1,7 @@
 package com.mahmoud.clipkid.core.billing.revenuecat
 
 import com.mahmoud.clipkid.core.domain.repository.BillingRepository
+import com.mahmoud.clipkid.core.domain.repository.EntitlementCache
 import com.mahmoud.clipkid.core.model.BillingError
 import com.mahmoud.clipkid.core.model.Entitlement
 import com.mahmoud.clipkid.core.model.Offering
@@ -41,6 +42,10 @@ import kotlinx.coroutines.launch
  * [BillingRepository] on RevenueCat.
  *
  * Privacy (child-directed app):
+ * - RevenueCat is configured only after the parent's consent, from parent mode (or to re-check a
+ *   subscription whose period ended): see ConnectBillingUseCase. Until then [entitlement] comes
+ *   from the on-device [EntitlementCache] and nothing is sent. Once configured in a process, the
+ *   SDK may refresh by itself when the app returns to the foreground, until the process ends.
  * - The RevenueCat user is anonymous (`appUserId = null`, never `logIn`): a random id kept on the
  *   device. No attributes, email, device identifiers, ad ids or integrations are ever set.
  * - Store in-app messages (e.g. "payment declined") are off: they would pop a store sheet over
@@ -53,12 +58,22 @@ internal class RevenueCatBillingRepository(
     private val debugLogs: Boolean,
     private val scope: CoroutineScope,
     private val clock: Clock,
+    private val cache: EntitlementCache,
 ) : BillingRepository {
 
     private val _entitlement = MutableStateFlow<Entitlement>(Entitlement.Unknown)
     override val entitlement: StateFlow<Entitlement> = _entitlement.asStateFlow()
 
     @Volatile private var started = false
+    override val isStarted: Boolean get() = started
+
+    init {
+        // The last known status, without contacting the store. Nothing cached = free.
+        scope.launch {
+            val cached = cache.read() ?: Entitlement.Free
+            _entitlement.compareAndSet(Entitlement.Unknown, cached)
+        }
+    }
     private var expiryCheck: Job? = null
 
     /** Packages of the last loaded offering, by id, so [purchase] buys exactly what was shown. */
@@ -109,6 +124,7 @@ internal class RevenueCatBillingRepository(
     private fun publish(info: CustomerInfo) {
         val value = info.toEntitlement()
         _entitlement.value = value
+        scope.launch { cache.write(value) }
         scheduleExpiryCheck(value)
     }
 
@@ -127,6 +143,7 @@ internal class RevenueCatBillingRepository(
     }
 
     override suspend fun offering(): Offering? {
+        if (!started) return null
         val offerings = try {
             Purchases.sharedInstance.awaitOfferings()
         } catch (e: PurchasesException) {
@@ -158,6 +175,7 @@ internal class RevenueCatBillingRepository(
     }
 
     override suspend fun purchase(plan: Plan): PurchaseOutcome {
+        if (!started) return PurchaseOutcome.Failed(BillingError.NotAvailable)
         val pkg = packages[plan.id] ?: return PurchaseOutcome.Failed(BillingError.NotAvailable)
         return try {
             val result = Purchases.sharedInstance.awaitPurchase(pkg)
@@ -170,7 +188,9 @@ internal class RevenueCatBillingRepository(
         }
     }
 
-    override suspend fun restore(): PurchaseOutcome = try {
+    override suspend fun restore(): PurchaseOutcome = if (!started) {
+        PurchaseOutcome.Failed(BillingError.NotAvailable)
+    } else try {
         val info = Purchases.sharedInstance.awaitRestore()
         publish(info)
         val value = entitlement.value

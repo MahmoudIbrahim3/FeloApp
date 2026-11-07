@@ -48,11 +48,12 @@ val billingModule: Module = module {
                 // RevenueCat expects its calls on the main thread.
                 scope = CoroutineScope(SupervisorJob() + Dispatchers.Main),
                 clock = get(),
+                cache = get(),
             )
         } else {
             println(
                 "ClipKid: no RevenueCat key (revenuecat.androidApiKey / revenuecat.iosApiKey in local.properties). " +
-                    "Billing is off: everything premium stays locked.",
+                    "Billing is off: the app stays on the free plan.",
             )
             NoStoreBillingRepository()
         }

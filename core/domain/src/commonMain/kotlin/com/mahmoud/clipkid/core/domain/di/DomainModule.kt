@@ -6,6 +6,7 @@ import com.mahmoud.clipkid.core.domain.parent.ResetPinUseCase
 import com.mahmoud.clipkid.core.domain.parent.UnlockWithPinUseCase
 import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
 import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
@@ -63,6 +64,7 @@ val domainModule: Module = module {
 
     // Subscriptions
     factoryOf(::ObserveAccessUseCase)
+    factoryOf(::ConnectBillingUseCase)
     factory { UnlockWithPinUseCase(get(), get()) }
     factoryOf(::ResetPinUseCase)
     factory { CreateAdultChallengeUseCase() }
