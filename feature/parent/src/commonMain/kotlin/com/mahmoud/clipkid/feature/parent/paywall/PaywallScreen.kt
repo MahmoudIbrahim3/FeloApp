@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mahmoud.clipkid.core.designsystem.component.ConsentNotice
 import com.mahmoud.clipkid.core.designsystem.component.Icon
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonLarge
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonTone
@@ -59,6 +60,8 @@ import com.mahmoud.clipkid.feature.parent.resources.paywall_badge
 import com.mahmoud.clipkid.feature.parent.resources.paywall_benefit_activity
 import com.mahmoud.clipkid.feature.parent.resources.paywall_benefit_children
 import com.mahmoud.clipkid.feature.parent.resources.paywall_close
+import com.mahmoud.clipkid.feature.parent.resources.paywall_consent_agree
+import com.mahmoud.clipkid.feature.parent.resources.paywall_consent_title
 import com.mahmoud.clipkid.feature.parent.resources.paywall_cta_busy
 import com.mahmoud.clipkid.feature.parent.resources.paywall_cta_subscribe
 import com.mahmoud.clipkid.feature.parent.resources.paywall_cta_trial
@@ -125,7 +128,7 @@ fun PaywallScreen(state: PaywallUiState, onEvent: (PaywallEvent) -> Unit, modifi
         Column(
             Modifier.fillMaxSize().widthIn(max = 560.dp).padding(horizontal = spacing.gutter, vertical = spacing.md),
         ) {
-            TopBar(showRestore = state.subscription == null, enabled = state.busy == null, onEvent = onEvent)
+            TopBar(showRestore = state.subscription == null && !state.needsConsent, enabled = state.busy == null, onEvent = onEvent)
             val subscription = state.subscription
             when {
                 subscription != null -> SubscribedContent(subscription, state.justSubscribed, onEvent)
@@ -182,6 +185,7 @@ private fun ColumnScope.PlansContent(state: PaywallUiState, onEvent: (PaywallEve
         Spacer(Modifier.height(spacing.xs))
         val offering = state.offering
         when {
+            state.needsConsent -> ConsentCard(onEvent)
             state.loading -> Text(stringResource(Res.string.paywall_loading), style = ClipKidTheme.typography.bodyLarge, color = colors.muted)
             offering == null -> Unavailable(enabled = state.busy == null) { onEvent(PaywallEvent.Retry) }
             else -> Plans(offering, state, onEvent)
@@ -189,6 +193,24 @@ private fun ColumnScope.PlansContent(state: PaywallUiState, onEvent: (PaywallEve
     }
     if (state.offering != null) {
         BottomActions(state, onEvent)
+    }
+}
+
+/** Installs from before the onboarding consent step: agree first, then the store is contacted. */
+@Composable
+private fun ConsentCard(onEvent: (PaywallEvent) -> Unit) {
+    val colors = ClipKidTheme.colors
+    Column(verticalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.md)) {
+        Text(stringResource(Res.string.paywall_consent_title), style = ClipKidTheme.typography.titleMedium, color = colors.ink)
+        ConsentNotice(
+            onPrivacy = { onEvent(PaywallEvent.Privacy) },
+            onYouTubeTerms = { onEvent(PaywallEvent.YouTubeTerms) },
+        )
+        PrimaryButton(
+            text = stringResource(Res.string.paywall_consent_agree),
+            onClick = { onEvent(PaywallEvent.AgreeConsent) },
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -407,6 +429,10 @@ private val previewOffering = Offering(
 private fun PaywallPreview() = ClipKidPreview {
     PaywallScreen(PaywallUiState(loading = false, offering = previewOffering), {})
 }
+
+@Preview
+@Composable
+private fun PaywallConsentPreview() = ClipKidPreview { PaywallScreen(PaywallUiState(loading = false, needsConsent = true), {}) }
 
 @Preview
 @Composable

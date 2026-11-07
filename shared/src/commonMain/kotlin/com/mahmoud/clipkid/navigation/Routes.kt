@@ -38,6 +38,10 @@ data object OnboardingWelcomeDest
 @Serializable
 data object OnboardingPinDest
 
+/** First run only, right after the PIN: the parent's consent to YouTube's player and the store. */
+@Serializable
+data object OnboardingConsentDest
+
 @Serializable
 data object OnboardingChildDest
 

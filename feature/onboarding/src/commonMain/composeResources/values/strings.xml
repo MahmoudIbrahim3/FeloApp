@@ -24,6 +24,10 @@
     <string name="onb_pin_mismatch">الرقمين مش زي بعض. ابدأ تاني من الأول.</string>
 
     <!-- Child (ChildSetup.png) -->
+    <string name="onb_consent_title">قبل ما نبدأ</string>
+    <string name="onb_consent_subtitle">اقرأ دي مرة واحدة بس.</string>
+    <string name="onb_consent_agree">موافق، كمّل</string>
+    <string name="onb_consent_caption">بالموافقة إنت موافق على سياسة الخصوصية وشروط خدمة YouTube.</string>
     <string name="onb_child_title">مين هيتفرج؟</string>
     <string name="onb_child_subtitle">اسم دلع يكفي. مش محتاجين أي بيانات تانية.</string>
     <string name="onb_child_name_label">اسم الطفل</string>

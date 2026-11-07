@@ -59,4 +59,12 @@
     <string name="showcase_plan_badge">وفّر ٪٣٣</string>
     <string name="showcase_plan_monthly">شهري</string>
     <string name="showcase_plan_monthly_price">١٫٥٠٠ د.ك</string>
+    <!-- Consent (onboarding step and paywall) -->
+    <string name="ds_consent_intro">ClipKid مش بيجمع أي بيانات عن ولادك، ومفيش تتبع ولا إعلانات مننا. بس فيه خدمتين لازم تعرفهم:</string>
+    <string name="ds_consent_youtube_title">الفيديوهات من YouTube</string>
+    <string name="ds_consent_youtube_body">الفيديوهات بتشتغل في مشغّل YouTube الرسمي، وجوجل بتستقبل بيانات الجهاز العادية اللي أي متصفح بيبعتها. YouTube ممكن يعرض إعلاناته جوه المشغّل.</string>
+    <string name="ds_consent_store_title">الاشتراك عن طريق المتجر</string>
+    <string name="ds_consent_store_body">لو اشتركت، الدفع بيتم عن طريق Apple أو Google، وRevenueCat بيتأكد من الاشتراك برقم عشوائي مالوش علاقة بيك. مش بنبعتلهم أي حاجة عن ولادك.</string>
+    <string name="ds_consent_privacy">سياسة الخصوصية</string>
+    <string name="ds_consent_youtube_terms">شروط خدمة YouTube</string>
 </resources>

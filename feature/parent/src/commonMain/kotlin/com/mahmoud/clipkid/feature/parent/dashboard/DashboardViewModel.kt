@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
+import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
@@ -95,7 +96,13 @@ class DashboardViewModel(
     private val updateChild: UpdateChildSettingsUseCase,
     private val grantExtras: GrantExtraVideosUseCase,
     private val observeAccess: ObserveAccessUseCase,
+    connectBilling: ConnectBillingUseCase,
 ) : ViewModel() {
+
+    init {
+        // Parent mode: the latest subscription status (renewal, cancellation), if the parent agreed.
+        viewModelScope.launch { connectBilling.forParent() }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<DashboardUiState> = combine(

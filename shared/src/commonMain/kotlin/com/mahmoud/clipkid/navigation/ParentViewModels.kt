@@ -14,6 +14,7 @@ import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
 import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
 import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
@@ -87,6 +88,7 @@ fun rememberDashboardViewModel(): DashboardViewModel {
                     updateChild = koin.get<UpdateChildSettingsUseCase>(),
                     grantExtras = koin.get<GrantExtraVideosUseCase>(),
                     observeAccess = koin.get<ObserveAccessUseCase>(),
+                    connectBilling = koin.get<ConnectBillingUseCase>(),
                 )
             }
         },
@@ -102,6 +104,7 @@ fun rememberPaywallViewModel(): PaywallViewModel {
             initializer {
                 PaywallViewModel(
                     billing = koin.get<BillingRepository>(),
+                    connectBilling = koin.get<ConnectBillingUseCase>(),
                     session = koin.get<ParentSession>(),
                 )
             }

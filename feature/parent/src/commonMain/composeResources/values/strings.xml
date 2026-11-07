@@ -132,6 +132,8 @@
     <string name="paywall_renew_play">الاشتراك بيتجدد تلقائي، وتقدر تلغيه في أي وقت من Google Play.</string>
     <string name="paywall_renew_app_store">الدفع بيتسحب من حساب Apple لما تأكد. الاشتراك بيتجدد تلقائي إلا لو لغيته قبل نهاية المدة بـ٢٤ ساعة على الأقل من إعدادات حسابك.</string>
     <string name="paywall_free_tier">المجاني: طفل واحد وسجل مشاهدة النهارده.</string>
+    <string name="paywall_consent_title">قبل ما تشترك</string>
+    <string name="paywall_consent_agree">موافق</string>
     <string name="paywall_terms">شروط الاستخدام</string>
     <string name="paywall_privacy">سياسة الخصوصية</string>
     <string name="paywall_loading">بنجيب الأسعار من المتجر…</string>

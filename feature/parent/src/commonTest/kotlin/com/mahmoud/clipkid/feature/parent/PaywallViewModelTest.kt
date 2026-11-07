@@ -20,7 +20,7 @@ import com.mahmoud.clipkid.core.model.Entitlement
 import com.mahmoud.clipkid.core.model.Offering
 import com.mahmoud.clipkid.core.model.PlanPeriod
 import com.mahmoud.clipkid.core.model.PurchaseOutcome
-import com.mahmoud.clipkid.feature.parent.paywall.LegalLinks
+import com.mahmoud.clipkid.core.model.LegalLinks
 import com.mahmoud.clipkid.feature.parent.paywall.PaywallBusy
 import com.mahmoud.clipkid.feature.parent.paywall.PaywallEffect
 import com.mahmoud.clipkid.feature.parent.paywall.PaywallEvent

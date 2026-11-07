@@ -1,9 +1,9 @@
 package com.mahmoud.clipkid.navigation
 
-import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
+import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.SyncCatalogUseCase
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
@@ -30,7 +30,8 @@ private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 private val FIRST_SYNC_WAIT = 15.seconds
 
 /**
- * Runs once at app start, before the first screen: starts billing, syncs the catalog (only changed rows; offline
+ * Runs once at app start, before the first screen: re-checks an ended subscription (the only time
+ * child mode contacts the store, and only after the parent's consent), syncs the catalog (only changed rows; offline
  * is fine, the cache keeps working) and decides where the app opens.
  *
  * With a cached catalog the sync runs in the background and screens update when it lands. With
@@ -38,8 +39,10 @@ private val FIRST_SYNC_WAIT = 15.seconds
  * going after that and the lists fill in when it finishes.
  */
 suspend fun prepareApp(koin: Koin): AppStart {
-    // RevenueCat is configured once, here, on the main thread (prepareApp runs in composition).
-    koin.get<BillingRepository>().start()
+    // No RevenueCat at launch: the subscription status comes from the on-device cache. Only a
+    // cached subscription whose period has ended is checked again (prepareApp runs in composition,
+    // on the main thread, which RevenueCat needs).
+    koin.get<ConnectBillingUseCase>().ifSubscriptionEnded()
 
     val sync = koin.get<SyncCatalogUseCase>()
     val job = appScope.launch { sync() }

@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mahmoud.clipkid.core.domain.parent.ParentSession
 import com.mahmoud.clipkid.core.domain.repository.BillingRepository
+import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
 import com.mahmoud.clipkid.core.model.BillingError
 import com.mahmoud.clipkid.core.model.Entitlement
+import com.mahmoud.clipkid.core.model.LegalLinks
 import com.mahmoud.clipkid.core.model.Offering
 import com.mahmoud.clipkid.core.model.Plan
 import com.mahmoud.clipkid.core.model.PlanPeriod
@@ -45,6 +47,11 @@ data class PaywallUiState(
     val subscription: Entitlement.Full? = null,
     /** Bought or restored on this screen just now: a welcome title instead of the status one. */
     val justSubscribed: Boolean = false,
+    /**
+     * The parent never agreed to the store and RevenueCat (installs from before the onboarding
+     * consent step): a consent card replaces the plans, and nothing is sent until "موافق".
+     */
+    val needsConsent: Boolean = false,
     val maxChildren: Int = SubscriptionLimits.MAX_FULL_CHILDREN,
 ) {
     /** The plan the button buys: the selected one, or the other if the store has only one. */
@@ -53,7 +60,7 @@ data class PaywallUiState(
             if (selected == PlanPeriod.Annual) o.annual ?: o.monthly else o.monthly ?: o.annual
         }
 
-    val unavailable: Boolean get() = !loading && subscription == null && offering == null
+    val unavailable: Boolean get() = !loading && !needsConsent && subscription == null && offering == null
 
     val savingsPercent: Int? get() = offering?.annualSavingsPercent
 }
@@ -66,6 +73,10 @@ sealed interface PaywallEvent {
     data object Close : PaywallEvent
     data object Terms : PaywallEvent
     data object Privacy : PaywallEvent
+
+    /** Consent card: "موافق". */
+    data object AgreeConsent : PaywallEvent
+    data object YouTubeTerms : PaywallEvent
     data object ManageSubscription : PaywallEvent
 }
 
@@ -79,6 +90,8 @@ sealed interface PaywallEffect {
 /**
  * Paywall (Paywall.png). Reachable only from parent mode, so only after the PIN.
  *
+ * - The store is contacted only after the parent's consent ([ConnectBillingUseCase]); older
+ *   installs without it see a consent card first.
  * - Plans and prices come from the live store offering; nothing is hard-coded.
  * - Annual is selected by default; the button offers the store's free trial when the parent is
  *   eligible for it.
@@ -91,6 +104,7 @@ sealed interface PaywallEffect {
  */
 class PaywallViewModel(
     private val billing: BillingRepository,
+    private val connectBilling: ConnectBillingUseCase,
     private val session: ParentSession,
     private val links: LegalLinks = LegalLinks.Default,
 ) : ViewModel() {
@@ -107,7 +121,13 @@ class PaywallViewModel(
                 _state.update { it.copy(subscription = value as? Entitlement.Full) }
             }
         }
-        load()
+        viewModelScope.launch {
+            if (connectBilling.forParent()) {
+                load()
+            } else {
+                _state.update { it.copy(loading = false, needsConsent = true) }
+            }
+        }
     }
 
     private fun load() {
@@ -123,12 +143,23 @@ class PaywallViewModel(
             is PaywallEvent.SelectPlan -> _state.update { if (it.busy == null) it.copy(selected = event.period, message = null) else it }
             PaywallEvent.Subscribe -> subscribe()
             PaywallEvent.Restore -> restore()
-            PaywallEvent.Retry -> if (_state.value.busy == null) load()
+            PaywallEvent.Retry -> if (_state.value.busy == null && !_state.value.needsConsent) load()
+            PaywallEvent.AgreeConsent -> agree()
+            PaywallEvent.YouTubeTerms -> effectChannel.trySend(PaywallEffect.OpenUrl(links.youtubeTerms))
             PaywallEvent.Close -> effectChannel.trySend(PaywallEffect.Close)
             PaywallEvent.Terms -> effectChannel.trySend(PaywallEffect.OpenUrl(links.terms))
             PaywallEvent.Privacy -> effectChannel.trySend(PaywallEffect.OpenUrl(links.privacy))
             PaywallEvent.ManageSubscription ->
                 _state.value.subscription?.managementUrl?.let { effectChannel.trySend(PaywallEffect.OpenUrl(it)) }
+        }
+    }
+
+    private fun agree() {
+        if (!_state.value.needsConsent) return
+        viewModelScope.launch {
+            connectBilling.agreeAndConnect()
+            _state.update { it.copy(needsConsent = false) }
+            load()
         }
     }
 
@@ -140,7 +171,7 @@ class PaywallViewModel(
     }
 
     private fun restore() {
-        if (_state.value.busy != null) return
+        if (_state.value.busy != null || _state.value.needsConsent) return
         runStoreFlow(PaywallBusy.Restoring) { billing.restore() }
     }
 

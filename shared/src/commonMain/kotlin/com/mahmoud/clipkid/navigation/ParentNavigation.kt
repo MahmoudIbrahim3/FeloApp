@@ -41,11 +41,12 @@ internal fun NavBackStackEntry.isInParentMode(): Boolean =
 
 // region Onboarding
 
-/** Welcome → PIN → child → collections. The steps share one ViewModel scoped to the graph. */
+/** Welcome → PIN → consent → child → collections. The steps share one ViewModel scoped to the graph. */
 internal fun NavGraphBuilder.onboardingGraph(nav: NavHostController, onFinished: (childId: String) -> Unit) {
     navigation<OnboardingGraph>(startDestination = OnboardingWelcomeDest) {
         composable<OnboardingWelcomeDest> { entry -> OnboardingStepHost(nav, entry, OnboardingStep.Welcome, onFinished) }
         composable<OnboardingPinDest> { entry -> OnboardingStepHost(nav, entry, OnboardingStep.Pin, onFinished) }
+        composable<OnboardingConsentDest> { entry -> OnboardingStepHost(nav, entry, OnboardingStep.Consent, onFinished) }
         composable<OnboardingChildDest> { entry -> OnboardingStepHost(nav, entry, OnboardingStep.Child, onFinished) }
         composable<OnboardingCollectionsDest> { entry -> OnboardingStepHost(nav, entry, OnboardingStep.Collections, onFinished) }
     }
@@ -59,12 +60,16 @@ private fun OnboardingStepHost(
     onFinished: (String) -> Unit,
 ) {
     val graphEntry = remember(entry) { nav.getBackStackEntry<OnboardingGraph>() }
+    val uriHandler = LocalUriHandler.current
     OnboardingRoute(
         step = step,
         viewModel = rememberOnboardingViewModel(graphEntry, OnboardingMode.FirstRun),
         onEffect = { effect ->
             when (effect) {
                 OnboardingEffect.OpenPin -> nav.navigate(OnboardingPinDest) { launchSingleTop = true }
+                OnboardingEffect.OpenConsent -> nav.navigate(OnboardingConsentDest) { launchSingleTop = true }
+                // Privacy policy / YouTube terms from the consent step: the parent set the PIN a moment ago.
+                is OnboardingEffect.OpenUrl -> uriHandler.openUri(effect.url)
                 OnboardingEffect.OpenChild -> nav.navigate(OnboardingChildDest) { launchSingleTop = true }
                 OnboardingEffect.OpenCollections -> nav.navigate(OnboardingCollectionsDest) { launchSingleTop = true }
                 OnboardingEffect.Back -> nav.popBackStack()
@@ -179,7 +184,7 @@ private fun AddChildStepHost(nav: NavHostController, entry: NavBackStackEntry, s
                     OnboardingEffect.Back -> nav.popBackStack()
                     // The new child is now the active one; the dashboard shows it.
                     is OnboardingEffect.Finished -> nav.popBackStack<AddChildGraph>(inclusive = true)
-                    OnboardingEffect.OpenPin, OnboardingEffect.OpenChild -> Unit
+                    OnboardingEffect.OpenPin, OnboardingEffect.OpenConsent, OnboardingEffect.OpenChild, is OnboardingEffect.OpenUrl -> Unit
                 }
             },
         )

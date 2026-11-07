@@ -16,8 +16,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.mahmoud.clipkid.core.domain.parent.ParentSession
-import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
+import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ObserveAccessUseCase
 import com.mahmoud.clipkid.feature.child.collection.CollectionEffect
 import com.mahmoud.clipkid.feature.child.collection.CollectionRoute
@@ -53,7 +53,7 @@ fun ClipKidNavHost() {
     val nav = rememberNavController()
     val session = remember { koin.get<ParentSession>() }
     val settings = remember { koin.get<SettingsRepository>() }
-    val billing = remember { koin.get<BillingRepository>() }
+    val connectBilling = remember { koin.get<ConnectBillingUseCase>() }
     val observeAccess = remember { koin.get<ObserveAccessUseCase>() }
     val scope = rememberCoroutineScope()
     val uriHandler = LocalUriHandler.current
@@ -101,8 +101,9 @@ fun ClipKidNavHost() {
     // Leaving the app (home button, app switcher) closes parent mode, except while a store
     // purchase sheet started from the paywall is open (it can send the app to the background).
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { session.onAppStopped() }
-    // Back in the foreground: renewals, cancellations and refunds show up at once.
-    LifecycleEventEffect(Lifecycle.Event.ON_START) { scope.launch { billing.refresh() } }
+    // Back in the foreground: a cached subscription whose period ended is checked again. Otherwise
+    // child mode never contacts the store; parent mode refreshes when the dashboard opens.
+    LifecycleEventEffect(Lifecycle.Event.ON_START) { scope.launch { connectBilling.ifSubscriptionEnded() } }
 
     // Free again with more than one child: child mode moves to the first child. The other
     // profiles keep their settings and history and come back with the subscription.

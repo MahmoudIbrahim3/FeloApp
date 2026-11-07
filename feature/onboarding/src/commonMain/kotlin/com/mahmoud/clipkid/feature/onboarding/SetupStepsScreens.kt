@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.mahmoud.clipkid.core.designsystem.component.AgeBandPicker
 import com.mahmoud.clipkid.core.designsystem.component.AvatarColorPicker
 import com.mahmoud.clipkid.core.designsystem.component.CollectionPickCard
+import com.mahmoud.clipkid.core.designsystem.component.ConsentNotice
 import com.mahmoud.clipkid.core.designsystem.component.DailyLimitPicker
 import com.mahmoud.clipkid.core.designsystem.component.PinDots
 import com.mahmoud.clipkid.core.designsystem.component.PinPad
@@ -63,6 +64,10 @@ import com.mahmoud.clipkid.feature.onboarding.resources.onb_child_title
 import com.mahmoud.clipkid.feature.onboarding.resources.onb_collections_empty
 import com.mahmoud.clipkid.feature.onboarding.resources.onb_collections_subtitle
 import com.mahmoud.clipkid.feature.onboarding.resources.onb_collections_title
+import com.mahmoud.clipkid.feature.onboarding.resources.onb_consent_agree
+import com.mahmoud.clipkid.feature.onboarding.resources.onb_consent_caption
+import com.mahmoud.clipkid.feature.onboarding.resources.onb_consent_subtitle
+import com.mahmoud.clipkid.feature.onboarding.resources.onb_consent_title
 import com.mahmoud.clipkid.feature.onboarding.resources.onb_finish
 import com.mahmoud.clipkid.feature.onboarding.resources.onb_finish_caption
 import com.mahmoud.clipkid.feature.onboarding.resources.onb_limit_minutes_caption
@@ -78,7 +83,7 @@ import com.mahmoud.clipkid.feature.onboarding.resources.onb_save_failed
 import org.jetbrains.compose.resources.stringResource
 
 /** Which step a route shows. All steps share one [OnboardingViewModel]. */
-enum class OnboardingStep { Welcome, Pin, Child, Collections }
+enum class OnboardingStep { Welcome, Pin, Consent, Child, Collections }
 
 /** One step of onboarding: collects the shared state and the effects, shows that step. */
 @Composable
@@ -92,19 +97,20 @@ fun OnboardingRoute(
     when (step) {
         OnboardingStep.Welcome -> WelcomeScreen(viewModel::onEvent)
         OnboardingStep.Pin -> SetPinScreen(state, viewModel::onEvent)
+        OnboardingStep.Consent -> ConsentScreen(state, viewModel::onEvent)
         OnboardingStep.Child -> ChildSetupScreen(state, viewModel::onEvent)
         OnboardingStep.Collections -> SetupCollectionsScreen(state, viewModel::onEvent)
     }
 }
 
-/** SetPin.png: step 1 of 3. Four digits, then the same four again. */
+/** SetPin.png: step 1. Four digits, then the same four again. */
 @Composable
 fun SetPinScreen(state: OnboardingUiState, onEvent: (OnboardingEvent) -> Unit, modifier: Modifier = Modifier) {
     val pin = state.pin
     val colors = ClipKidTheme.colors
     SetupScaffold(
-        step = 1,
-        totalSteps = 3,
+        step = state.pinStep,
+        totalSteps = state.totalSteps,
         title = stringResource(if (pin.confirming) Res.string.onb_pin_confirm_title else Res.string.onb_pin_title),
         subtitle = stringResource(if (pin.confirming) Res.string.onb_pin_confirm_subtitle else Res.string.onb_pin_subtitle),
         onBack = { onEvent(OnboardingEvent.PinBackClicked) },
@@ -136,6 +142,42 @@ fun SetPinScreen(state: OnboardingUiState, onEvent: (OnboardingEvent) -> Unit, m
                 )
             }
         }
+    }
+}
+
+/**
+ * First run only, right after the PIN: what the parent agrees to before the app uses outside
+ * services (YouTube's player; Apple/Google and RevenueCat for subscriptions). Nothing is saved
+ * until Finish. No design image yet; built from the setup steps' frame.
+ */
+@Composable
+fun ConsentScreen(state: OnboardingUiState, onEvent: (OnboardingEvent) -> Unit, modifier: Modifier = Modifier) {
+    SetupScaffold(
+        step = state.consentStep,
+        totalSteps = state.totalSteps,
+        title = stringResource(Res.string.onb_consent_title),
+        subtitle = stringResource(Res.string.onb_consent_subtitle),
+        onBack = { onEvent(OnboardingEvent.BackClicked) },
+        modifier = modifier,
+        bottom = {
+            PrimaryButton(
+                text = stringResource(Res.string.onb_consent_agree),
+                onClick = { onEvent(OnboardingEvent.ConsentAgreed) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Text(
+                text = stringResource(Res.string.onb_consent_caption),
+                style = ClipKidTheme.typography.bodySmall,
+                color = ClipKidTheme.colors.muted,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(top = ClipKidTheme.spacing.xs),
+            )
+        },
+    ) {
+        ConsentNotice(
+            onPrivacy = { onEvent(OnboardingEvent.PrivacyClicked) },
+            onYouTubeTerms = { onEvent(OnboardingEvent.YouTubeTermsClicked) },
+        )
     }
 }
 
