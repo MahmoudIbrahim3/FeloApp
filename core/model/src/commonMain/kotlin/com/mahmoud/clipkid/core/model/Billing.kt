@@ -28,7 +28,7 @@ val Entitlement.isFull: Boolean get() = this is Entitlement.Full
 
 enum class BillingStore { AppStore, PlayStore, TestStore, Other }
 
-/** Free vs full limits. Which collections are free is decided by the backend (`is_premium`). */
+/** Free vs full limits. Every video is free; the subscription sells parent features only. */
 object SubscriptionLimits {
     const val MAX_FREE_CHILDREN: Int = 1
     const val MAX_FULL_CHILDREN: Int = 4

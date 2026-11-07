@@ -22,9 +22,10 @@ import kotlinx.coroutines.IO
     ],
     // v2 (Phase 4): watch_events.position_sec for resume and progress bars.
     // v3 (Phase 5): cached_videos.server_updated_at for the incremental Supabase sync.
-    // Migrations are hand-written (MIGRATION_1_2, MIGRATION_2_3) so they don't depend on a 2.json
+    // v4 (Phase 8): cached_collections.is_premium dropped (every video is free).
+    // Migrations are hand-written (MIGRATION_1_2 … MIGRATION_3_4) so they don't depend on a 2.json
     // schema file being exported first.
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 @ConstructedBy(ClipKidDatabaseConstructor::class)
@@ -56,11 +57,19 @@ internal val MIGRATION_2_3 = Migration(2, 3) { connection ->
     connection.execSQL("ALTER TABLE cached_videos ADD COLUMN server_updated_at TEXT NOT NULL DEFAULT ''")
 }
 
+/**
+ * v3 → v4: no premium collections any more. SQLite 3.35+ (the bundled driver) drops the column in
+ * place; the rest of the cached catalog stays.
+ */
+internal val MIGRATION_3_4 = Migration(3, 4) { connection ->
+    connection.execSQL("ALTER TABLE cached_collections DROP COLUMN is_premium")
+}
+
 /** Same driver, dispatcher and migrations on every platform: bundled SQLite, queries off the main thread. */
 fun RoomDatabase.Builder<ClipKidDatabase>.buildClipKid(): ClipKidDatabase =
     setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
-        .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
         .build()
 
 /**

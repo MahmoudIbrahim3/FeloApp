@@ -87,7 +87,6 @@ internal fun Collection.toEntity() = CachedCollectionEntity(
     cover = DbJson.encodeToString(CoverStyle.serializer(), cover),
     ageBands = DbJson.encodeToString(AgeBandSet, ageBands),
     sortOrder = sortOrder,
-    isPremium = isPremium,
 )
 
 internal fun CachedCollectionEntity.toModel() = Collection(
@@ -97,7 +96,6 @@ internal fun CachedCollectionEntity.toModel() = Collection(
     cover = DbJson.decodeFromString(CoverStyle.serializer(), cover),
     ageBands = DbJson.decodeFromString(AgeBandSet, ageBands),
     sortOrder = sortOrder,
-    isPremium = isPremium,
 )
 
 internal fun Video.toEntity(serverUpdatedAt: String = "") = CachedVideoEntity(

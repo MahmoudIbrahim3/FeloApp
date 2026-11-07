@@ -68,7 +68,6 @@ data class CachedCollectionEntity(
     /** JSON array of AgeBand. */
     @ColumnInfo(name = "age_bands") val ageBands: String,
     @ColumnInfo(name = "sort_order") val sortOrder: Int,
-    @ColumnInfo(name = "is_premium") val isPremium: Boolean,
 )
 
 @Entity(

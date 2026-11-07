@@ -1,12 +1,10 @@
 package com.mahmoud.clipkid.core.domain.usecase
 
 import com.mahmoud.clipkid.core.domain.catalog.VisibleCatalog
-import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
-import com.mahmoud.clipkid.core.domain.repository.isFullNow
 import com.mahmoud.clipkid.core.domain.time.todayRange
 import com.mahmoud.clipkid.core.model.Video
 import kotlin.time.Clock
@@ -50,7 +48,6 @@ class GetUpNextUseCase(
     private val quota: GetDailyQuotaUseCase,
     private val clock: Clock,
     private val timeZone: TimeZone,
-    private val billing: BillingRepository,
 ) {
     suspend operator fun invoke(childId: String, finishedYoutubeId: String): UpNextResult {
         val child = requireNotNull(profiles.getProfile(childId)) { "Unknown child $childId" }
@@ -63,7 +60,6 @@ class GetUpNextUseCase(
             collections = catalog.observeCollections().first(),
             videos = allVideos,
             hiddenIds = hidden.getHiddenIds(childId),
-            isFull = billing.isFullNow(),
         )
         val day = clock.todayRange(timeZone)
         val watchedToday = history.getEvents(childId, day.start, day.end).mapTo(HashSet()) { it.youtubeId }

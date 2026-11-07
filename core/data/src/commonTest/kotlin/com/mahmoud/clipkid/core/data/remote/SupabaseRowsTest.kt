@@ -21,7 +21,7 @@ class SupabaseRowsTest {
         val row = json.decodeFromString(
             CollectionRow.serializer(),
             """{"id":"5b0f…","slug":"letters","title_ar":"الحروف","cover_bg":"#FFE6B0","cover_fg":"#8a5a00",
-               "cover_glyph":"أ ب","cover_icon":null,"age_bands":["2-3","4-6"],"sort_order":1,"is_premium":false,
+               "cover_glyph":"أ ب","cover_icon":null,"age_bands":["2-3","4-6"],"sort_order":1,
                "is_published":true,"updated_at":"2026-11-06T03:17:00.123456+00:00"}""",
         )
         assertEquals(
@@ -32,7 +32,6 @@ class SupabaseRowsTest {
                 cover = CoverStyle(0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ ب")),
                 ageBands = setOf(AgeBand.A2_3, AgeBand.A4_6),
                 sortOrder = 1,
-                isPremium = false,
             ),
             row.toModel(),
         )

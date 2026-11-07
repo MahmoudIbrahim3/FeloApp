@@ -172,7 +172,7 @@ class FakeCatalogDataSource(
             mark: CoverMark,
             bands: Set<AgeBand>,
             sortOrder: Int,
-        ) = Collection(id, id, title, CoverStyle(bg, fg, mark), bands, sortOrder, isPremium = false)
+        ) = Collection(id, id, title, CoverStyle(bg, fg, mark), bands, sortOrder)
 
         private fun MutableList<Video>.videos(
             collectionId: String,

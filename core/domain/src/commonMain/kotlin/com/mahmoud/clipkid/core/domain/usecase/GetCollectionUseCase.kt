@@ -1,12 +1,10 @@
 package com.mahmoud.clipkid.core.domain.usecase
 
 import com.mahmoud.clipkid.core.domain.catalog.VisibleCatalog
-import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
-import com.mahmoud.clipkid.core.domain.repository.observeIsFull
 import com.mahmoud.clipkid.core.model.ChildProfile
 import com.mahmoud.clipkid.core.model.Collection
 import com.mahmoud.clipkid.core.model.Video
@@ -70,18 +68,17 @@ class GetCollectionUseCase(
     private val history: WatchHistoryRepository,
     private val hidden: HiddenVideosRepository,
     private val clock: Clock,
-    private val billing: BillingRepository,
 ) {
     operator fun invoke(childId: String, collectionId: String): Flow<CollectionPage?> {
         val until = clock.now() + HISTORY_HORIZON
         return combine(
-            combine(profiles.observeProfile(childId).filterNotNull(), billing.observeIsFull(), ::Pair),
+            profiles.observeProfile(childId).filterNotNull(),
             catalog.observeCollections(),
             catalog.observeVideos(),
             hidden.observeHiddenIds(childId),
             history.observeEvents(childId, EPOCH, until),
-        ) { (child, isFull), collections, videos, hiddenIds, events ->
-            page(child, collections, videos, hiddenIds, events, collectionId, isFull)
+        ) { child, collections, videos, hiddenIds, events ->
+            page(child, collections, videos, hiddenIds, events, collectionId)
         }
     }
 
@@ -96,9 +93,8 @@ class GetCollectionUseCase(
             hiddenIds: Set<String>,
             events: List<WatchEvent>,
             collectionId: String,
-            isFull: Boolean,
         ): CollectionPage? {
-            val visible = VisibleCatalog.of(child, collections, videos, hiddenIds, isFull)
+            val visible = VisibleCatalog.of(child, collections, videos, hiddenIds)
             val collection = visible.collections.firstOrNull { it.id == collectionId } ?: return null
             val eventsByVideo = events.groupBy { it.youtubeId }
             val items = visible.videosByCollection[collection.id].orEmpty().map { video ->

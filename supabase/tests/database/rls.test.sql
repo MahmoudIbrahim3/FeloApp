@@ -3,7 +3,10 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(24);
+select plan(25);
+
+-- No paid content: every video is free (YouTube Developer Policies III.F.3.a).
+select hasnt_column('public', 'collections', 'is_premium', 'collections have no premium flag');
 
 -- Fixtures (as the test owner, which bypasses RLS) ------------------------------------------
 insert into public.collections (id, slug, title_ar, cover_bg, cover_fg, cover_glyph, age_bands, sort_order, is_published)

@@ -12,5 +12,4 @@ data class Collection(
     val cover: CoverStyle,
     @SerialName("age_bands") val ageBands: Set<AgeBand>,
     @SerialName("sort_order") val sortOrder: Int,
-    @SerialName("is_premium") val isPremium: Boolean = false,
 )

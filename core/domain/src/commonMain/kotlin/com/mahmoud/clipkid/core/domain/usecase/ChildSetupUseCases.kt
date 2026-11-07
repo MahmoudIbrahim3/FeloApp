@@ -38,7 +38,7 @@ object DailyLimitOptions {
     const val DEFAULT_MINUTES: Int = 30
 }
 
-/** Collections offered for an age band, in sortOrder. Premium ones are included (shown locked). */
+/** Collections offered for an age band, in sortOrder. */
 class GetCollectionsForAgeUseCase(private val catalog: CatalogRepository) {
     operator fun invoke(ageBand: AgeBand): Flow<List<Collection>> =
         catalog.observeCollections().map { all -> forAge(all, ageBand) }
@@ -47,12 +47,9 @@ class GetCollectionsForAgeUseCase(private val catalog: CatalogRepository) {
         fun forAge(all: List<Collection>, ageBand: AgeBand): List<Collection> =
             all.filter { ageBand in it.ageBands }.sortedBy { it.sortOrder }
 
-        /**
-         * A new child starts with every collection of the age band; premium ones only with the
-         * full subscription.
-         */
-        fun defaultSelection(collections: List<Collection>, isFull: Boolean): Set<String> =
-            collections.filter { isFull || !it.isPremium }.map { it.id }.toSet()
+        /** A new child starts with every collection of the age band. */
+        fun defaultSelection(collections: List<Collection>): Set<String> =
+            collections.map { it.id }.toSet()
     }
 }
 
@@ -67,26 +64,18 @@ class AddChildUseCase(
     private val profiles: ProfileRepository,
     private val settings: SettingsRepository,
     private val ids: IdGenerator,
-    private val catalog: CatalogRepository,
     private val billing: BillingRepository,
 ) {
     suspend operator fun invoke(child: NewChild): String {
         require(child.isValid) { "nickname must be 1..$NICKNAME_MAX_LENGTH characters" }
-        val isFull = billing.isFullNow()
-        val max = SubscriptionLimits.maxChildren(isFull)
+        val max = SubscriptionLimits.maxChildren(billing.isFullNow())
         if (profiles.observeProfiles().first().size >= max) throw ChildLimitReachedException(max)
-        val premium = if (isFull) {
-            emptySet()
-        } else {
-            catalog.observeCollections().first().filter { it.isPremium }.map { it.id }.toSet()
-        }
         val profile = ChildProfile(
             id = ids.newId(),
             nickname = child.nickname.trim(),
             avatarColor = child.avatarColor,
             ageBand = child.ageBand,
-            // Premium collections only with the full subscription.
-            allowedCollectionIds = child.allowedCollectionIds - premium,
+            allowedCollectionIds = child.allowedCollectionIds,
             dailyLimit = child.dailyLimit,
         )
         profiles.upsert(profile)
@@ -111,27 +100,20 @@ class CompleteOnboardingUseCase(
     }
 }
 
-/**
- * Dashboard changes to one child. Child mode observes the profile, so Home updates at once.
- * Premium collections can be turned on only with the full subscription.
- */
+/** Dashboard changes to one child. Child mode observes the profile, so Home updates at once. */
 class UpdateChildSettingsUseCase(
     private val profiles: ProfileRepository,
     private val catalog: CatalogRepository,
-    private val billing: BillingRepository,
 ) {
     suspend fun setDailyLimit(childId: String, limit: DailyLimit) {
         val child = profiles.getProfile(childId) ?: return
         if (child.dailyLimit != limit) profiles.upsert(child.copy(dailyLimit = limit))
     }
 
-    /** Returns false when the change was refused (premium collection without the subscription, or unknown child). */
+    /** Returns false when the change was refused (unknown child, or a collection that is not in the catalog). */
     suspend fun setCollectionAllowed(childId: String, collectionId: String, allowed: Boolean): Boolean {
         val child = profiles.getProfile(childId) ?: return false
-        if (allowed) {
-            val collection = catalog.observeCollections().first().firstOrNull { it.id == collectionId }
-            if (collection == null || (collection.isPremium && !billing.isFullNow())) return false
-        }
+        if (allowed && catalog.observeCollections().first().none { it.id == collectionId }) return false
         val ids = if (allowed) child.allowedCollectionIds + collectionId else child.allowedCollectionIds - collectionId
         if (ids != child.allowedCollectionIds) profiles.upsert(child.copy(allowedCollectionIds = ids))
         return true

@@ -26,10 +26,9 @@ internal data class CollectionRow(
     @SerialName("cover_icon") val coverIcon: String? = null,
     @SerialName("age_bands") val ageBands: List<String> = emptyList(),
     @SerialName("sort_order") val sortOrder: Int = 0,
-    @SerialName("is_premium") val isPremium: Boolean = false,
 ) {
     companion object {
-        const val COLUMNS = "id,slug,title_ar,cover_bg,cover_fg,cover_glyph,cover_icon,age_bands,sort_order,is_premium"
+        const val COLUMNS = "id,slug,title_ar,cover_bg,cover_fg,cover_glyph,cover_icon,age_bands,sort_order"
     }
 }
 
@@ -101,7 +100,6 @@ internal fun CollectionRow.toModel(): Collection? {
         cover = CoverStyle(bg, fg, mark),
         ageBands = bands,
         sortOrder = sortOrder,
-        isPremium = isPremium,
     )
 }
 

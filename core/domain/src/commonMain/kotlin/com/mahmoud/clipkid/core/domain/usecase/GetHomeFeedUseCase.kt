@@ -1,12 +1,10 @@
 package com.mahmoud.clipkid.core.domain.usecase
 
 import com.mahmoud.clipkid.core.domain.catalog.VisibleCatalog
-import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
-import com.mahmoud.clipkid.core.domain.repository.observeIsFull
 import com.mahmoud.clipkid.core.domain.time.currentDayFlow
 import com.mahmoud.clipkid.core.domain.time.rangeIn
 import com.mahmoud.clipkid.core.domain.time.startOfDaysBefore
@@ -29,8 +27,6 @@ data class HomeFeed(
     val child: ChildProfile,
     /** Visible collections, for the covers row. */
     val collections: List<Collection>,
-    /** Premium collections shown with a lock in the covers row (free tier only). */
-    val lockedCollections: List<Collection>,
     val continueWatching: ContinueWatching?,
     /** "جديد النهارده": a daily rotating pick, stable for the whole local day. */
     val newToday: List<Video>,
@@ -53,7 +49,6 @@ class GetHomeFeedUseCase(
     private val hidden: HiddenVideosRepository,
     private val clock: Clock,
     private val timeZone: TimeZone,
-    private val billing: BillingRepository,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(childId: String): Flow<HomeFeed> =
@@ -61,17 +56,16 @@ class GetHomeFeedUseCase(
             val day = date.rangeIn(timeZone)
             val windowStart = startOfDaysBefore(date, HISTORY_WINDOW_DAYS, timeZone)
             combine(
-                combine(profiles.observeProfile(childId).filterNotNull(), billing.observeIsFull(), ::Pair),
+                profiles.observeProfile(childId).filterNotNull(),
                 catalog.observeCollections(),
                 catalog.observeVideos(),
                 hidden.observeHiddenIds(childId),
                 history.observeEvents(childId, windowStart, day.end),
-            ) { (child, isFull), collections, videos, hiddenIds, events ->
-                val visible = VisibleCatalog.of(child, collections, videos, hiddenIds, isFull)
+            ) { child, collections, videos, hiddenIds, events ->
+                val visible = VisibleCatalog.of(child, collections, videos, hiddenIds)
                 HomeFeed(
                     child = child,
                     collections = visible.collections,
-                    lockedCollections = visible.lockedCollections,
                     continueWatching = continueWatching(visible, events),
                     newToday = newToday(child.id, date, visible, events, day.start),
                     shelves = visible.collections.mapNotNull { collection ->
