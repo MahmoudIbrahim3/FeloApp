@@ -13,18 +13,22 @@ Things you do in the store and Google consoles are not statuses; they are in "Yo
 
 | | OK | FIX | NEEDS DECISION |
 |---|---|---|---|
-| A. YouTube API Services | 16 | 4 | 2 |
+| A. YouTube API Services | 17 | 4 | 1 |
 | B. Google Play Families | 6 | 2 | 1 |
-| C. Apple Kids Category (1.3, 5.1.4) | 6 | 1 | 2 |
+| C. Apple Kids Category (1.3, 5.1.4) | 8 | 1 | 1 |
 | D. iOS privacy manifest | 1 | 1 | 0 |
-| E. COPPA / GDPR-K | 4 | 0 | 1 |
+| E. COPPA / GDPR-K | 5 | 0 | 0 |
 | F. Release build | 1 | 7 | 2 |
 | G. Accessibility | 6 | 1 | 1 |
-| **Total** | **40** | **16** | **9** |
+| **Total** | **43** | **16** | **6** |
 
 The 9 NEEDS DECISION rows map to 9 questions, D1–D9 (A18 and A21 share D1; C7 shares D2). The 16 FIX items are: A10, A13, A14, A19, B3, B8, C6 (same work as A14), D-1, F1–F7, G6.
 
-The biggest finding comes first: **D1, the paywall over YouTube videos, likely breaks YouTube's Developer Policies (III.F.3.a) and touches Apple 5.2.2.** I recommend settling it before anything else, because it changes the paywall, the store listing and the privacy policy.
+**Update 2026-11-07 (Phase 8, branch `phase-8-parent-plan`).** Mahmoud decided D1, D4 and D8; Phase 8 implemented D1 and D4. The table above now counts A18, C4, C9 and E2 as OK (C9 was unrated before). Still open: D2, D3, D5, D6, D7, D9, D1's sub-question (b) (A21), and all 16 FIX items.
+
+- **D1 → A.** Every video is free. ClipKid كامل sells parent features only: up to 4 child profiles (free: 1) and the 7-day activity report (free: today's list). `is_premium` is gone from the backend, Room and the app.
+- **D4 → A.** Onboarding consent step right after the PIN; RevenueCat only after consent, from parent mode or to re-check an ended subscription; child mode reads an on-device entitlement cache. Older installs get the consent card on the paywall.
+- **D8 → B.** The "forgot PIN" multiplication stays as it is.
 
 ---
 
@@ -49,10 +53,10 @@ The biggest finding comes first: **D1, the paywall over YouTube videos, likely b
 | A15 | Child-directed client: notify Google with its tools (III.J.1.b, ToS §9.1(iii)) | OK (code) | No write actions, no OAuth, no personalized ads | The designation itself is a console step: **M1 and M2**. |
 | A16 | No YouTube write actions from a child-directed client (III.J.2) | OK | The app never calls the Data API; the backend calls only `videos.list` (`index.ts:94`) | |
 | A17 | Quota extension / API Compliance Audit | OK (not needed) | One `videos.list` call per 50 videos per day at 1 unit each (Phase 5) vs the 10,000-unit default ([quota page](https://developers.google.com/youtube/v3/guides/quota_and_compliance_audits): an audit is needed "If you would like to request additional quota") | YouTube can still audit at any time (III.H). D1 option B needs YouTube's written approval, which goes through the same audit form. |
-| A18 | Don't charge to watch content in an embedded player; don't gate a video behind any action other than "play" (III.F.3.a-b; policy guide: "cannot charge people a fee for services that are offered free of charge on YouTube") | **NEEDS DECISION** | `VisibleCatalog.kt:41` (premium collections need `full_access`); paywall copy `strings.xml:107-108` ("افتح كل الكوليكشنز") | See **D1**. |
+| A18 | Don't charge to watch content in an embedded player; don't gate a video behind any action other than "play" (III.F.3.a-b; policy guide: "cannot charge people a fee for services that are offered free of charge on YouTube") | OK (Phase 8) | `VisibleCatalog.kt` has no subscription input; `collections.is_premium` dropped (`20261107000001_drop_is_premium.sql`); child mode has no locks or paywall route | D1 decided: every video is free; the subscription sells parent features only. |
 | A19 | Privacy-enhanced mode for a child-directed embed ([YouTube Help 171780](https://support.google.com/youtube/answer/171780): views don't personalize YouTube or ads; still requires self-designation) | **FIX** | `youtube_player.html:85` loads `www.youtube.com/iframe_api`; the player uses the default host | **Fix A19:** create the player with `host: 'https://www.youtube-nocookie.com'`. Test that the Referer still works (no error 153) on both platforms before release. |
 | A20 | Brand rules for the listing: no "YouTube" in the app name; no implied endorsement | OK | App name "ClipKid"; the listing drafts below don't use the YouTube name or logo | |
-| A21 | Gating by parental controls (daily limit / PIN / locks) | **NEEDS DECISION** | `DoneTodayScreen`, `AskParentScreen` | Part of **D1** (question b). |
+| A21 | Gating by parental controls (daily limit / PIN / locks) | **NEEDS DECISION** | `DoneTodayScreen` (daily limit). The premium locks and `AskParentScreen` are gone (Phase 8). | Part of **D1** (question b). |
 | A22 | Data deletion when access ends (ToS §24.3) | OK | All API data lives in Supabase (one SQL `delete`) and in each device's cache, which is wiped on the next sync. | |
 
 ## B. Google Play: Families policy, target audience, Data safety
@@ -77,12 +81,12 @@ The biggest finding comes first: **D1, the paywall over YouTube videos, likely b
 | C1 | Purchases only behind a parental gate (1.3; [Kids apps](https://developer.apple.com/app-store/kids-apps/): an "adult-level task") | OK | `ClipKidNavHost.kt:94` (`GatePurpose.Paywall` → unlock), `AskParentScreen` → `GateDest(Paywall)` (`:240`); purchases run only in `PaywallViewModel` | The PIN is a parental gate. The "forgot PIN" reset is weaker: see **D8**. |
 | C2 | Links out only behind the gate (1.3) | OK | Player links → `GateDest(GatePurpose.ExternalLink)` (`ClipKidNavHost.kt:208-209`); webview navigation blocked (`PlayerPlatform.android.kt:178`, `PlayerPlatform.ios.kt:135-156`); paywall/terms links only inside parent mode (`ParentNavigation.kt:141`) | A14 adds links only inside parent mode. |
 | C3 | No third-party analytics or advertising SDKs (1.3, 5.1.4) | OK (SDKs) | Same SDK list as B1 | YouTube's in-player ads are **D2**. |
-| C4 | No personal or device information sent to third parties, "even in sections intended for adults", unless the parent explicitly consents ([Kids apps](https://developer.apple.com/app-store/kids-apps/)) | **NEEDS DECISION** | `AppStartup.kt:42` starts RevenueCat at every launch (`RevenueCatBillingRepository.kt:72,88`); its requests carry an anonymous app user id, OS/app version and locale. The YouTube player (Google) receives standard browser/device data. | See **D4**. Is supabase-kt OK? **Yes:** it talks only to our own backend (a processor), sends no ids, and the only write is `{youtube_id, reason}` (`SupabaseVideoReporter.kt:14`). |
+| C4 | No personal or device information sent to third parties, "even in sections intended for adults", unless the parent explicitly consents ([Kids apps](https://developer.apple.com/app-store/kids-apps/)) | OK (Phase 8) | Onboarding consent step after the PIN (`ConsentScreen`); `ConnectBillingUseCase` configures RevenueCat only after consent, from parent mode, or to re-check an ended subscription; child mode reads `EntitlementCache`. The paywall shows the same consent card on older installs. | D4 decided (option A). The YouTube player (Google) is covered by the same consent text. supabase-kt sends no ids. |
 | C5 | Auto-renewable subscription disclosure (3.1.2(c), Schedule 2) | OK | Paywall: store price per period, trial length, the "after the trial" line, auto-renew text, restore, terms, privacy (`PaywallScreen.kt` `LegalText`, `BottomActions`) | The URLs are placeholders (D7). The content changes with D1. |
 | C6 | Privacy policy link in App Store Connect and inside the app (5.1.1(i)) | **FIX** | Only on the paywall today (placeholders) | Same fix as **A14**. URLs: D7. |
 | C7 | "For Kids" wording in metadata only inside the Kids Category (2.3.8, 5.1.4) | **NEEDS DECISION** | Store listing drafts below | Depends on **D2**. Both variants are drafted. |
 | C8 | Export compliance | — | | Tracked as **F7**. |
-| C9 | Monetizing access to third-party content needs the service's permission (5.2.2) | — | | Same question as **D1**. |
+| C9 | Monetizing access to third-party content needs the service's permission (5.2.2) | OK (Phase 8) | No third-party content is behind the subscription | D1. |
 | C10 | Privacy nutrition label answers | OK | See "Apple App Privacy answers" below | Depends on D1/D4. |
 | C11 | Restore purchases is available | OK | Paywall "استرجاع الاشتراك" | |
 
@@ -116,7 +120,7 @@ Apple's reason-code page didn't render as text for me, so the code meanings abov
 | ID | Requirement | Status | Evidence | Notes |
 |---|---|---|---|---|
 | E1 | No personal information from children leaves the device | OK | Children's data is only in local Room/DataStore: `Entities.kt:11` (`child_profiles`: nickname, avatar color, age band, settings), `:25` watch events, `:40` favorites, `:47` hidden, `:54` extra grants; PIN as a PBKDF2 hash in Keystore/Keychain (`Crypto.ios.kt:16`). Network flows are below: none carries a nickname, age, history or a device id. | |
-| E2 | Persistent identifiers count as personal information (FTC COPPA FAQ A.3, C.5) | **NEEDS DECISION** | RevenueCat's anonymous app user id; YouTube player cookies (the operator is responsible for third parties on its service, FAQ D.9 / D.11) | RevenueCat's id is used only to validate and restore the purchase. That fits COPPA's "support for internal operations" exception (FAQ C.5, F.2) **if** we collect no other personal information and never use it to contact anyone or build a profile. YouTube: A19 (privacy-enhanced mode) plus self-designation M1/M2. The open part is the same question as **D4**. |
+| E2 | Persistent identifiers count as personal information (FTC COPPA FAQ A.3, C.5) | OK (Phase 8) | RevenueCat's anonymous id is created only after the parent's consent, from parent mode, and used only to validate and restore the purchase (COPPA "support for internal operations", FAQ C.5, F.2). YouTube: A19 (privacy-enhanced mode) plus self-designation M1/M2. | D4 decided. Note: once configured in a process, the RevenueCat SDK may refresh by itself when the app returns to the foreground, until the process ends. |
 | E3 | Written retention and security policy (amended COPPA Rule, April 22, 2025) | OK | Included in the policy drafts below (retention section) | It becomes real once you publish it (D7). |
 | E4 | Parents can review or delete | OK | Everything about a child is on the device: the dashboard edits it, uninstall deletes it. Reports are anonymous and can't be matched to anyone. RevenueCat records can be deleted on request (dashboard / REST API). The policy explains how. | |
 | E5 | GDPR Art. 8: consent from the parent for under-16s where consent is the legal basis | OK | No consent-based processing of a child's data. Purchase processing is the parent's contract. | Only matters if you publish in the EU. Your `TARGET_REGIONS` are EG, KW, SA, AE. |
@@ -172,7 +176,7 @@ Whatever the first R8 run still reports under `missing_rules.txt` (`androidApp/b
 | G1 | Content descriptions are Arabic and come from resources | OK | No hard-coded descriptions in app screens; the only literal is `""` in a preview (`WeekBarChart.kt:117`) | |
 | G2 | Every icon-only control has a label | OK | `IconButtonLarge` requires one (`Buttons.kt:147`); e.g. `ChildTabs.kt:122`, `PlayerScreen.kt:109,343`, `PinPad.kt:130`; covers and cards merge their title (`CollectionCover`, `VideoCard.kt:186`) | |
 | G3 | Text contrast at least 4.5:1 (WCAG 1.4.3) | OK | Computed from `Color.kt` tokens: ink/background 14.5; muted/background 5.5; muted/surface 5.9; white/primary 5.4; primary links/background 5.1; ink/accent 8.9; danger/background 5.5; success/surface 5.3; onDarkMuted/dark 7.8; badge text 9.7. Cover glyphs (large text, 3:1 needed) 4.5 to 6.0 | |
-| G4 | Non-text contrast at least 3:1 for control outlines and meaningful icons (WCAG 1.4.11) | **NEEDS DECISION** | Unselected outline `border` #C9D3E0 on white = **1.51:1** (text field `SetupStepsScreens.kt:297-299`, age options `SetupControls.kt:191-195`, plan cards); premium star `accent` #FFB627 on white = **1.75:1** (`DashboardScreen.kt` `CollectionRow`, it has a text label) | See **D9**: these are CLAUDE.md design tokens. |
+| G4 | Non-text contrast at least 3:1 for control outlines and meaningful icons (WCAG 1.4.11) | **NEEDS DECISION** | Unselected outline `border` #C9D3E0 on white = **1.51:1** (text field `SetupStepsScreens.kt:297-299`, age options `SetupControls.kt:191-195`, plan cards); `accent` #FFB627 icons on white = **1.75:1** (the dashboard's subscription link star, which has a text label; the premium-collection star was removed in Phase 8) | See **D9**: these are CLAUDE.md design tokens. |
 | G5 | Text scales with the system font size | OK | All sizes in `sp` (`Type.kt:63-65`); Compose follows Android font scale and iOS Dynamic Type | |
 | G6 | No clipped text at 130% font size | **FIX** | Fixed heights around text: `SetupControls.kt:191` (52 dp age option), `:234` (72 dp collection card), `SegmentedControl.kt:52` (56 dp), `SetupStepsScreens.kt:297` (56 dp field), `GateScreen.kt:322` (64 dp PIN field) | At 130%, the largest label in them is ≈ 34 dp tall, so nothing clips today; at 150–200% the 52/56 dp boxes would. **Fix G6:** `height(x)` → `heightIn(min = x)` in those five places. Buttons, chips, plan cards and pickers already use minimum sizes. Check on device: Android font size at the largest step and iOS "Larger Text" at 130%: onboarding, dashboard, paywall, PIN gate. |
 | G7 | Headings, roles and states | OK | `Shelf.kt:107` headings; `Role.Button` / `Role.Switch` / `Role.RadioButton` (`PlanCard`) / `Role.Checkbox`; quota dots and PIN dots announce a summary (`QuotaDots.kt:52`, `PinPad.kt:152`) | |
@@ -183,6 +187,8 @@ Whatever the first R8 run still reports under `missing_rules.txt` (`androidApp/b
 ## Decisions (your answers needed)
 
 **D1. The subscription unlocks YouTube videos. YouTube's policies forbid charging to watch embedded YouTube content. What should the subscription sell?** (A18, A21, C9)
+
+> **Decided 2026-11-07: A.** Paid set: up to 4 children and the 7-day activity report. Done in Phase 8. Sub-question (b) is still open.
 
 - **Evidence:**
   - Developer Policies III.F.3.a: API clients "must not charge users to watch content in an embedded YouTube player".
@@ -212,6 +218,8 @@ Whatever the first R8 run still reports under `missing_rules.txt` (`androidApp/b
 - **"Contains ads":** we serve none. YouTube may show non-personalized ads inside the player. Do you want to answer "No" (we have no ad SDK and no ad inventory), or "Yes" to be conservative? "Yes" shows a badge and invites Families ads review of an SDK we don't have. My recommendation is "No" plus a note in the review comments, but this is a judgment call.
 
 **D4. RevenueCat (and the YouTube player) send device-level data before any parent consent. Is that acceptable?** (C4, E2)
+
+> **Decided 2026-11-07: A.** Done in Phase 8 (consent step, `ConnectBillingUseCase`, `EntitlementCache`).
 
 - **Evidence:**
   - Apple's Kids page: "Kids apps should not transmit personally identifiable information or device information to third parties — even in sections intended for adults — unless the parent explicitly consents".
@@ -252,6 +260,8 @@ Fill these in and I'll finalize the bundled policy text and the URLs:
 
 **D8. The "forgot PIN" reset is a multiplication (6–9 × 11–19). Is that hard enough for a 9–12-year-old?** (C1)
 
+> **Decided 2026-11-07: B (keep it as it is).**
+
 - Evidence: `AdultChallenge.kt` (`CreateAdultChallengeUseCase`). A child who resets the PIN gets parent mode: settings, paywall and links.
 - **Options:**
   - **A (recommended):** a harder challenge: two 2-digit numbers (e.g. 37 × 48), typed answer, a 2-minute lockout after 3 wrong answers.
@@ -277,11 +287,11 @@ Every network call the app makes, and what it sends. All of them use HTTPS.
 | 2 | A parent hides a video, or YouTube reports error 100/101/150 | same | `POST video_reports {youtube_id, reason}`, reason ∈ `parent_hidden`, `video_removed`, `embed_disabled`. Nothing else (anon can't read the table). | — | `SupabaseVideoReporter.kt:14`, `PlayerViewModel.kt:311-312` |
 | 3 | Thumbnails on screen | `i.ytimg.com` (URL from the catalog) | Image GET (IP, User-Agent) | JPEG | `App.kt:24-27` (Coil + Ktor) |
 | 4 | The player screen | `www.youtube.com` (→ `youtube-nocookie.com` after A19), `*.googlevideo.com`, `*.ytimg.com` | YouTube's own iframe traffic. Referer `https://com.mahmoud.clipkid`; YouTube's cookies/storage in the webview | Player, stream, YouTube's ads | `youtube_player.html:85`, platform players |
-| 5 | Launch, foreground, paywall, purchase, restore | `api.revenuecat.com` | Anonymous app user id (`$RCAnonymousID:…`), store purchase token/receipt, product ids, platform/OS/app version, locale, storefront. **No attributes, no ad ids** (`RevenueCatBillingRepository.kt:72-75`) | Entitlement `full_access`, offering | `core/billing/...` |
+| 5 | Only after the parent's consent: parent mode (dashboard, paywall), purchase, restore; at launch / foreground only to re-check a cached subscription whose period ended | `api.revenuecat.com` | Anonymous app user id (`$RCAnonymousID:…`), store purchase token/receipt, product ids, platform/OS/app version, locale, storefront. **No attributes, no ad ids** | Entitlement `full_access`, offering | `core/billing/...`, `ConnectBillingUseCase` |
 | 6 | Purchase / restore | Google Play Billing / Apple StoreKit | Handled by the OS store with the parent's store account | Transactions | — |
 | — | Never from the app | YouTube Data API | Only our backend's scheduled `videos.list` (server-to-server, no user data) | | `supabase/functions/refresh-youtube-data/index.ts:94` |
 
-Stored only on the device: child profiles (nickname, avatar color, age band, allowed collections, daily limit), watch events, favorites, hidden videos, extra grants, cached catalog, settings, the PIN hash (Keystore/Keychain), Coil image cache, RevenueCat's own cache (anonymous id, last entitlement).
+Stored only on the device: child profiles (nickname, avatar color, age band, allowed collections, daily limit), watch events, favorites, hidden videos, extra grants, cached catalog, settings (including the parent's consent flag and the last subscription status: full yes/no, end date, renew, trial, store, manage URL; no ids), the PIN hash (Keystore/Keychain), Coil image cache, RevenueCat's own cache once it has been configured (anonymous id, last entitlement).
 
 ## Google Play Data safety answers
 
@@ -312,7 +322,7 @@ Identifiers: none. RevenueCat says to declare "User ID" only for a custom app us
 
 ## Privacy policy drafts
 
-Placeholders in `[brackets]` come from D7. The text describes the app **as it is today**; the subscription paragraph changes with D1 and the consent paragraph with D4. Not legal advice: have it reviewed if you can.
+Placeholders in `[brackets]` come from D7. The text describes the app **as of Phase 8** (D1 and D4 decided). Not legal advice: have it reviewed if you can.
 
 ### English
 
@@ -329,7 +339,7 @@ Placeholders in `[brackets]` come from D7. The text describes the app **as it is
 > 1. **Catalog updates.** The app downloads the list of reviewed videos from our server (hosted by Supabase in [region]). These requests contain no information about you or your children.
 > 2. **Anonymous video reports.** When you hide a video, or a video stops working, the app sends us only the video's YouTube ID and the reason (for example "hidden by a parent"). No device, user or child identifier is included, so a report can't be linked to you. We keep reports for [12 months] to improve the catalog, then delete them.
 > 3. **Videos.** Videos play in YouTube's official embedded player, in [privacy-enhanced mode]. ClipKid uses YouTube API Services. When a video plays, YouTube (Google) receives the information any web player receives, such as your IP address and device/browser details, and may show its own non-personalized ads on Made for Kids videos. We have told Google that ClipKid is directed to children. YouTube's use of this information is covered by the Google Privacy Policy (https://policies.google.com/privacy), and by using ClipKid you agree to the YouTube Terms of Service (https://www.youtube.com/t/terms).
-> 4. **Subscriptions (optional).** Purchases are handled by Apple (App Store) or Google (Google Play) with your store account; we never see your payment details. To check whether a subscription is active we use RevenueCat (https://www.revenuecat.com/privacy), which receives a random app-generated ID, your purchase receipt, the product bought and basic app/OS information. We don't send RevenueCat any names, emails or other attributes.
+> 4. **Subscriptions (optional).** Every video in ClipKid is free. The optional subscription adds parent features: more child profiles and the weekly activity report. Purchases are handled by Apple (App Store) or Google (Google Play) with your store account; we never see your payment details. To check whether a subscription is active we use RevenueCat (https://www.revenuecat.com/privacy), which receives a random app-generated ID, your purchase receipt, the product bought and basic app/OS information. The app contacts RevenueCat only after you agree to it in the app, and only from the parent section (or to check a subscription that has reached its renewal date). We don't send RevenueCat any names, emails or other attributes.
 >
 > **Children.** ClipKid is designed for children aged 2–12 to use under a parent's supervision. We do not knowingly collect personal information from children. Anything a parent enters about a child stays on the device. Purchases, settings and links that leave the app are behind the parent PIN.
 >
@@ -356,7 +366,7 @@ Placeholders in `[brackets]` come from D7. The text describes the app **as it is
 > ١. **تحديث الكتالوج.** التطبيق بينزّل قايمة الفيديوهات اللي راجعناها من السيرفر بتاعنا (على Supabase في [المنطقة]). الطلبات دي مفيهاش أي معلومة عنك أو عن ولادك.
 > ٢. **بلاغات من غير أسماء.** لما تخبّي فيديو أو فيديو يبطّل يشتغل، التطبيق بيبعت لنا رقم الفيديو على YouTube والسبب بس (زي "الأهل خبّوه"). مفيش أي رقم للجهاز أو للمستخدم أو للطفل، فمستحيل نعرف البلاغ جاي من مين. بنحتفظ بالبلاغات [١٢ شهر] علشان نحسّن الكتالوج، وبعدين بنمسحها.
 > ٣. **الفيديوهات.** الفيديوهات بتشتغل في المشغّل الرسمي المدمج بتاع YouTube، [في وضع الخصوصية المحسّن]. ClipKid بيستخدم خدمات YouTube API. وقت تشغيل الفيديو، YouTube (جوجل) بيوصله اللي بيوصل لأي مشغّل ويب، زي عنوان الـIP ونوع الجهاز والمتصفح، وممكن يعرض إعلاناته غير المخصّصة على فيديوهات الأطفال. إحنا بلّغنا جوجل إن ClipKid موجّه للأطفال. استخدام YouTube للمعلومات دي خاضع لسياسة خصوصية جوجل (https://policies.google.com/privacy)، وباستخدامك لـ ClipKid إنت موافق على شروط خدمة YouTube (https://www.youtube.com/t/terms).
-> ٤. **الاشتراك (اختياري).** الشراء بيتم عن طريق أبل (App Store) أو جوجل (Google Play) بحسابك في المتجر، وإحنا عمرنا ما بنشوف بيانات الدفع. علشان نعرف الاشتراك شغال ولا لأ بنستخدم RevenueCat (https://www.revenuecat.com/privacy)، وبيوصله رقم عشوائي بيعمله التطبيق، وإيصال الشراء، والباقة اللي اشتريتها، ومعلومات بسيطة عن التطبيق ونظام التشغيل. مش بنبعت لـ RevenueCat أي أسامي أو إيميلات أو بيانات تانية.
+> ٤. **الاشتراك (اختياري).** كل الفيديوهات في ClipKid مجانية. الاشتراك الاختياري بيضيف مميزات للأهل: أطفال أكتر، وسجل مشاهدة الأسبوع كله. الشراء بيتم عن طريق أبل (App Store) أو جوجل (Google Play) بحسابك في المتجر، وإحنا عمرنا ما بنشوف بيانات الدفع. علشان نعرف الاشتراك شغال ولا لأ بنستخدم RevenueCat (https://www.revenuecat.com/privacy)، وبيوصله رقم عشوائي بيعمله التطبيق، وإيصال الشراء، والباقة اللي اشتريتها، ومعلومات بسيطة عن التطبيق ونظام التشغيل. التطبيق مش بيكلّم RevenueCat غير بعد ما توافق جوه التطبيق، ومن قسم الأهل بس (أو علشان يتأكد من اشتراك وصل لميعاد تجديده). مش بنبعت لـ RevenueCat أي أسامي أو إيميلات أو بيانات تانية.
 >
 > **الأطفال.** ClipKid معمول لأطفال من سنتين لـ١٢ سنة يستخدموه تحت إشراف الأهل. إحنا مش بنجمع عن قصد أي بيانات شخصية من الأطفال، وأي حاجة الأهل بيكتبوها عن الطفل بتفضل على الجهاز. الشراء والإعدادات وأي لينك بيخرج برّه التطبيق كلهم ورا الرقم السري بتاع الأهل.
 >
@@ -387,7 +397,7 @@ Counts are characters as the stores count them (Unicode code points), measured w
 | App Store keywords (Kids) | حروف,أرقام,قرآن,أدعية,أخلاق,حواديت,علوم,تعليم,أطفال,حضانة,رقابة أبوية,حد يومي | 77 / 100 |
 | App Store keywords (General) | حروف,أرقام,قرآن,أدعية,أخلاق,حواديت,علوم,تعليم,رقابة أبوية,حد يومي,عيلة | 70 / 100 |
 
-**Full description (Kids variant, 863 / 4000 characters).** For the General variant, drop the age line and say "للعيلة" instead of "لولادك". The subscription paragraph waits for D1.
+**Full description (Kids variant, about 960 / 4000 characters (the Phase 7 count + 97 for the Phase 8 edits)).** For the General variant, drop the age line and say "للعيلة" instead of "لولادك".
 
 ```
 ClipKid بيقدّم لولادك فيديوهات بنختارها ونراجعها واحد واحد، علشان تبقى مطمّن على اللي بيتفرجوا عليه.
@@ -397,13 +407,13 @@ ClipKid بيقدّم لولادك فيديوهات بنختارها ونراجع
 • محتوى على قد سن كل طفل: من سنتين لحد ١٢ سنة.
 • إنت اللي بتحدد الحد اليومي: عدد فيديوهات أو عدد دقايق. لما الحد يخلص، التطبيق بيقول "برافو يا بطل" ويستنى لبكرة.
 • مفيش فيد لا نهائي، ومفيش تشغيل تلقائي للفيديو اللي بعده. ابنك هو اللي بيختار، من ٣ اختيارات بس.
-• لوحة للأهل برقم سري: تغيّر الإعدادات، تشوف نشاط الأسبوع، تخبّي أي فيديو، وتدّي فيديو زيادة النهارده.
+• لوحة للأهل برقم سري: تغيّر الإعدادات، تشوف اتفرجوا على إيه النهارده، تخبّي أي فيديو، وتدّي فيديو زيادة النهارده.
 • المفضلة لكل طفل.
 • من غير حسابات ومن غير تسجيل دخول: إعدادات ولادك وسجلّهم متخزنين على جهازك بس.
 
 لازم يكون فيه نت علشان الفيديوهات تشتغل.
 
-الاشتراك (اختياري): [يتحدد بعد قرار D1]
+كل الفيديوهات مجانية. الاشتراك (اختياري) بيضيف مميزات للأهل: لحد ٤ أطفال كل واحد بإعداداته، وسجل مشاهدة الأسبوع كله لكل طفل.
 
 سياسة الخصوصية: [الرابط]
 شروط الاستخدام: [الرابط]

@@ -70,10 +70,15 @@ Font licenses (OFL) and the Lucide icon license (ISC) are in `core/designsystem/
 
 ## Subscriptions (RevenueCat)
 
-`core:billing` implements `BillingRepository` with RevenueCat (`purchases-kmp-core`). Free =
-the collections with `is_premium = false` in Supabase + 1 child; the `full_access` entitlement
-opens premium collections and up to 4 children. Expiry keeps every setting and all history; it
-only locks content again (and children after the first).
+`core:billing` implements `BillingRepository` with RevenueCat (`purchases-kmp-core`). Every video
+is free (YouTube Developer Policies III.F.3.a). Free = 1 child and today's activity; the
+`full_access` entitlement adds up to 4 children and the 7-day activity report. Expiry keeps every
+setting and all history; it only locks children after the first and the week view again.
+
+RevenueCat is never configured before the parent's consent (onboarding step after the PIN, or
+the paywall's consent card on older installs), and then only from parent mode, or at launch to
+re-check a cached subscription whose period ended (`ConnectBillingUseCase`). Child mode reads the
+last status from `EntitlementCache` (DataStore).
 
 The app only knows these names, so product ids can change freely in the stores:
 
@@ -96,7 +101,7 @@ revenuecat.iosApiKey=appl_...         # CLIPKID_RC_IOS_KEY
 revenuecat.testStoreApiKey=test_...   # CLIPKID_RC_TEST_KEY, optional, debug builds only
 ```
 
-- No key: billing is off (`NoStoreBillingRepository`): everything premium stays locked and the
+- No key: billing is off (`NoStoreBillingRepository`): the app stays on the free plan and the
   paywall says the subscription is not available. Tests and previews always run this way.
 - The Test Store key wins in debug builds. Remove it to test against the real sandboxes.
 - Privacy: anonymous RevenueCat user only; no attributes, device ids or integrations; store

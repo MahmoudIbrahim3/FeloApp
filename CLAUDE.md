@@ -6,7 +6,7 @@ ClipKid is a curated video app for children aged 2–12, Arabic-first (Egyptian 
 - Parents set a daily limit (N videos or N minutes). No infinite feed, no autoplay, no countdowns.
 - One app, two modes: Child mode (default) and Parent mode behind a PIN gate.
 - v1 has no accounts and no login. All settings and history live on the device.
-- Revenue: subscription via RevenueCat (entitlement `full_access`, offering `default` with `$rc_monthly` + `$rc_annual`). Free tier = the collections with `is_premium = false` (the backend decides) and 1 child profile; full = all collections and up to 4 child profiles. No ads, ever.
+- Revenue: subscription via RevenueCat (entitlement `full_access`, offering `default` with `$rc_monthly` + `$rc_annual`). **Every video and collection is free for everyone** (YouTube Developer Policies III.F.3.a: never charge to watch embedded YouTube content). The subscription sells parent features only: free = 1 child profile and today's activity; full = up to 4 child profiles and the 7-day activity report. No ads, ever.
 
 ## Non-negotiable rules (YouTube, Google Families, Apple Kids)
 1. Never download, cache, store or play YouTube audio/video outside the official embedded player. No background playback, no offline playback, no audio-only.
@@ -48,7 +48,7 @@ Rules: features depend only on core modules, never on each other. Navigation liv
 
 ## Domain model
 - `AgeBand`: A2_3, A4_6, A7_9, A10_12
-- `Collection(id, slug, titleAr, cover: CoverStyle(bg, fg, glyph | icon), ageBands, sortOrder, isPremium)`
+- `Collection(id, slug, titleAr, cover: CoverStyle(bg, fg, glyph | icon), ageBands, sortOrder)`
 - `Video(youtubeId, collectionId, titleAr, durationSec, thumbnailUrl, tags, ageBands, sortOrder, madeForKids, embeddable, refreshedAt)`
 - `ChildProfile(id, nickname, avatarColor, ageBand, allowedCollectionIds, dailyLimit: Videos(n) | Minutes(m))`
 - `WatchEvent(id, childId, youtubeId, startedAt, watchedSec, completed)`
@@ -61,8 +61,10 @@ Rules: features depend only on core modules, never on each other. Navigation liv
 - Up Next = 1 primary choice (next video in the same collection) + up to 2 by shared tag. Exclude videos watched today and hidden videos. Never more than 3 choices.
 - A child only sees collections allowed for their profile AND matching their age band. Hidden videos never appear for that child.
 - When a parent hides a video, send `{youtubeId, reason: "parent_hidden"}` to the backend with no device, user or child identifiers.
-- Subscriptions: premium collections show a lock badge in child mode; tapping one opens the "اسأل بابا أو ماما" screen, never the paywall. The paywall is only reachable in parent mode (after the PIN). Prices, periods and trials come only from the store.
-- A new subscription (purchase or restore) switches on, for every child, the premium collections of their age band. Expiry never changes settings or history: premium content locks again and only the first (oldest) child stays usable; the others keep everything and come back with the subscription.
+- Subscriptions: nothing a child can watch ever depends on the subscription; child mode never shows locks, prices or the paywall. The paywall is only reachable in parent mode (after the PIN): from a locked extra child, "+" at the free limit, the dashboard's subscription link, and the Activity week card. Prices, periods and trials come only from the store.
+- Expiry never changes settings or history: only the first (oldest) child stays usable (the others keep everything and come back with the subscription), and Activity shows today only (history keeps being recorded).
+- Consent: onboarding asks the parent to agree, right after the PIN, that videos play through YouTube's player and subscriptions go through Apple/Google and RevenueCat. Older installs without it get the same consent card on the paywall. Before consent the app never contacts RevenueCat.
+- RevenueCat is configured only through `ConnectBillingUseCase`: in parent mode (dashboard, paywall), or at launch / back to the foreground to re-check a cached subscription whose period ended. Child mode otherwise reads the cached status (`EntitlementCache`).
 - RevenueCat runs with an anonymous app user id only: never `logIn`, attributes, device identifiers, integrations or store in-app messages.
 
 ## UI and design
@@ -74,7 +76,7 @@ Rules: features depend only on core modules, never on each other. Navigation liv
 - Touch targets ≥ 48dp everywhere, ≥ 56dp for primary child actions.
 - Video cards = real YouTube thumbnail + YouTube attribution + duration badge. Collection covers = unified style (color + glyph/icon), never a thumbnail.
 - Layout: compact width → bottom bar with 2 tabs (Home, Favorites). Expanded width (tablet) → navigation rail on the start side (right in RTL), larger cards, more items per shelf. Use window size classes.
-- Reference screens: `design/*.png`, exported at 2x (780×1688 px = 390×844 dp phone; `HomeTablet.png` 2560×1600 px = 1280×800 dp tablet landscape). Names: Onboard, SetPin, ChildSetup, SetupCollections, HomeFeed, HomeTablet, Collection, Clips (= the video player screen), UpNext, DoneToday, Favorites, Gate, Parent, Activity, Paywall. Match them; when the code and an image disagree, ask.
+- Reference screens: `design/*.png`, exported at 2x (780×1688 px = 390×844 dp phone; `HomeTablet.png` 2560×1600 px = 1280×800 dp tablet landscape). Names: Onboard, SetPin, (consent step: no image yet), ChildSetup, SetupCollections, HomeFeed, HomeTablet, Collection, Clips (= the video player screen), UpNext, DoneToday, Favorites, Gate, Parent, Activity, Paywall. Match them; when the code and an image disagree, ask.
 - Strings: Egyptian colloquial Arabic in `composeResources/values/strings.xml`. No hard-coded strings in composables.
 
 ## How to work
