@@ -116,7 +116,12 @@ fun rememberActivityViewModel(childId: String): ActivityViewModel {
         key = "activity/$childId",
         factory = viewModelFactory {
             initializer {
-                ActivityViewModel(childId, koin.get<GetWeeklyActivityUseCase>(), koin.get<HideVideoUseCase>())
+                ActivityViewModel(
+                    childId = childId,
+                    getActivity = koin.get<GetWeeklyActivityUseCase>(),
+                    hideVideo = koin.get<HideVideoUseCase>(),
+                    observeAccess = koin.get<ObserveAccessUseCase>(),
+                )
             }
         },
     )

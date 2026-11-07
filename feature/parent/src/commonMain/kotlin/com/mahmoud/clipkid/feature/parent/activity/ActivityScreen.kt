@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.mahmoud.clipkid.core.designsystem.component.Icon
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonLarge
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonTone
+import com.mahmoud.clipkid.core.designsystem.component.PrimaryButton
 import com.mahmoud.clipkid.core.designsystem.component.SecondaryButton
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.component.VideoThumbnail
@@ -56,6 +57,10 @@ import com.mahmoud.clipkid.feature.parent.resources.act_list_separator
 import com.mahmoud.clipkid.feature.parent.resources.act_not_finished
 import com.mahmoud.clipkid.feature.parent.resources.act_row_meta
 import com.mahmoud.clipkid.feature.parent.resources.act_subtitle
+import com.mahmoud.clipkid.feature.parent.resources.act_subtitle_today
+import com.mahmoud.clipkid.feature.parent.resources.act_week_locked_button
+import com.mahmoud.clipkid.feature.parent.resources.act_week_locked_message
+import com.mahmoud.clipkid.feature.parent.resources.act_week_locked_title
 import com.mahmoud.clipkid.feature.parent.resources.act_time_am
 import com.mahmoud.clipkid.feature.parent.resources.act_time_pm
 import com.mahmoud.clipkid.feature.parent.resources.act_title
@@ -88,7 +93,10 @@ fun ActivityRoute(viewModel: ActivityViewModel, onEffect: (ActivityEffect) -> Un
     ActivityScreen(state, viewModel::onEvent)
 }
 
-/** Activity.png: 7-day chart with the dashed limit line, and today's videos with "اخفيه". */
+/**
+ * Activity.png: 7-day chart with the dashed limit line, and today's videos with "اخفيه".
+ * Free plan: today's videos only, and a card that opens the paywall in place of the chart.
+ */
 @Composable
 fun ActivityScreen(state: ActivityUiState, onEvent: (ActivityEvent) -> Unit, modifier: Modifier = Modifier) {
     val colors = ClipKidTheme.colors
@@ -105,7 +113,7 @@ fun ActivityScreen(state: ActivityUiState, onEvent: (ActivityEvent) -> Unit, mod
                 .padding(horizontal = spacing.gutter, vertical = spacing.md),
             verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
-            val activity = (state as? ActivityUiState.Content)?.activity
+            val content = state as? ActivityUiState.Content
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButtonLarge(
                     icon = ClipKidIcons.Back,
@@ -117,17 +125,25 @@ fun ActivityScreen(state: ActivityUiState, onEvent: (ActivityEvent) -> Unit, mod
                 Spacer(Modifier.size(spacing.md))
                 Column(Modifier.weight(1f)) {
                     Text(stringResource(Res.string.act_title), style = ClipKidTheme.typography.displayMedium, color = colors.ink)
-                    if (activity != null) {
+                    if (content != null) {
                         Text(
-                            stringResource(Res.string.act_subtitle, activity.child.nickname),
+                            stringResource(
+                                if (content.showsWeek) Res.string.act_subtitle else Res.string.act_subtitle_today,
+                                content.activity.child.nickname,
+                            ),
                             style = ClipKidTheme.typography.bodyMedium,
                             color = colors.muted,
                         )
                     }
                 }
             }
-            if (activity != null) {
-                ChartCard(activity)
+            if (content != null) {
+                val activity = content.activity
+                if (content.showsWeek) {
+                    ChartCard(activity)
+                } else {
+                    WeekLockedCard(onClick = { onEvent(ActivityEvent.SeeWeekClicked) })
+                }
                 TodaySection(activity.today, onHide = { onEvent(ActivityEvent.HideClicked(it)) })
                 HideNote()
             }
@@ -170,6 +186,29 @@ private fun ChartCard(activity: WeeklyActivity) {
                 activity.limitLine.toArabicDigits(),
             ),
             contentDescription = chartDescription,
+        )
+    }
+}
+
+/** Free plan: in place of the chart. No week numbers are shown here. */
+@Composable
+private fun WeekLockedCard(onClick: () -> Unit) {
+    val colors = ClipKidTheme.colors
+    val spacing = ClipKidTheme.spacing
+    Column(
+        Modifier.fillMaxWidth().background(colors.surface, ClipKidTheme.shapes.card).padding(spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(spacing.sm),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(ClipKidIcons.Chart, contentDescription = null, tint = colors.primary, size = 28.dp)
+            Spacer(Modifier.size(spacing.sm))
+            Text(stringResource(Res.string.act_week_locked_title), style = ClipKidTheme.typography.titleMedium, color = colors.ink)
+        }
+        Text(stringResource(Res.string.act_week_locked_message), style = ClipKidTheme.typography.bodyMedium, color = colors.muted)
+        PrimaryButton(
+            text = stringResource(Res.string.act_week_locked_button),
+            onClick = onClick,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
@@ -276,7 +315,16 @@ private fun ActivityPreview() = ClipKidPreview {
     val child = ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A4_6, emptySet(), DailyLimit.Minutes(30))
     val today = LocalDate(2026, 11, 4)
     val days = (6 downTo 0).map { back -> DayActivity(today.minus(back, DateTimeUnit.DAY), 3, (14 + back * 2) * 60) }
-    ActivityScreen(ActivityUiState.Content(WeeklyActivity(child, days, QuotaUnit.Seconds, 30, emptyList())), {})
+    ActivityScreen(ActivityUiState.Content(WeeklyActivity(child, days, QuotaUnit.Seconds, 30, emptyList()), showsWeek = true), {})
+}
+
+@Preview
+@Composable
+private fun ActivityFreePreview() = ClipKidPreview {
+    val child = ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A4_6, emptySet(), DailyLimit.Videos(3))
+    val today = LocalDate(2026, 11, 4)
+    val days = (6 downTo 0).map { back -> DayActivity(today.minus(back, DateTimeUnit.DAY), 0, 0) }
+    ActivityScreen(ActivityUiState.Content(WeeklyActivity(child, days, QuotaUnit.Videos, 3, emptyList()), showsWeek = false), {})
 }
 
 @Preview

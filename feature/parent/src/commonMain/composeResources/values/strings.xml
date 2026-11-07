@@ -68,6 +68,10 @@
     <!-- Activity (Activity.png) -->
     <string name="act_title">سجل المشاهدة</string>
     <string name="act_subtitle">%1$s · آخر ٧ أيام</string>
+    <string name="act_subtitle_today">%1$s · النهارده</string>
+    <string name="act_week_locked_title">شوف الأسبوع كله لكل طفل</string>
+    <string name="act_week_locked_message">اعرف كل يوم في آخر ٧ أيام اتفرج كام فيديو وكام دقيقة، مع ClipKid كامل.</string>
+    <string name="act_week_locked_button">اعرف أكتر</string>
     <string name="act_avg_label">متوسط اليوم</string>
     <string name="act_avg_value">%1$s دقيقة</string>
     <string name="act_week_videos">فيديوهات الأسبوع</string>

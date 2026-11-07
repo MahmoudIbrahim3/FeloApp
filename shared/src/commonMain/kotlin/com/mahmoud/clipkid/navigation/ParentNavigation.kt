@@ -124,6 +124,7 @@ internal fun NavGraphBuilder.parentGraph(nav: NavHostController, session: Parent
                     onEffect = { effect ->
                         when (effect) {
                             ActivityEffect.Back -> nav.popBackStack()
+                            ActivityEffect.OpenSubscription -> nav.navigate(SubscriptionDest) { launchSingleTop = true }
                         }
                     },
                 )
