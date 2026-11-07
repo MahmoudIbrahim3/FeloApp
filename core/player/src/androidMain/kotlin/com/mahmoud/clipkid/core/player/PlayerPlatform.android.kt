@@ -101,9 +101,9 @@ private class AndroidPlayer(
     @SuppressLint("SetJavaScriptEnabled")
     val webView: WebView = WebView(context).apply {
         setBackgroundColor(Color.BLACK)
-        // Without this, some devices composite the <video> element's hardware surface
-        // incorrectly inside Compose's AndroidView: audio plays but the picture stays black.
-        setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        // The app forces RTL in Compose, which hands it down to this view. YouTube's page lays
+        // itself out, so keep the WebView itself LTR: an RTL WebView can shift its page sideways.
+        layoutDirection = View.LAYOUT_DIRECTION_LTR
         isVerticalScrollBarEnabled = false
         isHorizontalScrollBarEnabled = false
         settings.apply {

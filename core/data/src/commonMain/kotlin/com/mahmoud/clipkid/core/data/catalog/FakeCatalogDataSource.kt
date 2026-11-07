@@ -56,7 +56,14 @@ class FakeCatalogDataSource(
          * TODO(Mahmoud): fill in before testing the player on a device. Keep it empty in commits
          * that ship.
          */
-        val DEBUG_VIDEO_ID_OVERRIDES: List<String> = emptyList()
+        val DEBUG_VIDEO_ID_OVERRIDES: List<String> = listOf(
+            "2I8iZDt8Zns",
+            "tRvAuK7vhFM",
+            "OBMYA4zXjVs",
+            "cxn5cQ8FhlU",
+            "rgPD0ORn5QI",
+            "0gz04luZbHk",
+        )
 
         // Shared tags (Arabic display labels) so Up Next can suggest across collections.
         private const val ANIMALS = "الحيوانات"

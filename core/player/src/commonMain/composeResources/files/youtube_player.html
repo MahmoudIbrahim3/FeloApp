@@ -8,7 +8,10 @@
   <style>
     /* Layout of our own page only: the player iframe fills it. Nothing is drawn over the player. */
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
-    #player { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    /* Pinned to the viewport and sized with !important: YouTube's frame otherwise collapsed to 0
+       height in Android WebView (sound, no picture, nothing to tap). fitPlayer() also sets it in px. */
+    #player { position: fixed; top: 0; right: 0; bottom: 0; left: 0;
+              width: 100% !important; height: 100% !important; border: 0; }
   </style>
 </head>
 <body>
@@ -36,6 +39,16 @@
     try { return (player && player.getDuration) ? (player.getDuration() || 0) : 0; } catch (e) { return 0; }
   }
 
+  // Sizes YouTube's frame to the page in pixels, so it never depends on how this web view resolves
+  // percentages. Runs when the player is ready and whenever the view changes size (rotation).
+  function fitPlayer() {
+    var frame = document.getElementById('player');
+    if (!frame || !window.innerWidth || !window.innerHeight) { return; }
+    frame.style.setProperty('width', window.innerWidth + 'px', 'important');
+    frame.style.setProperty('height', window.innerHeight + 'px', 'important');
+  }
+  window.addEventListener('resize', fitPlayer);
+
   function stopTick() {
     if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
   }
@@ -59,6 +72,7 @@
       },
       events: {
         onReady: function () {
+          fitPlayer();
           send({ type: 'ready', duration: duration(), time: currentTime() });
         },
         onStateChange: function (event) {
