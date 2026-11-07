@@ -101,6 +101,9 @@ private class AndroidPlayer(
     @SuppressLint("SetJavaScriptEnabled")
     val webView: WebView = WebView(context).apply {
         setBackgroundColor(Color.BLACK)
+        // Without this, some devices composite the <video> element's hardware surface
+        // incorrectly inside Compose's AndroidView: audio plays but the picture stays black.
+        setLayerType(View.LAYER_TYPE_HARDWARE, null)
         isVerticalScrollBarEnabled = false
         isHorizontalScrollBarEnabled = false
         settings.apply {
