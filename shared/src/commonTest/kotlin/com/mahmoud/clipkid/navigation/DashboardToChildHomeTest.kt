@@ -12,6 +12,7 @@ import com.mahmoud.clipkid.core.domain.testing.TestClock
 import com.mahmoud.clipkid.core.domain.testing.child
 import com.mahmoud.clipkid.core.domain.testing.kuwait
 import com.mahmoud.clipkid.core.domain.testing.runViewModelTest
+import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
@@ -41,15 +42,16 @@ class DashboardToChildHomeTest {
         val quota = GetDailyQuotaUseCase(profiles, history, clock, KUWAIT)
         val billing = FakeBillingRepository()
 
-        val home = HomeViewModel(CHILD, GetHomeFeedUseCase(catalog, profiles, history, FakeHiddenVideosRepository(), clock, KUWAIT, billing), quota)
+        val home = HomeViewModel(CHILD, GetHomeFeedUseCase(catalog, profiles, history, FakeHiddenVideosRepository(), clock, KUWAIT), quota)
         val dashboard = DashboardViewModel(
             profiles,
             settings,
             quota,
             GetCollectionsForAgeUseCase(catalog),
-            UpdateChildSettingsUseCase(profiles, catalog, billing),
+            UpdateChildSettingsUseCase(profiles, catalog),
             GrantExtraVideosUseCase(history, clock, KUWAIT),
             ObserveAccessUseCase(billing, profiles),
+            ConnectBillingUseCase(billing, settings, clock),
         )
         runCurrent()
         fun homeContent() = assertIs<HomeUiState.Content>(home.state.value)

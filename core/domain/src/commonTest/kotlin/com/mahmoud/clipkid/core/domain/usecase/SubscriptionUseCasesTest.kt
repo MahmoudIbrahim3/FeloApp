@@ -3,13 +3,15 @@ package com.mahmoud.clipkid.core.domain.usecase
 import app.cash.turbine.test
 import com.mahmoud.clipkid.core.domain.testing.FULL
 import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
-import com.mahmoud.clipkid.core.domain.testing.FakeCatalogRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
+import com.mahmoud.clipkid.core.domain.testing.FakeSettingsRepository
 import com.mahmoud.clipkid.core.domain.testing.child
-import com.mahmoud.clipkid.core.domain.testing.collection
-import com.mahmoud.clipkid.core.model.AgeBand
 import com.mahmoud.clipkid.core.model.Entitlement
 import kotlinx.coroutines.test.runTest
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -65,24 +67,79 @@ class SubscriptionUseCasesTest {
     }
 
     @Test
-    fun enablePremiumAddsThePremiumCollectionsOfEachChildsAgeBand() = runTest {
-        val catalog = FakeCatalogRepository(
-            listOf(
-                collection("letters", 1),
-                collection("stories", 2, ageBands = setOf(AgeBand.A4_6, AgeBand.A7_9)).copy(isPremium = true),
-                collection("science", 3, ageBands = setOf(AgeBand.A10_12)).copy(isPremium = true),
-            ),
-        )
-        val profiles = FakeProfileRepository(
-            child(id = "small", ageBand = AgeBand.A4_6, allowed = setOf("letters")),
-            child(id = "big", ageBand = AgeBand.A10_12, allowed = emptySet()),
-        )
-        val enable = EnablePremiumCollectionsUseCase(profiles, catalog)
-
-        enable()
-        enable() // idempotent
-
-        assertEquals(setOf("letters", "stories"), profiles.getProfile("small")?.allowedCollectionIds)
-        assertEquals(setOf("science"), profiles.getProfile("big")?.allowedCollectionIds)
+    fun weeklyActivityIsAFullFeature() {
+        assertFalse(Access(isFull = false, childIds = listOf("a")).showsWeeklyActivity)
+        assertTrue(Access(isFull = true, childIds = listOf("a")).showsWeeklyActivity)
     }
+
+    // region ConnectBillingUseCase
+
+    private val now = Instant.parse("2026-11-07T09:00:00Z")
+    private val clock = object : Clock {
+        override fun now(): Instant = this@SubscriptionUseCasesTest.now
+    }
+
+    private fun connect(billing: FakeBillingRepository, consent: Boolean) =
+        ConnectBillingUseCase(billing, FakeSettingsRepository(consentGiven = consent), clock)
+
+    @Test
+    fun parentModeNeverConnectsWithoutConsent() = runTest {
+        val billing = FakeBillingRepository()
+
+        assertFalse(connect(billing, consent = false).forParent())
+        assertEquals(0, billing.startCalls)
+    }
+
+    @Test
+    fun parentModeConnectsOnceThenRefreshes() = runTest {
+        val billing = FakeBillingRepository()
+        val useCase = connect(billing, consent = true)
+
+        assertTrue(useCase.forParent())
+        assertTrue(useCase.forParent())
+
+        assertEquals(1, billing.startCalls)
+        assertEquals(1, billing.refreshCalls)
+    }
+
+    @Test
+    fun agreeingRecordsConsentAndConnects() = runTest {
+        val billing = FakeBillingRepository()
+        val settings = FakeSettingsRepository(consentGiven = false)
+
+        ConnectBillingUseCase(billing, settings, clock).agreeAndConnect()
+
+        assertTrue(settings.consent.value)
+        assertTrue(billing.started)
+    }
+
+    @Test
+    fun childModeDoesNotConnectForAFreeOrRunningSubscription() = runTest {
+        val free = FakeBillingRepository(Entitlement.Free)
+        connect(free, consent = true).ifSubscriptionEnded()
+        assertEquals(0, free.startCalls)
+
+        val running = FakeBillingRepository(FULL.copy(expiresAt = now + 1.days))
+        connect(running, consent = true).ifSubscriptionEnded()
+        assertEquals(0, running.startCalls)
+
+        val lifetime = FakeBillingRepository(FULL.copy(expiresAt = null))
+        connect(lifetime, consent = true).ifSubscriptionEnded()
+        assertEquals(0, lifetime.startCalls)
+    }
+
+    @Test
+    fun anEndedCachedSubscriptionIsCheckedAgainOnlyWithConsent() = runTest {
+        val ended = FULL.copy(expiresAt = now - 1.hours)
+
+        val withoutConsent = FakeBillingRepository(ended)
+        connect(withoutConsent, consent = false).ifSubscriptionEnded()
+        assertEquals(0, withoutConsent.startCalls)
+
+        val withConsent = FakeBillingRepository(ended)
+        connect(withConsent, consent = true).ifSubscriptionEnded()
+        assertEquals(1, withConsent.startCalls)
+    }
+
+    // endregion
 }

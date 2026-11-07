@@ -26,14 +26,14 @@ class ChildSetupUseCasesTest {
     private val collections = listOf(
         collection("numbers", sortOrder = 2, ageBands = setOf(AgeBand.A4_6, AgeBand.A7_9)),
         collection("letters", sortOrder = 1),
-        collection("stories", sortOrder = 3).copy(isPremium = true),
+        collection("stories", sortOrder = 3),
         collection("science", sortOrder = 4, ageBands = setOf(AgeBand.A7_9)),
     )
     private val catalog = FakeCatalogRepository(collections, emptyList())
     private val profiles = FakeProfileRepository()
     private val settings = FakeSettingsRepository()
     private val billing = FakeBillingRepository()
-    private val addChild = AddChildUseCase(profiles, settings, SequentialIdGenerator("kid-"), catalog, billing)
+    private val addChild = AddChildUseCase(profiles, settings, SequentialIdGenerator("kid-"), billing)
 
     private fun newChild(nickname: String = "  ليلى ", allowed: Set<String> = setOf("letters", "numbers")) = NewChild(
         nickname = nickname,
@@ -44,12 +44,11 @@ class ChildSetupUseCasesTest {
     )
 
     @Test
-    fun collectionsForAgeAreFilteredAndSorted_andPremiumIsNotPreSelected() = runTest {
+    fun collectionsForAgeAreFilteredAndSorted_andAllPreSelected() = runTest {
         val forAge = GetCollectionsForAgeUseCase(catalog)(AgeBand.A4_6).first()
 
         assertEquals(listOf("letters", "numbers", "stories"), forAge.map { it.id })
-        assertEquals(setOf("letters", "numbers"), GetCollectionsForAgeUseCase.defaultSelection(forAge, isFull = false))
-        assertEquals(setOf("letters", "numbers", "stories"), GetCollectionsForAgeUseCase.defaultSelection(forAge, isFull = true))
+        assertEquals(setOf("letters", "numbers", "stories"), GetCollectionsForAgeUseCase.defaultSelection(forAge))
     }
 
     @Test
@@ -63,9 +62,9 @@ class ChildSetupUseCasesTest {
     }
 
     @Test
-    fun addChildNeverEnablesPremiumCollections() = runTest {
+    fun addChildKeepsEveryChosenCollectionOnTheFreePlan() = runTest {
         val id = addChild(newChild(allowed = setOf("letters", "stories")))
-        assertEquals(setOf("letters"), profiles.getProfile(id)?.allowedCollectionIds)
+        assertEquals(setOf("letters", "stories"), profiles.getProfile(id)?.allowedCollectionIds)
     }
 
     @Test
@@ -82,6 +81,7 @@ class ChildSetupUseCasesTest {
         val id = CompleteOnboardingUseCase(settings, addChild)("1357", newChild())
 
         assertTrue(settings.verifyPin("1357"))
+        assertTrue(settings.consentGiven.first(), "onboarding can't finish without the consent step")
         assertTrue(settings.onboardingDone.first())
         assertEquals(id, settings.activeChildId.first())
     }
@@ -98,7 +98,7 @@ class ChildSetupUseCasesTest {
     @Test
     fun dashboardChangesTheLimitAndTheCollections() = runTest {
         profiles.upsert(child(limit = DailyLimit.Videos(3), allowed = setOf("letters")))
-        val update = UpdateChildSettingsUseCase(profiles, catalog, billing)
+        val update = UpdateChildSettingsUseCase(profiles, catalog)
 
         update.setDailyLimit(CHILD, DailyLimit.Minutes(30))
         assertTrue(update.setCollectionAllowed(CHILD, "numbers", allowed = true))
@@ -110,24 +110,13 @@ class ChildSetupUseCasesTest {
     }
 
     @Test
-    fun dashboardCannotTurnOnPremiumOrUnknownCollections() = runTest {
+    fun dashboardTurnsOnAnyCollectionOnTheFreePlanButNotUnknownOnes() = runTest {
         profiles.upsert(child(allowed = setOf("letters")))
-        val update = UpdateChildSettingsUseCase(profiles, catalog, billing)
+        val update = UpdateChildSettingsUseCase(profiles, catalog)
 
-        assertFalse(update.setCollectionAllowed(CHILD, "stories", allowed = true))
+        assertTrue(update.setCollectionAllowed(CHILD, "stories", allowed = true))
         assertFalse(update.setCollectionAllowed(CHILD, "nope", allowed = true))
-        assertEquals(setOf("letters"), profiles.getProfile(CHILD)?.allowedCollectionIds)
-    }
-
-    @Test
-    fun withTheSubscriptionPremiumCanBeAddedAndTurnedOn() = runTest {
-        billing.entitlement.value = FULL
-        val id = addChild(newChild(allowed = setOf("letters", "stories")))
-        assertEquals(setOf("letters", "stories"), profiles.getProfile(id)?.allowedCollectionIds)
-
-        val update = UpdateChildSettingsUseCase(profiles, catalog, billing)
-        assertTrue(update.setCollectionAllowed(id, "stories", allowed = false))
-        assertTrue(update.setCollectionAllowed(id, "stories", allowed = true))
+        assertEquals(setOf("letters", "stories"), profiles.getProfile(CHILD)?.allowedCollectionIds)
     }
 
     @Test

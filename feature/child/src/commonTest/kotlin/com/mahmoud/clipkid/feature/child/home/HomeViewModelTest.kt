@@ -2,11 +2,9 @@ package com.mahmoud.clipkid.feature.child.home
 
 import app.cash.turbine.test
 import com.mahmoud.clipkid.core.domain.testing.CHILD
-import com.mahmoud.clipkid.core.domain.testing.FULL
 import com.mahmoud.clipkid.core.domain.testing.child
 import com.mahmoud.clipkid.core.domain.testing.event
 import com.mahmoud.clipkid.core.domain.testing.kuwait
-import com.mahmoud.clipkid.core.model.Entitlement
 import com.mahmoud.clipkid.core.model.WatchSource
 import com.mahmoud.clipkid.feature.child.testing.ChildFixture
 import com.mahmoud.clipkid.feature.child.testing.runViewModelTest
@@ -95,38 +93,12 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun premiumWithoutTheSubscriptionIsALockedCoverAndOpensAskParent() = runViewModelTest {
-        val f = ChildFixture(this)
-        f.catalog.collections.value = f.catalog.collections.value.map { if (it.id == "stories") it.copy(isPremium = true) else it }
+    fun everyAllowedCollectionIsOpenOnTheFreePlan() = runViewModelTest {
+        val f = ChildFixture(this) // FakeBillingRepository starts free
         val vm = viewModel(f)
 
         val state = assertIs<HomeUiState.Content>(vm.state.value)
-        assertEquals(listOf("letters", "numbers"), state.collections.map { it.id })
-        assertEquals(listOf("letters" to false, "numbers" to false, "stories" to true), state.covers.map { it.collection.id to it.locked })
-        assertTrue(state.shelves.none { it.collection.id == "stories" })
-        assertTrue(state.newToday.none { it.collectionId == "stories" })
-
-        vm.effects.test {
-            vm.onEvent(HomeEvent.LockedCollectionClicked("stories"))
-            assertEquals(HomeEffect.OpenAskParent, awaitItem())
-        }
-    }
-
-    @Test
-    fun subscribingOpensPremiumAtOnce_andExpiryLocksItAgain() = runViewModelTest {
-        val f = ChildFixture(this)
-        f.catalog.collections.value = f.catalog.collections.value.map { if (it.id == "stories") it.copy(isPremium = true) else it }
-        val vm = viewModel(f)
-
-        f.billing.entitlement.value = FULL
-        advanceUntilIdle()
-        val full = assertIs<HomeUiState.Content>(vm.state.value)
-        assertEquals(listOf("letters", "numbers", "stories"), full.collections.map { it.id })
-        assertTrue(full.lockedCollections.isEmpty())
-
-        f.billing.entitlement.value = Entitlement.Free
-        advanceUntilIdle()
-        val expired = assertIs<HomeUiState.Content>(vm.state.value)
-        assertEquals(listOf("stories"), expired.lockedCollections.map { it.id })
+        assertEquals(listOf("letters", "numbers", "stories"), state.collections.map { it.id })
+        assertTrue(state.shelves.any { it.collection.id == "stories" })
     }
 }

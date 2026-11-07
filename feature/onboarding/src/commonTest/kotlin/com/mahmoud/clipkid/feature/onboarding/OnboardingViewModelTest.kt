@@ -1,7 +1,6 @@
 package com.mahmoud.clipkid.feature.onboarding
 
 import app.cash.turbine.test
-import com.mahmoud.clipkid.core.domain.testing.FULL
 import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeCatalogRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
@@ -14,6 +13,7 @@ import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.model.AgeBand
 import com.mahmoud.clipkid.core.model.DailyLimit
+import com.mahmoud.clipkid.core.model.LegalLinks
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -30,7 +30,7 @@ class OnboardingViewModelTest {
         listOf(
             collection("letters", 1),
             collection("numbers", 2, ageBands = setOf(AgeBand.A4_6)),
-            collection("stories", 3).copy(isPremium = true),
+            collection("stories", 3),
             collection("science", 4, ageBands = setOf(AgeBand.A7_9)),
         ),
         emptyList(),
@@ -38,14 +38,16 @@ class OnboardingViewModelTest {
     private val profiles = FakeProfileRepository()
     private val settings = FakeSettingsRepository()
     private val billing = FakeBillingRepository()
-    private val addChild = AddChildUseCase(profiles, settings, SequentialIdGenerator("kid-"), catalog, billing)
+    private val addChild = AddChildUseCase(profiles, settings, SequentialIdGenerator("kid-"), billing)
+
+    private val links = LegalLinks(terms = "https://example.com/terms", privacy = "https://example.com/privacy")
 
     private fun TestScope.viewModel(mode: OnboardingMode = OnboardingMode.FirstRun) = OnboardingViewModel(
         mode,
         GetCollectionsForAgeUseCase(catalog),
         CompleteOnboardingUseCase(settings, addChild),
         addChild,
-        billing,
+        links,
     ).also { runCurrent() }
 
     private fun OnboardingViewModel.typePin(pin: String) {
@@ -53,7 +55,7 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun pinMustBeEnteredTwiceTheSame() = runViewModelTest {
+    fun pinMustBeEnteredTwiceTheSame_thenTheConsentStep() = runViewModelTest {
         val vm = viewModel()
         vm.effects.test {
             vm.typePin("2468")
@@ -64,8 +66,41 @@ class OnboardingViewModelTest {
 
             vm.typePin("2468")
             vm.onEvent(OnboardingEvent.PinNext)
+            assertEquals(OnboardingEffect.OpenConsent, awaitItem())
+        }
+    }
+
+    @Test
+    fun consentStepOpensTheLinksAndAgreeingLeadsToTheChildStep() = runViewModelTest {
+        val vm = viewModel()
+        assertEquals(4, vm.state.value.totalSteps)
+        assertEquals(2, vm.state.value.consentStep)
+        assertEquals(3, vm.state.value.childStep)
+
+        vm.effects.test {
+            vm.onEvent(OnboardingEvent.PrivacyClicked)
+            assertEquals(OnboardingEffect.OpenUrl("https://example.com/privacy"), awaitItem())
+            vm.onEvent(OnboardingEvent.YouTubeTermsClicked)
+            assertEquals(OnboardingEffect.OpenUrl(LegalLinks.YOUTUBE_TERMS), awaitItem())
+
+            vm.onEvent(OnboardingEvent.ConsentAgreed)
             assertEquals(OnboardingEffect.OpenChild, awaitItem())
         }
+        assertTrue(vm.state.value.consentAgreed)
+        assertFalse(settings.consent.value, "nothing is saved before Finish")
+    }
+
+    @Test
+    fun firstRunCannotFinishWithoutConsent() = runViewModelTest {
+        val vm = viewModel()
+        vm.onEvent(OnboardingEvent.NicknameChanged("يوسف"))
+        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
+        runCurrent()
+        assertFalse(vm.state.value.canFinish)
+
+        vm.onEvent(OnboardingEvent.ConsentAgreed)
+        runCurrent()
+        assertTrue(vm.state.value.canFinish)
     }
 
     @Test
@@ -107,30 +142,29 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun ageBandPreSelectsItsCollectionsExceptPremium() = runViewModelTest {
+    fun ageBandPreSelectsAllItsCollectionsOnTheFreePlan() = runViewModelTest {
         val vm = viewModel()
         vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
         runCurrent()
 
         val options = vm.state.value.collections
         assertEquals(listOf("letters", "numbers", "stories"), options.map { it.collection.id })
-        assertEquals(listOf(true, true, false), options.map { it.selected })
-        assertTrue(options.last().locked)
+        assertEquals(listOf(true, true, true), options.map { it.selected })
     }
 
     @Test
-    fun premiumCannotBeToggledOnAndChangingTheAgeResetsTheChoice() = runViewModelTest {
+    fun collectionsCanBeToggledAndChangingTheAgeResetsTheChoice() = runViewModelTest {
         val vm = viewModel()
         vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
         runCurrent()
-        vm.onEvent(OnboardingEvent.CollectionToggled("stories", on = true))
+        vm.onEvent(OnboardingEvent.CollectionToggled("stories", on = false))
         vm.onEvent(OnboardingEvent.CollectionToggled("numbers", on = false))
         runCurrent()
         assertEquals(setOf("letters"), vm.state.value.collections.filter { it.selected }.map { it.collection.id }.toSet())
 
         vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A7_9))
         runCurrent()
-        assertEquals(listOf("letters", "science"), vm.state.value.collections.filter { it.selected }.map { it.collection.id })
+        assertEquals(listOf("letters", "stories", "science"), vm.state.value.collections.filter { it.selected }.map { it.collection.id })
     }
 
     @Test
@@ -154,6 +188,7 @@ class OnboardingViewModelTest {
         vm.onEvent(OnboardingEvent.PinNext)
         vm.typePin("2468")
         vm.onEvent(OnboardingEvent.PinNext)
+        vm.onEvent(OnboardingEvent.ConsentAgreed)
         vm.onEvent(OnboardingEvent.NicknameChanged("يوسف"))
         vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
         vm.onEvent(OnboardingEvent.LimitChanged(DailyLimit.Minutes(30)))
@@ -161,17 +196,19 @@ class OnboardingViewModelTest {
         assertNull(settings.pin.value, "nothing is saved before Finish")
 
         vm.effects.test {
+            assertEquals(OnboardingEffect.OpenConsent, awaitItem())
             assertEquals(OnboardingEffect.OpenChild, awaitItem())
             vm.onEvent(OnboardingEvent.FinishClicked)
             val finished = awaitItem() as OnboardingEffect.Finished
 
             assertTrue(settings.verifyPin("2468"))
+            assertTrue(settings.consent.value)
             assertTrue(settings.onboardingDone.first())
             assertEquals(finished.childId, settings.activeChildId.first())
             val saved = assertNotNull(profiles.getProfile(finished.childId))
             assertEquals("يوسف", saved.nickname)
             assertEquals(DailyLimit.Minutes(30), saved.dailyLimit)
-            assertEquals(setOf("letters", "numbers"), saved.allowedCollectionIds)
+            assertEquals(setOf("letters", "numbers", "stories"), saved.allowedCollectionIds)
         }
         assertEquals("", vm.state.value.pin.entered, "the PIN is dropped from memory")
     }
@@ -192,21 +229,5 @@ class OnboardingViewModelTest {
         }
         assertTrue(settings.verifyPin("1111"))
         assertFalse(settings.onboardingDone.first())
-    }
-
-    @Test
-    fun withTheSubscriptionPremiumIsPreSelectedAndCanBeToggled() = runViewModelTest {
-        billing.entitlement.value = FULL
-        val vm = viewModel(OnboardingMode.AddChild)
-        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
-        runCurrent()
-
-        val options = vm.state.value.collections
-        assertEquals(listOf(true, true, true), options.map { it.selected })
-        assertFalse(options.last().locked)
-
-        vm.onEvent(OnboardingEvent.CollectionToggled("stories", on = false))
-        runCurrent()
-        assertFalse(vm.state.value.collections.last().selected)
     }
 }

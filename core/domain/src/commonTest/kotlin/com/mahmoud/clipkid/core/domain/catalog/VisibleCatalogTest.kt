@@ -8,58 +8,38 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+/** Every video is free: only the parent's choices, the age band and hidden videos decide. */
 class VisibleCatalogTest {
 
-    /** Catalog with "stories" (4-12) as the premium collection. */
-    private val collections = Catalog.collections.map { if (it.id == "stories") it.copy(isPremium = true) else it }
-    private val childWithStories = child(allowed = setOf("letters", "numbers", "stories"))
-
     @Test
-    fun freeHidesPremiumVideosButListsTheCollectionAsLocked() {
-        val visible = VisibleCatalog.of(childWithStories, collections, Catalog.videos, emptySet(), isFull = false)
-
-        assertEquals(listOf("letters", "numbers"), visible.collections.map { it.id })
-        assertEquals(listOf("stories"), visible.lockedCollections.map { it.id })
-        assertTrue(visible.videos.none { it.collectionId == "stories" })
-        assertFalse(visible.isVisible("S1"))
-    }
-
-    @Test
-    fun freeListsLockedPremiumOfTheAgeBandEvenIfTheParentNeverAllowedIt() {
-        val visible = VisibleCatalog.of(child(allowed = setOf("letters")), collections, Catalog.videos, emptySet(), isFull = false)
-        assertEquals(listOf("stories"), visible.lockedCollections.map { it.id })
-    }
-
-    @Test
-    fun lockedPremiumFollowsTheAgeBand() {
-        val toddler = child(ageBand = AgeBand.A2_3, allowed = setOf("letters", "stories"))
-        val visible = VisibleCatalog.of(toddler, collections, Catalog.videos, emptySet(), isFull = false)
-        assertTrue(visible.lockedCollections.isEmpty(), "stories is 4-12: not shown to a 2-3 child at all")
-    }
-
-    @Test
-    fun fullShowsAllowedPremiumAndLocksNothing() {
-        val visible = VisibleCatalog.of(childWithStories, collections, Catalog.videos, emptySet(), isFull = true)
+    fun everyAllowedCollectionOfTheAgeBandIsVisible() {
+        val visible = VisibleCatalog.of(child(allowed = setOf("letters", "numbers", "stories")), Catalog.collections, Catalog.videos, emptySet())
 
         assertEquals(listOf("letters", "numbers", "stories"), visible.collections.map { it.id })
-        assertTrue(visible.lockedCollections.isEmpty())
         assertTrue(visible.isVisible("S1"))
     }
 
     @Test
-    fun fullStillRespectsWhatTheParentAllowed() {
-        val visible = VisibleCatalog.of(child(allowed = setOf("letters")), collections, Catalog.videos, emptySet(), isFull = true)
+    fun respectsWhatTheParentAllowed() {
+        val visible = VisibleCatalog.of(child(allowed = setOf("letters")), Catalog.collections, Catalog.videos, emptySet())
+
         assertEquals(listOf("letters"), visible.collections.map { it.id })
-        assertTrue(visible.lockedCollections.isEmpty())
+        assertFalse(visible.isVisible("S1"))
     }
 
     @Test
-    fun expiryRelocksWithoutChangingTheProfile() {
-        val profile = childWithStories
-        VisibleCatalog.of(profile, collections, Catalog.videos, emptySet(), isFull = true)
-        val afterExpiry = VisibleCatalog.of(profile, collections, Catalog.videos, emptySet(), isFull = false)
+    fun followsTheAgeBand() {
+        val toddler = child(ageBand = AgeBand.A2_3, allowed = setOf("letters", "stories"))
+        val visible = VisibleCatalog.of(toddler, Catalog.collections, Catalog.videos, emptySet())
 
-        assertEquals(listOf("stories"), afterExpiry.lockedCollections.map { it.id })
-        assertTrue("stories" in profile.allowedCollectionIds, "settings are kept for when the subscription is back")
+        assertEquals(listOf("letters"), visible.collections.map { it.id }, "stories is 4-12: not shown to a 2-3 child")
+    }
+
+    @Test
+    fun hiddenVideosNeverAppear() {
+        val visible = VisibleCatalog.of(child(), Catalog.collections, Catalog.videos, setOf("L2"))
+
+        assertFalse(visible.isVisible("L2"))
+        assertTrue(visible.isVisible("L1"))
     }
 }

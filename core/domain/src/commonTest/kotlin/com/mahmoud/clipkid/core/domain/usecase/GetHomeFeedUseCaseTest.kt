@@ -3,7 +3,6 @@ package com.mahmoud.clipkid.core.domain.usecase
 import app.cash.turbine.test
 import com.mahmoud.clipkid.core.domain.testing.CHILD
 import com.mahmoud.clipkid.core.domain.testing.Catalog
-import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeCatalogRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeHiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
@@ -42,8 +41,7 @@ class GetHomeFeedUseCaseTest {
         profile: ChildProfile = child(DailyLimit.Videos(3)),
         catalog: FakeCatalogRepository = Catalog.repository(),
         origin: Instant = start,
-        billing: FakeBillingRepository = FakeBillingRepository(),
-    ) = GetHomeFeedUseCase(catalog, FakeProfileRepository(profile), history, hidden, TestClock(testScheduler, origin), KUWAIT, billing)
+    ) = GetHomeFeedUseCase(catalog, FakeProfileRepository(profile), history, hidden, TestClock(testScheduler, origin), KUWAIT)
 
     @Test
     fun oneShelfPerAllowedCollectionMatchingTheAgeBand_inSortOrder() = runTest {

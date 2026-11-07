@@ -2,19 +2,15 @@ package com.mahmoud.clipkid.feature.parent
 
 import app.cash.turbine.test
 import com.mahmoud.clipkid.core.domain.parent.ParentSession
-import com.mahmoud.clipkid.core.domain.testing.CHILD
 import com.mahmoud.clipkid.core.domain.testing.FULL
 import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
-import com.mahmoud.clipkid.core.domain.testing.FakeCatalogRepository
-import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
+import com.mahmoud.clipkid.core.domain.testing.FakeSettingsRepository
 import com.mahmoud.clipkid.core.domain.testing.TEST_OFFERING
 import com.mahmoud.clipkid.core.domain.testing.TestClock
-import com.mahmoud.clipkid.core.domain.testing.child
-import com.mahmoud.clipkid.core.domain.testing.collection
 import com.mahmoud.clipkid.core.domain.testing.kuwait
 import com.mahmoud.clipkid.core.domain.testing.runViewModelTest
 import com.mahmoud.clipkid.core.domain.testing.testPlan
-import com.mahmoud.clipkid.core.domain.usecase.EnablePremiumCollectionsUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
 import com.mahmoud.clipkid.core.model.BillingError
 import com.mahmoud.clipkid.core.model.Entitlement
 import com.mahmoud.clipkid.core.model.Offering
@@ -37,22 +33,17 @@ import kotlin.test.assertTrue
 
 class PaywallViewModelTest {
 
-    private val catalog = FakeCatalogRepository(
-        listOf(
-            collection("letters", 1),
-            collection("numbers", 2),
-            collection("quran", 3),
-            collection("stories", 4).copy(isPremium = true),
-        ),
-    )
-    private val profiles = FakeProfileRepository(child(allowed = setOf("letters")))
     private val billing = FakeBillingRepository()
+
+    /** The parent agreed in onboarding; the consent tests turn it off. */
+    private val settings = FakeSettingsRepository(consentGiven = true)
     private val links = LegalLinks(terms = "https://example.com/terms", privacy = "https://example.com/privacy")
 
     private fun TestScope.paywall(): Pair<PaywallViewModel, ParentSession> {
-        val session = ParentSession(TestClock(testScheduler, kuwait(2026, 11, 6, 20, 0)), backgroundScope)
+        val clock = TestClock(testScheduler, kuwait(2026, 11, 6, 20, 0))
+        val session = ParentSession(clock, backgroundScope)
         session.unlock()
-        val vm = PaywallViewModel(billing, catalog, EnablePremiumCollectionsUseCase(profiles, catalog), session, links)
+        val vm = PaywallViewModel(billing, ConnectBillingUseCase(billing, settings, clock), session, links)
         runCurrent()
         return vm to session
     }
@@ -66,8 +57,8 @@ class PaywallViewModelTest {
         assertEquals(PlanPeriod.Annual, state.selectedPlan?.period)
         assertEquals(33, state.savingsPercent)
         assertEquals(7, state.selectedPlan?.trial?.days)
-        assertEquals(3, state.freeCollections)
         assertNull(state.subscription)
+        assertTrue(billing.started, "the parent agreed: the store is contacted")
     }
 
     @Test
@@ -94,14 +85,13 @@ class PaywallViewModelTest {
     }
 
     @Test
-    fun aPurchaseTurnsTheSubscriptionOn_andOpensPremiumForEveryChild() = runViewModelTest {
+    fun aPurchaseTurnsTheSubscriptionOn() = runViewModelTest {
         val (vm, _) = paywall()
         vm.onEvent(PaywallEvent.Subscribe)
         runCurrent()
 
         assertEquals(FULL, vm.state.value.subscription)
         assertTrue(vm.state.value.justSubscribed)
-        assertEquals(setOf("letters", "stories"), profiles.getProfile(CHILD)?.allowedCollectionIds)
     }
 
     @Test
@@ -132,7 +122,6 @@ class PaywallViewModelTest {
 
         assertNull(vm.state.value.message)
         assertNull(vm.state.value.subscription)
-        assertEquals(setOf("letters"), profiles.getProfile(CHILD)?.allowedCollectionIds)
     }
 
     @Test
@@ -160,7 +149,6 @@ class PaywallViewModelTest {
         vm.onEvent(PaywallEvent.Restore)
         runCurrent()
         assertEquals(FULL, vm.state.value.subscription)
-        assertEquals(setOf("letters", "stories"), profiles.getProfile(CHILD)?.allowedCollectionIds)
     }
 
     @Test
@@ -197,10 +185,45 @@ class PaywallViewModelTest {
             assertEquals(PaywallEffect.OpenUrl(links.terms), awaitItem())
             vm.onEvent(PaywallEvent.Privacy)
             assertEquals(PaywallEffect.OpenUrl(links.privacy), awaitItem())
+            vm.onEvent(PaywallEvent.YouTubeTerms)
+            assertEquals(PaywallEffect.OpenUrl(LegalLinks.YOUTUBE_TERMS), awaitItem())
             vm.onEvent(PaywallEvent.ManageSubscription)
             assertEquals(PaywallEffect.OpenUrl(FULL.managementUrl!!), awaitItem())
             vm.onEvent(PaywallEvent.Close)
             assertEquals(PaywallEffect.Close, awaitItem())
         }
+    }
+
+    @Test
+    fun withoutConsent_aConsentCardShows_andTheStoreIsNotContacted() = runViewModelTest {
+        settings.consent.value = false
+        val (vm, _) = paywall()
+        val state = vm.state.value
+
+        assertTrue(state.needsConsent)
+        assertFalse(state.loading)
+        assertFalse(state.unavailable, "the consent card, not the store error")
+        assertNull(state.offering)
+        assertEquals(0, billing.startCalls)
+
+        vm.onEvent(PaywallEvent.Restore)
+        vm.onEvent(PaywallEvent.Retry)
+        runCurrent()
+        assertEquals(0, billing.restoreCalls)
+        assertEquals(0, billing.startCalls)
+    }
+
+    @Test
+    fun agreeingSavesConsent_connects_andShowsThePlans() = runViewModelTest {
+        settings.consent.value = false
+        val (vm, _) = paywall()
+
+        vm.onEvent(PaywallEvent.AgreeConsent)
+        runCurrent()
+
+        assertTrue(settings.consent.value)
+        assertTrue(billing.started)
+        assertFalse(vm.state.value.needsConsent)
+        assertEquals(TEST_OFFERING, vm.state.value.offering)
     }
 }

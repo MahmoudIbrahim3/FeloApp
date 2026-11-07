@@ -87,4 +87,11 @@ class DataStoreSettingsRepositoryTest {
         settings.setActiveChildId(null)
         assertNull(settings.activeChildId.first())
     }
+
+    @Test
+    fun consentIsOffUntilGivenAndSurvives() = runTest {
+        assertFalse(settings.consentGiven.first())
+        settings.setConsentGiven(true)
+        assertTrue(settings.consentGiven.first())
+    }
 }

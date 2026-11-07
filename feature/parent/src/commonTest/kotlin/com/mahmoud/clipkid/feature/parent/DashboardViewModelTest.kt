@@ -14,6 +14,7 @@ import com.mahmoud.clipkid.core.domain.testing.TestClock
 import com.mahmoud.clipkid.core.domain.testing.child
 import com.mahmoud.clipkid.core.domain.testing.kuwait
 import com.mahmoud.clipkid.core.domain.testing.runViewModelTest
+import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GrantExtraVideosUseCase
@@ -57,9 +58,10 @@ class DashboardViewModelTest {
             settings,
             quota,
             GetCollectionsForAgeUseCase(catalog),
-            UpdateChildSettingsUseCase(profiles, catalog, billing),
+            UpdateChildSettingsUseCase(profiles, catalog),
             GrantExtraVideosUseCase(history, clock, KUWAIT),
             ObserveAccessUseCase(billing, profiles),
+            ConnectBillingUseCase(billing, settings, clock),
         )
         runCurrent()
         return vm to quota
@@ -119,27 +121,43 @@ class DashboardViewModelTest {
     }
 
     @Test
-    fun freeLocksTheSecondChildAndPremium_andTheyOpenThePaywall() = runViewModelTest {
+    fun freeLocksTheSecondChild_andItAndAddChildOpenThePaywall() = runViewModelTest {
         billing.entitlement.value = Entitlement.Free
-        catalog.collections.value = catalog.collections.value.map { if (it.id == "stories") it.copy(isPremium = true) else it }
         val (vm, _) = dashboard()
 
         assertEquals(setOf(OTHER_CHILD), vm.content.lockedChildIds)
         assertEquals(AddChildAction.Subscribe, vm.content.addChild)
         assertFalse(vm.content.isSubscribed)
-        assertEquals(listOf(false, false, true), vm.content.collections.map { it.locked })
 
         vm.effects.test {
             vm.onEvent(DashboardEvent.SelectChild(OTHER_CHILD))
-            assertEquals(DashboardEffect.OpenSubscription, awaitItem())
-            vm.onEvent(DashboardEvent.CollectionToggled("stories", allowed = true))
             assertEquals(DashboardEffect.OpenSubscription, awaitItem())
             vm.onEvent(DashboardEvent.AddChildClicked)
             assertEquals(DashboardEffect.OpenSubscription, awaitItem())
         }
         runCurrent()
         assertEquals(CHILD, settings.activeChildId.first())
-        assertEquals(setOf("letters", "numbers"), profiles.getProfile(CHILD)?.allowedCollectionIds)
+    }
+
+    @Test
+    fun freeCanSwitchOnAnyCollection() = runViewModelTest {
+        billing.entitlement.value = Entitlement.Free
+        val (vm, _) = dashboard()
+
+        vm.onEvent(DashboardEvent.CollectionToggled("stories", allowed = true))
+        runCurrent()
+        assertEquals(setOf("letters", "numbers", "stories"), profiles.getProfile(CHILD)?.allowedCollectionIds)
+        assertTrue(vm.content.collections.first { it.collection.id == "stories" }.allowed)
+    }
+
+    @Test
+    fun theDashboardConnectsToTheStoreOnlyAfterConsent() = runViewModelTest {
+        dashboard()
+        assertEquals(0, billing.startCalls)
+
+        settings.setConsentGiven(true)
+        dashboard()
+        assertEquals(1, billing.startCalls)
     }
 
     @Test

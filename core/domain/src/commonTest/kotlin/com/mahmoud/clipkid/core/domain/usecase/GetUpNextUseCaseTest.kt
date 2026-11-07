@@ -4,7 +4,6 @@ import com.mahmoud.clipkid.core.domain.testing.ANIMALS
 import com.mahmoud.clipkid.core.domain.testing.CHILD
 import com.mahmoud.clipkid.core.domain.testing.COLORS
 import com.mahmoud.clipkid.core.domain.testing.Catalog
-import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeCatalogRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeHiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
@@ -45,7 +44,6 @@ class GetUpNextUseCaseTest {
             quota = GetDailyQuotaUseCase(profiles, history, clock, KUWAIT),
             clock = clock,
             timeZone = KUWAIT,
-            billing = FakeBillingRepository(),
         )
     }
 

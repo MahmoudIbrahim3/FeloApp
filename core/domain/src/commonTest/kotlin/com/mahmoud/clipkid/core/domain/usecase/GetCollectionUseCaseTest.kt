@@ -2,7 +2,6 @@ package com.mahmoud.clipkid.core.domain.usecase
 
 import com.mahmoud.clipkid.core.domain.testing.CHILD
 import com.mahmoud.clipkid.core.domain.testing.Catalog
-import com.mahmoud.clipkid.core.domain.testing.FakeBillingRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeFavoritesRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeHiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.testing.FakeProfileRepository
@@ -63,7 +62,6 @@ class GetCollectionUseCaseTest {
             history = history,
             hidden = hidden,
             clock = FixedClock(now),
-            billing = FakeBillingRepository(),
         )
 
     @Test
@@ -122,7 +120,6 @@ class GetFavoritesUseCaseTest {
             profiles = FakeProfileRepository(child()),
             favorites = favorites,
             hidden = FakeHiddenVideosRepository(),
-            billing = FakeBillingRepository(),
         )
 
         val items: List<FavoriteItem> = useCase(CHILD).first()

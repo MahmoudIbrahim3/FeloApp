@@ -3,7 +3,6 @@ package com.mahmoud.clipkid.feature.child.player
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.mahmoud.clipkid.core.domain.testing.CHILD
-import com.mahmoud.clipkid.core.domain.testing.FULL
 import com.mahmoud.clipkid.core.domain.testing.child
 import com.mahmoud.clipkid.core.domain.testing.event
 import com.mahmoud.clipkid.core.domain.testing.kuwait
@@ -42,7 +41,6 @@ class PlayerViewModelTest {
         toggleFavorite = f.toggleFavorite,
         catalog = f.catalog,
         favorites = f.favorites,
-        billing = f.billing,
     ).also { advanceUntilIdle() }
 
     private fun PlayerViewModel.player(event: YouTubePlayerEvent) = onEvent(PlayerEvent.FromPlayer(event))
@@ -85,7 +83,7 @@ class PlayerViewModelTest {
 
         val vm = PlayerViewModel(
             CHILD, "L1", WatchSource.Home, SavedStateHandle(), f.startWatch, f.updateProgress, f.resumePosition,
-            f.reportVideo, f.network, f.toggleFavorite, f.catalog, f.favorites, f.billing,
+            f.reportVideo, f.network, f.toggleFavorite, f.catalog, f.favorites,
         )
         vm.effects.test {
             advanceUntilIdle()
@@ -299,18 +297,5 @@ class PlayerViewModelTest {
         advanceUntilIdle()
 
         assertEquals(PlayerUiState.Unavailable, vm.state.value)
-    }
-
-    @Test
-    fun aPremiumVideoIsUnavailableWithoutTheSubscription() = runViewModelTest {
-        val f = ChildFixture(this)
-        f.catalog.collections.value = f.catalog.collections.value.map { if (it.id == "letters") it.copy(isPremium = true) else it }
-        val vm = viewModel(f)
-
-        assertIs<PlayerUiState.Unavailable>(vm.state.value)
-
-        f.billing.entitlement.value = FULL
-        advanceUntilIdle()
-        assertIs<PlayerUiState.Ready>(vm.state.value)
     }
 }

@@ -11,6 +11,7 @@ import com.mahmoud.clipkid.core.domain.parent.ParentSession
 import com.mahmoud.clipkid.core.domain.parent.ResetPinUseCase
 import com.mahmoud.clipkid.core.domain.parent.UnlockWithPinUseCase
 import com.mahmoud.clipkid.core.domain.repository.BillingRepository
+import com.mahmoud.clipkid.core.domain.repository.EntitlementCache
 import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
@@ -22,7 +23,7 @@ import com.mahmoud.clipkid.core.domain.repository.VideoReporter
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
 import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
 import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
-import com.mahmoud.clipkid.core.domain.usecase.EnablePremiumCollectionsUseCase
+import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
@@ -117,7 +118,9 @@ class KoinGraphTest {
             // Phase 6 (subscriptions).
             koin.get<BillingRepository>(),
             koin.get<ObserveAccessUseCase>(),
-            koin.get<EnablePremiumCollectionsUseCase>(),
+            // Phase 8 (parent consent, entitlement cache).
+            koin.get<ConnectBillingUseCase>(),
+            koin.get<EntitlementCache>(),
         ).forEach { assertTrue(it !is Unit) }
     }
 
