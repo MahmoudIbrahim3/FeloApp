@@ -40,7 +40,6 @@ import com.mahmoud.clipkid.core.designsystem.resources.ds_age_years_ten_plus
 import com.mahmoud.clipkid.core.designsystem.resources.ds_avatar_color
 import com.mahmoud.clipkid.core.designsystem.resources.ds_by_time
 import com.mahmoud.clipkid.core.designsystem.resources.ds_minutes_short
-import com.mahmoud.clipkid.core.designsystem.resources.ds_premium
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_child_1
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_glyph_letters
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_letters
@@ -212,8 +211,7 @@ private fun AgeBandOption(label: String, selected: Boolean, onClick: () -> Unit,
 
 /**
  * A collection to switch on or off during setup (SetupCollections.png): cover color with a
- * primary border and a check when on, white with an empty ring when off. Premium collections
- * show a star and cannot be switched on.
+ * primary border and a check when on, white with an empty ring when off.
  */
 @Composable
 fun CollectionPickCard(
@@ -222,21 +220,18 @@ fun CollectionPickCard(
     selected: Boolean,
     onToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    locked: Boolean = false,
 ) {
     val colors = ClipKidTheme.colors
     val shape = ClipKidTheme.shapes.card
-    val on = selected && !locked
+    val on = selected
     val background by animateColorAsState(if (on) Color(style.bg) else colors.surface, label = "pickBg")
-    val premiumDescription = stringResource(Res.string.ds_premium, title)
     Row(
         modifier
             .height(72.dp)
             .clip(shape)
             .background(background)
             .then(if (on) Modifier.border(3.dp, colors.primary, shape) else Modifier)
-            .toggleable(value = on, enabled = !locked, role = Role.Checkbox, onValueChange = onToggle)
-            .then(if (locked) Modifier.semantics { contentDescription = premiumDescription } else Modifier)
+            .toggleable(value = on, role = Role.Checkbox, onValueChange = onToggle)
             .padding(horizontal = ClipKidTheme.spacing.md),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -248,7 +243,6 @@ fun CollectionPickCard(
             modifier = Modifier.weight(1f),
         )
         when {
-            locked -> Icon(ClipKidIcons.Star, contentDescription = null, tint = colors.accent, size = 24.dp)
             on -> Box(
                 Modifier.size(24.dp).background(colors.primary, ClipKidTheme.shapes.pill),
                 contentAlignment = Alignment.Center,
@@ -303,7 +297,6 @@ fun SetupControlsShowcase() {
                 style = CoverPalettes.Stories.toCoverStyle(CoverMark.Icon("moon")),
                 selected = false,
                 onToggle = {},
-                locked = true,
                 modifier = Modifier.weight(1f),
             )
         }

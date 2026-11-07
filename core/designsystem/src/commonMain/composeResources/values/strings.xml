@@ -12,8 +12,6 @@
     <string name="ds_minutes_short">%1$s د</string>
     <string name="ds_age_years">%1$s–%2$s سنين</string>
     <string name="ds_age_years_ten_plus">%1$s–%2$s سنة</string>
-    <string name="ds_premium">%1$s · بالاشتراك</string>
-    <string name="ds_locked">%1$s · مقفولة، محتاجة بابا أو ماما</string>
     <string name="ds_avatar_color">لون %1$s</string>
 
     <!-- Sample content used only by component showcases / previews -->

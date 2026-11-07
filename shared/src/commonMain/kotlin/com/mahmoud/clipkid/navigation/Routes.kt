@@ -25,10 +25,6 @@ data class UpNextDest(val childId: String, val finishedYoutubeId: String)
 @Serializable
 data class DoneTodayDest(val childId: String)
 
-/** A locked (premium) collection was tapped: "اسأل بابا أو ماما". Never the paywall itself. */
-@Serializable
-data class AskParentDest(val childId: String)
-
 // endregion
 
 // region Onboarding (first launch only). One ViewModel is shared by the steps of the graph.
@@ -60,9 +56,6 @@ enum class GatePurpose {
 
     /** "عايز تكمّل؟" on DoneToday: +1 / +3 for [GateDest.childId]. */
     GrantExtras,
-
-    /** Paywall: from "للأهل" on AskParent. The dashboard reaches it from inside parent mode. */
-    Paywall,
 
     /** Any link that leaves the app, e.g. "Watch on YouTube" (player phase): [GateDest.url]. */
     ExternalLink,

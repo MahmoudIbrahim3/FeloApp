@@ -59,10 +59,6 @@
     <string name="child_done_ask_parent">عايز تكمّل؟ اسأل بابا أو ماما</string>
 
     <!-- A locked (premium) collection tapped in child mode. -->
-    <string name="child_ask_parent_title">اسأل بابا أو ماما</string>
-    <string name="child_ask_parent_message">الكوليكشن دي مقفولة. بابا أو ماما يقدروا يفتحوها لك.</string>
-    <string name="child_ask_parent_back">رجوع</string>
-    <string name="child_ask_parent_for_parents">للأهل</string>
 
     <!-- Favorites -->
     <string name="child_favorites_title">المفضلة</string>

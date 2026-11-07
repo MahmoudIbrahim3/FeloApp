@@ -49,15 +49,15 @@ import com.mahmoud.clipkid.core.model.Entitlement
 import com.mahmoud.clipkid.core.model.Offering
 import com.mahmoud.clipkid.core.model.Plan
 import com.mahmoud.clipkid.core.model.PlanPeriod
+import com.mahmoud.clipkid.core.model.SubscriptionLimits
 import com.mahmoud.clipkid.core.model.TrialPeriod
 import com.mahmoud.clipkid.core.model.TrialUnit
 import com.mahmoud.clipkid.feature.parent.resources.Res
 import com.mahmoud.clipkid.feature.parent.resources.paywall_after_trial_month
 import com.mahmoud.clipkid.feature.parent.resources.paywall_after_trial_year
 import com.mahmoud.clipkid.feature.parent.resources.paywall_badge
+import com.mahmoud.clipkid.feature.parent.resources.paywall_benefit_activity
 import com.mahmoud.clipkid.feature.parent.resources.paywall_benefit_children
-import com.mahmoud.clipkid.feature.parent.resources.paywall_benefit_collections
-import com.mahmoud.clipkid.feature.parent.resources.paywall_benefit_new
 import com.mahmoud.clipkid.feature.parent.resources.paywall_close
 import com.mahmoud.clipkid.feature.parent.resources.paywall_cta_busy
 import com.mahmoud.clipkid.feature.parent.resources.paywall_cta_subscribe
@@ -65,6 +65,7 @@ import com.mahmoud.clipkid.feature.parent.resources.paywall_cta_trial
 import com.mahmoud.clipkid.feature.parent.resources.paywall_done
 import com.mahmoud.clipkid.feature.parent.resources.paywall_ends_on
 import com.mahmoud.clipkid.feature.parent.resources.paywall_free_tier
+import com.mahmoud.clipkid.feature.parent.resources.paywall_videos_free
 import com.mahmoud.clipkid.feature.parent.resources.paywall_loading
 import com.mahmoud.clipkid.feature.parent.resources.paywall_manage
 import com.mahmoud.clipkid.feature.parent.resources.paywall_msg_already_owned
@@ -173,9 +174,11 @@ private fun ColumnScope.PlansContent(state: PaywallUiState, onEvent: (PaywallEve
             color = colors.ink,
             modifier = Modifier.semantics { heading() },
         )
-        Benefit(stringResource(Res.string.paywall_benefit_collections))
         Benefit(stringResource(Res.string.paywall_benefit_children, state.maxChildren.toArabicDigits()))
-        Benefit(stringResource(Res.string.paywall_benefit_new))
+        Benefit(stringResource(Res.string.paywall_benefit_activity))
+        // Every video is free (YouTube Developer Policies III.F.3.a); said plainly, so no parent
+        // thinks the subscription buys content.
+        Text(stringResource(Res.string.paywall_videos_free), style = ClipKidTheme.typography.bodyMedium, color = colors.muted)
         Spacer(Modifier.height(spacing.xs))
         val offering = state.offering
         when {
@@ -264,7 +267,7 @@ private fun BottomActions(state: PaywallUiState, onEvent: (PaywallEvent) -> Unit
             modifier = Modifier.fillMaxWidth(),
         )
         if (plan != null) {
-            LegalText(plan, state.freeCollections)
+            LegalText(plan)
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             TextLink(stringResource(Res.string.paywall_terms), small = true) { onEvent(PaywallEvent.Terms) }
@@ -279,7 +282,7 @@ private fun trialLabel(trial: TrialPeriod): String =
     pluralStringResource(Res.plurals.paywall_cta_trial, trial.days, trial.days.toArabicDigits())
 
 @Composable
-private fun LegalText(plan: Plan, freeCollections: Int) {
+private fun LegalText(plan: Plan) {
     val price = when {
         plan.trial != null && plan.period == PlanPeriod.Annual -> stringResource(Res.string.paywall_after_trial_year, plan.price)
         plan.trial != null -> stringResource(Res.string.paywall_after_trial_month, plan.price)
@@ -292,7 +295,7 @@ private fun LegalText(plan: Plan, freeCollections: Int) {
             PlatformStore.AppStore -> Res.string.paywall_renew_app_store
         },
     )
-    val free = pluralStringResource(Res.plurals.paywall_free_tier, freeCollections, freeCollections.toArabicDigits())
+    val free = stringResource(Res.string.paywall_free_tier)
     Text(
         text = "$price $renew\n$free",
         style = ClipKidTheme.typography.bodySmall,
@@ -323,7 +326,7 @@ private fun ColumnScope.SubscribedContent(subscription: Entitlement.Full, justSu
                 modifier = Modifier.semantics { heading() },
             )
             if (justSubscribed) {
-                Text(stringResource(Res.string.paywall_welcome_message), style = ClipKidTheme.typography.bodyLarge, color = colors.ink)
+                Text(stringResource(Res.string.paywall_welcome_message, SubscriptionLimits.MAX_FULL_CHILDREN.toArabicDigits()), style = ClipKidTheme.typography.bodyLarge, color = colors.ink)
             }
             if (subscription.isTrial) {
                 Text(stringResource(Res.string.paywall_trial_status), style = ClipKidTheme.typography.bodyLarge, color = colors.muted)
@@ -402,7 +405,7 @@ private val previewOffering = Offering(
 @Preview
 @Composable
 private fun PaywallPreview() = ClipKidPreview {
-    PaywallScreen(PaywallUiState(loading = false, offering = previewOffering, freeCollections = 3), {})
+    PaywallScreen(PaywallUiState(loading = false, offering = previewOffering), {})
 }
 
 @Preview

@@ -25,11 +25,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-/**
- * One collection switch. [locked]: a premium collection without the subscription; shown with a
- * star, and tapping it opens the paywall instead of switching it on.
- */
-data class CollectionToggle(val collection: Collection, val allowed: Boolean, val locked: Boolean = false)
+/** One collection switch. Every collection is free. */
+data class CollectionToggle(val collection: Collection, val allowed: Boolean)
 
 /** What the "+" after the child chips does. */
 enum class AddChildAction {
@@ -87,8 +84,8 @@ sealed interface DashboardEffect {
 /**
  * Parent dashboard (Parent.png). Every change is saved at once, so child Home follows it.
  *
- * Free vs full: without the subscription, premium collections and extra children show a lock and
- * open the paywall (this screen is already behind the PIN). Nothing is deleted on expiry.
+ * Free vs full: without the subscription, extra children show a lock and open the paywall (this
+ * screen is already behind the PIN). Every collection is free. Nothing is deleted on expiry.
  */
 class DashboardViewModel(
     private val profiles: ProfileRepository,
@@ -123,10 +120,7 @@ class DashboardViewModel(
                         children = children,
                         selected = selected,
                         quota = quota,
-                        collections = collections.map {
-                            val locked = it.isPremium && !access.isFull
-                            CollectionToggle(it, allowed = it.id in selected.allowedCollectionIds && !locked, locked = locked)
-                        },
+                        collections = collections.map { CollectionToggle(it, allowed = it.id in selected.allowedCollectionIds) },
                         lockedChildIds = children.mapNotNullTo(HashSet()) { c -> c.id.takeIf(access::isChildLocked) },
                         addChild = when {
                             access.canAddChild -> AddChildAction.Add
@@ -161,11 +155,7 @@ class DashboardViewModel(
                 viewModelScope.launch { updateChild.setDailyLimit(c.selected.id, event.limit) }
             }
             is DashboardEvent.CollectionToggled -> content?.let { c ->
-                if (c.collections.any { it.collection.id == event.collectionId && it.locked }) {
-                    effectChannel.trySend(DashboardEffect.OpenSubscription)
-                } else {
-                    viewModelScope.launch { updateChild.setCollectionAllowed(c.selected.id, event.collectionId, event.allowed) }
-                }
+                viewModelScope.launch { updateChild.setCollectionAllowed(c.selected.id, event.collectionId, event.allowed) }
             }
             is DashboardEvent.GrantExtra -> content?.let { c ->
                 viewModelScope.launch { grantExtras(c.selected.id, event.videos) }

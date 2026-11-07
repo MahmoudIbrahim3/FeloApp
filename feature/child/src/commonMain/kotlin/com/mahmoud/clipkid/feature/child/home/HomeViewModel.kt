@@ -28,37 +28,25 @@ sealed interface HomeUiState {
         val avatarColor: Long,
         val quota: DailyQuota,
         val continueWatching: ContinueWatching?,
+        /** The covers row, in catalog order. */
         val collections: List<Collection>,
-        /** Premium collections without the subscription: shown with a lock, open "اسأل بابا أو ماما". */
-        val lockedCollections: List<Collection> = emptyList(),
         val newToday: List<Video>,
         val shelves: List<Shelf>,
     ) : HomeUiState {
         /** Nothing is visible to this child right now: show the empty state instead of rails. */
         val isEmpty: Boolean get() = newToday.isEmpty() && continueWatching == null
-
-        /** The covers row: open and locked collections together, in catalog order. */
-        val covers: List<CoverItem>
-            get() = (collections.map { CoverItem(it, locked = false) } + lockedCollections.map { CoverItem(it, locked = true) })
-                .sortedWith(compareBy<CoverItem> { it.collection.sortOrder }.thenBy { it.collection.id })
     }
 }
-
-data class CoverItem(val collection: Collection, val locked: Boolean)
 
 sealed interface HomeEvent {
     data class VideoClicked(val youtubeId: String, val source: WatchSource) : HomeEvent
     data class CollectionClicked(val collectionId: String) : HomeEvent
-
-    /** A premium collection without the subscription. Never the paywall: a child-friendly stop. */
-    data class LockedCollectionClicked(val collectionId: String) : HomeEvent
     data object LockClicked : HomeEvent
 }
 
 sealed interface HomeEffect {
     data class OpenVideo(val youtubeId: String, val source: WatchSource) : HomeEffect
     data class OpenCollection(val collectionId: String) : HomeEffect
-    data object OpenAskParent : HomeEffect
     data object OpenGate : HomeEffect
 }
 
@@ -85,7 +73,6 @@ class HomeViewModel(
         val effect = when (event) {
             is HomeEvent.VideoClicked -> HomeEffect.OpenVideo(event.youtubeId, event.source)
             is HomeEvent.CollectionClicked -> HomeEffect.OpenCollection(event.collectionId)
-            is HomeEvent.LockedCollectionClicked -> HomeEffect.OpenAskParent
             HomeEvent.LockClicked -> HomeEffect.OpenGate
         }
         effectChannel.trySend(effect)
@@ -98,7 +85,6 @@ class HomeViewModel(
             quota = quota,
             continueWatching = feed.continueWatching,
             collections = feed.collections,
-            lockedCollections = feed.lockedCollections,
             newToday = feed.newToday,
             shelves = feed.shelves,
         )

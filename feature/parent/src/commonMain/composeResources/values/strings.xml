@@ -59,7 +59,6 @@
     <string name="dash_limit_minutes_caption">عدد الدقايق في اليوم</string>
     <string name="dash_collections_title">الكوليكشنز المسموحة</string>
     <string name="dash_collections_caption">مناسبة لسن %1$s</string>
-    <string name="dash_collection_premium">بالاشتراك</string>
     <string name="dash_activity">سجل المشاهدة</string>
     <string name="dash_subscription">الاشتراك</string>
     <string name="dash_subscribed">إنت مشترك</string>
@@ -104,10 +103,10 @@
     <string name="paywall_close">اقفل</string>
     <string name="paywall_restore">استرجاع الاشتراك</string>
     <string name="paywall_badge">ClipKid كامل</string>
-    <string name="paywall_title">افتح كل الكوليكشنز لكل ولادك</string>
-    <string name="paywall_benefit_collections">كل الكوليكشنز لكل الأعمار</string>
-    <string name="paywall_benefit_children">لحد %1$s أطفال بإعدادات منفصلة</string>
-    <string name="paywall_benefit_new">كوليكشنز جديدة بتنزل باستمرار</string>
+    <string name="paywall_title">تابع ولادك كلهم بسهولة</string>
+    <string name="paywall_benefit_children">لحد %1$s أطفال، كل واحد بإعداداته</string>
+    <string name="paywall_benefit_activity">سجل مشاهدة الأسبوع كله لكل طفل</string>
+    <string name="paywall_videos_free">كل الفيديوهات مجانية للكل. الاشتراك بيضيف مميزات للأهل بس.</string>
     <string name="paywall_plan_annual">سنوي</string>
     <string name="paywall_plan_monthly">شهري</string>
     <string name="paywall_per_month">%1$s / شهر</string>
@@ -128,14 +127,7 @@
     <string name="paywall_price_month">%1$s في الشهر.</string>
     <string name="paywall_renew_play">الاشتراك بيتجدد تلقائي، وتقدر تلغيه في أي وقت من Google Play.</string>
     <string name="paywall_renew_app_store">الدفع بيتسحب من حساب Apple لما تأكد. الاشتراك بيتجدد تلقائي إلا لو لغيته قبل نهاية المدة بـ٢٤ ساعة على الأقل من إعدادات حسابك.</string>
-    <plurals name="paywall_free_tier">
-        <item quantity="zero">المجاني: طفل واحد.</item>
-        <item quantity="one">المجاني: كوليكشن واحد وطفل واحد.</item>
-        <item quantity="two">المجاني: كوليكشنين وطفل واحد.</item>
-        <item quantity="few">المجاني: %1$s كوليكشنز وطفل واحد.</item>
-        <item quantity="many">المجاني: %1$s كوليكشن وطفل واحد.</item>
-        <item quantity="other">المجاني: %1$s كوليكشن وطفل واحد.</item>
-    </plurals>
+    <string name="paywall_free_tier">المجاني: طفل واحد وسجل مشاهدة النهارده.</string>
     <string name="paywall_terms">شروط الاستخدام</string>
     <string name="paywall_privacy">سياسة الخصوصية</string>
     <string name="paywall_loading">بنجيب الأسعار من المتجر…</string>
@@ -151,7 +143,7 @@
     <string name="paywall_msg_failed">حصلت مشكلة. جرّب تاني.</string>
     <string name="paywall_subscribed_title">إنت مشترك في ClipKid كامل</string>
     <string name="paywall_welcome_title">أهلاً بيك في ClipKid كامل!</string>
-    <string name="paywall_welcome_message">كل الكوليكشنز اتفتحت لولادك. تقدر تقفل أي كوليكشن من لوحة الأهل.</string>
+    <string name="paywall_welcome_message">دلوقتي تقدر تضيف لحد %1$s أطفال وتشوف سجل الأسبوع كله لكل واحد.</string>
     <string name="paywall_trial_status">إنت في التجربة المجانية.</string>
     <string name="paywall_renews_on">بيتجدد يوم %1$s.</string>
     <string name="paywall_ends_on">شغال لحد يوم %1$s.</string>

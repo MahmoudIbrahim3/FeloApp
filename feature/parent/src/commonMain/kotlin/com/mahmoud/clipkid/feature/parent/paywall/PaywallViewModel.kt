@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mahmoud.clipkid.core.domain.parent.ParentSession
 import com.mahmoud.clipkid.core.domain.repository.BillingRepository
-import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
-import com.mahmoud.clipkid.core.domain.usecase.EnablePremiumCollectionsUseCase
 import com.mahmoud.clipkid.core.model.BillingError
 import com.mahmoud.clipkid.core.model.Entitlement
 import com.mahmoud.clipkid.core.model.Offering
@@ -19,7 +17,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -48,8 +45,6 @@ data class PaywallUiState(
     val subscription: Entitlement.Full? = null,
     /** Bought or restored on this screen just now: a welcome title instead of the status one. */
     val justSubscribed: Boolean = false,
-    /** Free collections in the catalog, for "المجاني: ٣ كوليكشنز وطفل واحد". */
-    val freeCollections: Int = 0,
     val maxChildren: Int = SubscriptionLimits.MAX_FULL_CHILDREN,
 ) {
     /** The plan the button buys: the selected one, or the other if the store has only one. */
@@ -89,14 +84,13 @@ sealed interface PaywallEffect {
  *   eligible for it.
  * - A purchase or restore keeps parent mode open while the store sheet is up
  *   ([ParentSession.holdForStoreFlow]).
- * - When it turns the subscription on, premium collections are switched on for every child.
+ * - The subscription sells parent features only (more children, the weekly activity report).
+ *   Every video is free, so nothing about what children can watch changes on purchase.
  * - The entitlement is observed: a renewal, a cancellation or a purchase from another screen
  *   shows up here at once.
  */
 class PaywallViewModel(
     private val billing: BillingRepository,
-    private val catalog: CatalogRepository,
-    private val enablePremium: EnablePremiumCollectionsUseCase,
     private val session: ParentSession,
     private val links: LegalLinks = LegalLinks.Default,
 ) : ViewModel() {
@@ -112,10 +106,6 @@ class PaywallViewModel(
             billing.entitlement.collect { value ->
                 _state.update { it.copy(subscription = value as? Entitlement.Full) }
             }
-        }
-        viewModelScope.launch {
-            val free = catalog.observeCollections().first().count { !it.isPremium }
-            _state.update { it.copy(freeCollections = free) }
         }
         load()
     }
@@ -155,7 +145,6 @@ class PaywallViewModel(
     }
 
     private fun runStoreFlow(busy: PaywallBusy, call: suspend () -> PurchaseOutcome) {
-        val wasFull = billing.entitlement.value.isFull
         _state.update { it.copy(busy = busy, message = null) }
         viewModelScope.launch {
             val outcome = try {
@@ -166,7 +155,6 @@ class PaywallViewModel(
             when (outcome) {
                 is PurchaseOutcome.Success ->
                     if (outcome.entitlement.isFull) {
-                        if (!wasFull) enablePremium()
                         _state.update { it.copy(justSubscribed = true) }
                     } else {
                         _state.update { it.copy(message = PaywallMessage.Failed) }

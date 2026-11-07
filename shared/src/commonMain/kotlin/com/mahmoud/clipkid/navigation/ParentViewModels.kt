@@ -10,12 +10,10 @@ import com.mahmoud.clipkid.core.domain.parent.ParentSession
 import com.mahmoud.clipkid.core.domain.parent.ResetPinUseCase
 import com.mahmoud.clipkid.core.domain.parent.UnlockWithPinUseCase
 import com.mahmoud.clipkid.core.domain.repository.BillingRepository
-import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
 import com.mahmoud.clipkid.core.domain.usecase.AddChildUseCase
 import com.mahmoud.clipkid.core.domain.usecase.CompleteOnboardingUseCase
-import com.mahmoud.clipkid.core.domain.usecase.EnablePremiumCollectionsUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetCollectionsForAgeUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetWeeklyActivityUseCase
@@ -49,7 +47,6 @@ fun rememberOnboardingViewModel(owner: ViewModelStoreOwner, mode: OnboardingMode
                     getCollectionsForAge = koin.get<GetCollectionsForAgeUseCase>(),
                     completeOnboarding = koin.get<CompleteOnboardingUseCase>(),
                     addChild = koin.get<AddChildUseCase>(),
-                    billing = koin.get<BillingRepository>(),
                 )
             }
         },
@@ -105,8 +102,6 @@ fun rememberPaywallViewModel(): PaywallViewModel {
             initializer {
                 PaywallViewModel(
                     billing = koin.get<BillingRepository>(),
-                    catalog = koin.get<CatalogRepository>(),
-                    enablePremium = koin.get<EnablePremiumCollectionsUseCase>(),
                     session = koin.get<ParentSession>(),
                 )
             }

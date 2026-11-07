@@ -19,7 +19,6 @@ import com.mahmoud.clipkid.core.domain.parent.ParentSession
 import com.mahmoud.clipkid.core.domain.repository.BillingRepository
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
 import com.mahmoud.clipkid.core.domain.usecase.ObserveAccessUseCase
-import com.mahmoud.clipkid.feature.child.askparent.AskParentScreen
 import com.mahmoud.clipkid.feature.child.collection.CollectionEffect
 import com.mahmoud.clipkid.feature.child.collection.CollectionRoute
 import com.mahmoud.clipkid.feature.child.common.ChildTab
@@ -91,10 +90,6 @@ fun ClipKidNavHost() {
                     replaceGateWith(GrantDest(childId))
                 }
             }
-            GatePurpose.Paywall -> {
-                session.unlock()
-                replaceGateWith(SubscriptionDest)
-            }
             GatePurpose.ExternalLink -> {
                 nav.popBackStack()
                 dest.url?.let(uriHandler::openUri)
@@ -152,7 +147,6 @@ fun ClipKidNavHost() {
                             PlayerDest(dest.childId, effect.youtubeId, effect.source),
                         )
                         is HomeEffect.OpenCollection -> nav.navigate(CollectionDest(dest.childId, effect.collectionId))
-                        HomeEffect.OpenAskParent -> nav.navigate(AskParentDest(dest.childId)) { launchSingleTop = true }
                         HomeEffect.OpenGate -> nav.navigate(GateDest(GatePurpose.ParentDashboard))
                     }
                 },
@@ -230,14 +224,6 @@ fun ClipKidNavHost() {
                         UpNextEffect.Home -> goHome(dest.childId)
                     }
                 },
-            )
-        }
-
-        composable<AskParentDest> {
-            AskParentScreen(
-                onBack = { nav.popBackStack() },
-                // The paywall only ever opens behind the PIN.
-                onParents = { nav.navigate(GateDest(GatePurpose.Paywall)) },
             )
         }
 

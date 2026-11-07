@@ -67,7 +67,6 @@ import com.mahmoud.clipkid.feature.parent.resources.dash_activity
 import com.mahmoud.clipkid.feature.parent.resources.dash_add_child
 import com.mahmoud.clipkid.feature.parent.resources.dash_child_chip
 import com.mahmoud.clipkid.feature.parent.resources.dash_child_locked
-import com.mahmoud.clipkid.feature.parent.resources.dash_collection_premium
 import com.mahmoud.clipkid.feature.parent.resources.dash_collections_caption
 import com.mahmoud.clipkid.feature.parent.resources.dash_collections_title
 import com.mahmoud.clipkid.feature.parent.resources.dash_grant_minutes
@@ -300,28 +299,22 @@ private fun grantedAmount(videos: Int, minutesMode: Boolean): String =
         pluralStringResource(Res.plurals.dash_videos_watched, videos, videos.toArabicDigits())
     }
 
-/** One collection switch. A locked (premium) row is one button that opens the paywall. */
+/** One collection switch. */
 @Composable
 private fun CollectionRow(toggle: CollectionToggle, onChange: (Boolean) -> Unit) {
-    val colors = ClipKidTheme.colors
     Row(
         Modifier
             .fillMaxWidth()
-            .defaultMinSize(minHeight = 56.dp)
-            .then(if (toggle.locked) Modifier.clickable(role = Role.Button) { onChange(true) } else Modifier),
+            .defaultMinSize(minHeight = 56.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             toggle.collection.titleAr,
             style = ClipKidTheme.typography.bodyLarge,
-            color = if (toggle.locked) colors.muted else colors.ink,
+            color = ClipKidTheme.colors.ink,
             modifier = Modifier.weight(1f),
         )
-        if (toggle.locked) {
-            Icon(ClipKidIcons.Star, contentDescription = stringResource(Res.string.dash_collection_premium), tint = colors.accent, size = 20.dp)
-            Spacer(Modifier.size(ClipKidTheme.spacing.xs))
-        }
-        Toggle(checked = toggle.allowed, onCheckedChange = onChange, enabled = !toggle.locked)
+        Toggle(checked = toggle.allowed, onCheckedChange = onChange)
     }
 }
 
@@ -376,7 +369,7 @@ private val previewContent = DashboardUiState.Content(
     quota = GetDailyQuotaUseCase.computeQuota(DailyLimit.Minutes(30), 0, emptyList()).copy(used = 18 * 60, videosWatched = 2, secondsWatched = 18 * 60),
     collections = listOf(
         CollectionToggle(Collection("letters", "letters", PREVIEW_COLLECTION, CoverStyle(0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ")), setOf(AgeBand.A4_6), 1), true),
-        CollectionToggle(Collection("stories", "stories", PREVIEW_COLLECTION, CoverStyle(0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon")), setOf(AgeBand.A4_6), 2, isPremium = true), false, locked = true),
+        CollectionToggle(Collection("stories", "stories", PREVIEW_COLLECTION, CoverStyle(0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon")), setOf(AgeBand.A4_6), 2), false),
     ),
     lockedChildIds = setOf("c2"),
     addChild = AddChildAction.Subscribe,
