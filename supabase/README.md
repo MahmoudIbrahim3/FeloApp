@@ -40,8 +40,9 @@ enable "YouTube Data API v3" → Credentials → API key → restrict it to YouT
    ```sh
    supabase login
    supabase link --project-ref <project-ref>
-   supabase db push
+   supabase db push --remote
    ```
+   (Newer CLI versions push to a local stack by default; `--remote` targets the linked project.)
 2. **Seed the collections**: Dashboard → SQL Editor → paste `supabase/seed.sql` → Run.
    (Safe to run again; existing slugs are skipped.)
 3. **Function secrets** (pick a long random value for `REFRESH_SECRET`, e.g. `openssl rand -hex 32`):
