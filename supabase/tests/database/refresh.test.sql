@@ -6,14 +6,14 @@ set search_path = public, extensions;
 select plan(7);
 
 insert into public.collections (id, slug, title_ar, cover_bg, cover_fg, cover_glyph, age_bands, is_published)
-values ('00000000-0000-0000-0000-0000000000a1', 'test-refresh', 'تجربة', '#FFFFFF', '#000000', 'أ', array['2-3'], true);
+values ('00000000-0000-0000-0000-0000000000a1', 'test-refresh', 'تجربة', '#FFFFFF', '#000000', 'أ', array['3-5'], true);
 
 insert into public.videos (youtube_id, collection_id, title_ar, age_bands, status, yt_duration_sec, yt_refreshed_at)
 values
-  ('okdraft0001', '00000000-0000-0000-0000-0000000000a1', 'مسودة', array['2-3'], 'draft', null, null),
-  ('okapprov001', '00000000-0000-0000-0000-0000000000a1', 'موافق', array['2-3'], 'approved', 10, now() - interval '8 days'),
-  ('noembed0001', '00000000-0000-0000-0000-0000000000a1', 'مش embed', array['2-3'], 'approved', 10, now() - interval '8 days'),
-  ('gone0000001', '00000000-0000-0000-0000-0000000000a1', 'اتمسح', array['2-3'], 'approved', 10, now() - interval '8 days');
+  ('okdraft0001', '00000000-0000-0000-0000-0000000000a1', 'مسودة', array['3-5'], 'draft', null, null),
+  ('okapprov001', '00000000-0000-0000-0000-0000000000a1', 'موافق', array['3-5'], 'approved', 10, now() - interval '8 days'),
+  ('noembed0001', '00000000-0000-0000-0000-0000000000a1', 'مش embed', array['3-5'], 'approved', 10, now() - interval '8 days'),
+  ('gone0000001', '00000000-0000-0000-0000-0000000000a1', 'اتمسح', array['3-5'], 'approved', 10, now() - interval '8 days');
 
 select is(
   public.apply_youtube_refresh($$[

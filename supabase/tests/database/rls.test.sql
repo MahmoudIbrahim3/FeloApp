@@ -11,26 +11,26 @@ select hasnt_column('public', 'collections', 'is_premium', 'collections have no 
 -- Fixtures (as the test owner, which bypasses RLS) ------------------------------------------
 insert into public.collections (id, slug, title_ar, cover_bg, cover_fg, cover_glyph, age_bands, sort_order, is_published)
 values
-  ('00000000-0000-0000-0000-000000000001', 'test-published', 'منشورة', '#FFFFFF', '#000000', 'أ', array['2-3'], 1, true),
-  ('00000000-0000-0000-0000-000000000002', 'test-hidden', 'مخفية', '#FFFFFF', '#000000', 'ب', array['2-3'], 2, false);
+  ('00000000-0000-0000-0000-000000000001', 'test-published', 'منشورة', '#FFFFFF', '#000000', 'أ', array['3-5'], 1, true),
+  ('00000000-0000-0000-0000-000000000002', 'test-hidden', 'مخفية', '#FFFFFF', '#000000', 'ب', array['3-5'], 2, false);
 
 insert into public.videos
   (youtube_id, collection_id, title_ar, age_bands, status, yt_duration_sec, yt_thumbnail_url, yt_made_for_kids, yt_embeddable, yt_refreshed_at)
 values
   -- visible
-  ('visible0001', '00000000-0000-0000-0000-000000000001', 'ظاهر', array['2-3'], 'approved', 60, 'https://i.ytimg.com/vi/visible0001/hqdefault.jpg', true, true, now() - interval '1 day'),
+  ('visible0001', '00000000-0000-0000-0000-000000000001', 'ظاهر', array['3-5'], 'approved', 60, 'https://i.ytimg.com/vi/visible0001/hqdefault.jpg', true, true, now() - interval '1 day'),
   -- hidden: draft
-  ('draft000001', '00000000-0000-0000-0000-000000000001', 'مسودة', array['2-3'], 'draft', 60, 'https://x', true, true, now()),
+  ('draft000001', '00000000-0000-0000-0000-000000000001', 'مسودة', array['3-5'], 'draft', 60, 'https://x', true, true, now()),
   -- hidden: unavailable
-  ('unavail0001', '00000000-0000-0000-0000-000000000001', 'مش متاح', array['2-3'], 'unavailable', 60, 'https://x', true, false, now()),
+  ('unavail0001', '00000000-0000-0000-0000-000000000001', 'مش متاح', array['3-5'], 'unavailable', 60, 'https://x', true, false, now()),
   -- hidden: approved but not embeddable
-  ('noembed0001', '00000000-0000-0000-0000-000000000001', 'مش embed', array['2-3'], 'approved', 60, 'https://x', true, false, now()),
+  ('noembed0001', '00000000-0000-0000-0000-000000000001', 'مش embed', array['3-5'], 'approved', 60, 'https://x', true, false, now()),
   -- hidden: approved but YouTube data older than 30 days
-  ('stale000001', '00000000-0000-0000-0000-000000000001', 'قديم', array['2-3'], 'approved', 60, 'https://x', true, true, now() - interval '31 days'),
+  ('stale000001', '00000000-0000-0000-0000-000000000001', 'قديم', array['3-5'], 'approved', 60, 'https://x', true, true, now() - interval '31 days'),
   -- hidden: approved but never refreshed
-  ('never000001', '00000000-0000-0000-0000-000000000001', 'جديد', array['2-3'], 'approved', null, null, null, null, null),
+  ('never000001', '00000000-0000-0000-0000-000000000001', 'جديد', array['3-5'], 'approved', null, null, null, null, null),
   -- hidden: approved, fresh, but its collection is not published
-  ('unpubcol001', '00000000-0000-0000-0000-000000000002', 'مجموعة مخفية', array['2-3'], 'approved', 60, 'https://x', true, true, now());
+  ('unpubcol001', '00000000-0000-0000-0000-000000000002', 'مجموعة مخفية', array['3-5'], 'approved', 60, 'https://x', true, true, now());
 
 -- As the app (publishable key = anon) --------------------------------------------------------
 set local role anon;
@@ -53,7 +53,7 @@ select is_empty($$ select 1 from public.videos where youtube_id = 'stale000001' 
 
 select throws_ok(
   $$ insert into public.videos (youtube_id, collection_id, title_ar, age_bands)
-     values ('evil0000001', '00000000-0000-0000-0000-000000000001', 'x', array['2-3']) $$,
+     values ('evil0000001', '00000000-0000-0000-0000-000000000001', 'x', array['3-5']) $$,
   '42501', null, 'anon cannot insert videos'
 );
 select throws_ok(
@@ -70,7 +70,7 @@ select throws_ok(
 );
 select throws_ok(
   $$ insert into public.collections (slug, title_ar, cover_bg, cover_fg, cover_glyph, age_bands)
-     values ('evil', 'x', '#000000', '#000000', 'x', array['2-3']) $$,
+     values ('evil', 'x', '#000000', '#000000', 'x', array['3-5']) $$,
   '42501', null, 'anon cannot insert collections'
 );
 select throws_ok(

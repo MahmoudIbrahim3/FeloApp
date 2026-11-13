@@ -84,7 +84,7 @@ enable "YouTube Data API v3" → Credentials → API key → restrict it to YouT
    | `collection_id` | pick the collection (the picker shows `collections`) |
    | `title_ar` | **our** Arabic title, Egyptian colloquial — not YouTube's title |
    | `tags` | e.g. `{الحيوانات,أغاني}` — Arabic labels shared across collections (Up Next uses them) |
-   | `age_bands` | any of `{2-3,4-6,7-9,10-12}`, e.g. `{4-6,7-9}` |
+   | `age_bands` | any of `{3-5,6-8,9-12}`, e.g. `{3-5,6-8}` |
    | `sort_order` | position in the collection (1, 2, 3 …) |
    | `status` | `draft` (the default) |
 
