@@ -1,7 +1,7 @@
 # ClipKid — Project Guide
 
 ## Product
-ClipKid is a curated video app for children aged 2–12, Arabic-first (Egyptian colloquial UI copy, RTL), on Android and iOS.
+ClipKid is a curated video app for children aged 3–12, Arabic-first (Egyptian colloquial UI copy, RTL), on Android and iOS.
 - Every video is hand-picked and reviewed by the team. Videos play through the official YouTube embedded player (IFrame API). We never host, download or cache video.
 - Parents set a daily limit (N videos or N minutes). No infinite feed, no autoplay, no countdowns.
 - One app, two modes: Child mode (default) and Parent mode behind a PIN gate.
@@ -47,7 +47,7 @@ Rules: features depend only on core modules, never on each other. Navigation liv
 - Catalog (collections + videos) is cached in Room and synced with Supabase on every app start: only changed rows are downloaded (manifest of `youtube_id` + `updated_at`), and videos the backend no longer lists are deleted. Only a first launch with an empty cache waits for it. Cached YouTube data older than 30 days is never shown. The app works from cache when offline (lists only; playback needs network, and the player shows an offline state).
 
 ## Domain model
-- `AgeBand`: A2_3, A4_6, A7_9, A10_12
+- `AgeBand`: A3_5, A6_8, A9_12 (Google Play Families groups; wire values "3-5", "6-8", "9-12")
 - `Collection(id, slug, titleAr, cover: CoverStyle(bg, fg, glyph | icon), ageBands, sortOrder)`
 - `Video(youtubeId, collectionId, titleAr, durationSec, thumbnailUrl, tags, ageBands, sortOrder, madeForKids, embeddable, refreshedAt)`
 - `ChildProfile(id, nickname, avatarColor, ageBand, allowedCollectionIds, dailyLimit: Videos(n) | Minutes(m))`
