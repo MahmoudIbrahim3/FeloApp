@@ -23,9 +23,10 @@ import kotlinx.coroutines.IO
     // v2 (Phase 4): watch_events.position_sec for resume and progress bars.
     // v3 (Phase 5): cached_videos.server_updated_at for the incremental Supabase sync.
     // v4 (Phase 8): cached_collections.is_premium dropped (every video is free).
-    // Migrations are hand-written (MIGRATION_1_2 … MIGRATION_3_4) so they don't depend on a 2.json
+    // v5 (Phase 8): three age bands (3-5, 6-8, 9-12); dev data wiped, same tables.
+    // Migrations are hand-written (MIGRATION_1_2 … MIGRATION_4_5) so they don't depend on a 2.json
     // schema file being exported first.
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 @ConstructedBy(ClipKidDatabaseConstructor::class)
@@ -65,11 +66,29 @@ internal val MIGRATION_3_4 = Migration(3, 4) { connection ->
     connection.execSQL("ALTER TABLE cached_collections DROP COLUMN is_premium")
 }
 
+/**
+ * v4 → v5: the four age bands became three (3-5, 6-8, 9-12). Saved children and the cached
+ * catalog still hold the old values, which no longer parse. The app was not released yet, so
+ * everything on the device goes: the next launch syncs the catalog again and, with no child
+ * left, starts onboarding (prepareApp). Children's data first, then the children, then the cache.
+ */
+internal val MIGRATION_4_5 = Migration(4, 5) { connection ->
+    listOf(
+        "watch_events",
+        "favorites",
+        "hidden_videos",
+        "extra_grants",
+        "child_profiles",
+        "cached_videos",
+        "cached_collections",
+    ).forEach { table -> connection.execSQL("DELETE FROM $table") }
+}
+
 /** Same driver, dispatcher and migrations on every platform: bundled SQLite, queries off the main thread. */
 fun RoomDatabase.Builder<ClipKidDatabase>.buildClipKid(): ClipKidDatabase =
     setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
-        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
         .build()
 
 /**

@@ -1,10 +1,9 @@
 package com.mahmoud.clipkid.core.data.catalog
 
 import com.mahmoud.clipkid.core.model.AgeBand
-import com.mahmoud.clipkid.core.model.AgeBand.A10_12
-import com.mahmoud.clipkid.core.model.AgeBand.A2_3
-import com.mahmoud.clipkid.core.model.AgeBand.A4_6
-import com.mahmoud.clipkid.core.model.AgeBand.A7_9
+import com.mahmoud.clipkid.core.model.AgeBand.A3_5
+import com.mahmoud.clipkid.core.model.AgeBand.A6_8
+import com.mahmoud.clipkid.core.model.AgeBand.A9_12
 import com.mahmoud.clipkid.core.model.Collection
 import com.mahmoud.clipkid.core.model.CoverMark
 import com.mahmoud.clipkid.core.model.CoverStyle
@@ -70,10 +69,10 @@ class FakeCatalogDataSource(
         private const val NATURE = "الطبيعة"
         private const val HYGIENE = "النضافة"
 
-        private val SMALL = setOf(A2_3, A4_6)
-        private val YOUNG = setOf(A2_3, A4_6, A7_9)
+        private val SMALL = setOf(A3_5)
+        private val YOUNG = setOf(A3_5, A6_8)
         private val ALL = AgeBand.entries.toSet()
-        private val OLDER = setOf(A4_6, A7_9, A10_12)
+        private val OLDER = setOf(A6_8, A9_12)
 
         val COLLECTIONS: List<Collection> = listOf(
             collection("letters", "الحروف", 0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ ب"), SMALL, 1),

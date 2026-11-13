@@ -88,10 +88,9 @@ fun ChipShowcase() {
     var child by remember { mutableIntStateOf(0) }
     var age by remember { mutableIntStateOf(1) }
     val ages = listOf(
-        stringResource(Res.string.showcase_age_range, 2.toArabicDigits(), 3.toArabicDigits()),
-        stringResource(Res.string.showcase_age_range, 4.toArabicDigits(), 6.toArabicDigits()),
-        stringResource(Res.string.showcase_age_range, 7.toArabicDigits(), 9.toArabicDigits()),
-        stringResource(Res.string.showcase_age_range_years, 10.toArabicDigits(), 12.toArabicDigits()),
+        stringResource(Res.string.showcase_age_range, 3.toArabicDigits(), 5.toArabicDigits()),
+        stringResource(Res.string.showcase_age_range, 6.toArabicDigits(), 8.toArabicDigits()),
+        stringResource(Res.string.showcase_age_range_years, 9.toArabicDigits(), 12.toArabicDigits()),
     )
     ShowcaseColumn {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

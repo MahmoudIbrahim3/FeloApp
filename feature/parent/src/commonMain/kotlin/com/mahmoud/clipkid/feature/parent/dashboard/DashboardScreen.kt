@@ -362,14 +362,14 @@ private fun CardHeader(title: String, caption: String) {
 private const val PREVIEW_CHILD = "يوسف"
 private const val PREVIEW_COLLECTION = "الحروف"
 
-private val previewChild = ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A4_6, setOf("letters"), DailyLimit.Minutes(30))
+private val previewChild = ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A6_8, setOf("letters"), DailyLimit.Minutes(30))
 private val previewContent = DashboardUiState.Content(
-    children = listOf(previewChild, previewChild.copy(id = "c2", ageBand = AgeBand.A7_9)),
+    children = listOf(previewChild, previewChild.copy(id = "c2", ageBand = AgeBand.A9_12)),
     selected = previewChild,
     quota = GetDailyQuotaUseCase.computeQuota(DailyLimit.Minutes(30), 0, emptyList()).copy(used = 18 * 60, videosWatched = 2, secondsWatched = 18 * 60),
     collections = listOf(
-        CollectionToggle(Collection("letters", "letters", PREVIEW_COLLECTION, CoverStyle(0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ")), setOf(AgeBand.A4_6), 1), true),
-        CollectionToggle(Collection("stories", "stories", PREVIEW_COLLECTION, CoverStyle(0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon")), setOf(AgeBand.A4_6), 2), false),
+        CollectionToggle(Collection("letters", "letters", PREVIEW_COLLECTION, CoverStyle(0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ")), setOf(AgeBand.A6_8), 1), true),
+        CollectionToggle(Collection("stories", "stories", PREVIEW_COLLECTION, CoverStyle(0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon")), setOf(AgeBand.A6_8), 2), false),
     ),
     lockedChildIds = setOf("c2"),
     addChild = AddChildAction.Subscribe,

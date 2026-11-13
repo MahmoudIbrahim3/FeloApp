@@ -356,9 +356,9 @@ private fun NicknameField(value: String, onValueChange: (String) -> Unit, placeh
 private const val PREVIEW_NICKNAME = "يوسف"
 
 private val previewCollections = listOf(
-    CollectionOption(Collection("letters", "letters", "الحروف", CoverStyle(0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ")), setOf(AgeBand.A4_6), 1), true),
-    CollectionOption(Collection("numbers", "numbers", "الأرقام", CoverStyle(0xFFD6E8FF, 0xFF1A4FB5, CoverMark.Glyph("١")), setOf(AgeBand.A4_6), 2), true),
-    CollectionOption(Collection("stories", "stories", "حواديت", CoverStyle(0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon")), setOf(AgeBand.A4_6), 3), false),
+    CollectionOption(Collection("letters", "letters", "الحروف", CoverStyle(0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ")), setOf(AgeBand.A6_8), 1), true),
+    CollectionOption(Collection("numbers", "numbers", "الأرقام", CoverStyle(0xFFD6E8FF, 0xFF1A4FB5, CoverMark.Glyph("١")), setOf(AgeBand.A6_8), 2), true),
+    CollectionOption(Collection("stories", "stories", "حواديت", CoverStyle(0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon")), setOf(AgeBand.A6_8), 3), false),
 )
 
 @Preview
@@ -380,19 +380,19 @@ private fun ChildSetupEmptyPreview() = ClipKidPreview { ChildSetupScreen(Onboard
 @Preview
 @Composable
 private fun ChildSetupFilledPreview() = ClipKidPreview {
-    ChildSetupScreen(OnboardingUiState(OnboardingMode.FirstRun, nickname = PREVIEW_NICKNAME, ageBand = AgeBand.A4_6), {})
+    ChildSetupScreen(OnboardingUiState(OnboardingMode.FirstRun, nickname = PREVIEW_NICKNAME, ageBand = AgeBand.A6_8), {})
 }
 
 @Preview
 @Composable
 private fun SetupCollectionsPreview() = ClipKidPreview {
-    SetupCollectionsScreen(OnboardingUiState(OnboardingMode.FirstRun, nickname = PREVIEW_NICKNAME, ageBand = AgeBand.A4_6, collections = previewCollections), {})
+    SetupCollectionsScreen(OnboardingUiState(OnboardingMode.FirstRun, nickname = PREVIEW_NICKNAME, ageBand = AgeBand.A6_8, collections = previewCollections), {})
 }
 
 @Preview
 @Composable
 private fun SetupCollectionsEmptyPreview() = ClipKidPreview {
-    SetupCollectionsScreen(OnboardingUiState(OnboardingMode.AddChild, nickname = PREVIEW_NICKNAME, ageBand = AgeBand.A2_3), {})
+    SetupCollectionsScreen(OnboardingUiState(OnboardingMode.AddChild, nickname = PREVIEW_NICKNAME, ageBand = AgeBand.A3_5), {})
 }
 
 // endregion

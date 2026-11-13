@@ -47,11 +47,11 @@ class GetHomeFeedUseCaseTest {
     fun oneShelfPerAllowedCollectionMatchingTheAgeBand_inSortOrder() = runTest {
         val feed = homeFeed()(CHILD).first()
 
-        // science is 7-12 only; the child is 4-6.
+        // science is 9-12 only; the child is 6-8.
         assertEquals(listOf("letters", "numbers", "stories"), feed.collections.map { it.id })
         assertEquals(listOf("letters", "numbers", "stories"), feed.shelves.map { it.collection.id })
         assertEquals(listOf("L1", "L2", "L3", "L4", "L5"), feed.shelves[0].videos.map { it.youtubeId })
-        // N3 is 7-9 only.
+        // N3 is 9-12 only.
         assertEquals(listOf("N1", "N2"), feed.shelves[1].videos.map { it.youtubeId })
     }
 
@@ -65,7 +65,7 @@ class GetHomeFeedUseCaseTest {
 
     @Test
     fun olderChildSeesTheirBand() = runTest {
-        val feed = homeFeed(child(ageBand = AgeBand.A7_9))(CHILD).first()
+        val feed = homeFeed(child(ageBand = AgeBand.A9_12))(CHILD).first()
 
         assertEquals(listOf("letters", "numbers", "stories", "science"), feed.shelves.map { it.collection.id })
         assertEquals(listOf("N1", "N2", "N3"), feed.shelves[1].videos.map { it.youtubeId })

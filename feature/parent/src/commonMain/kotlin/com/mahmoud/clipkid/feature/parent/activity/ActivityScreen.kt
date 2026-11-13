@@ -312,7 +312,7 @@ private const val PREVIEW_CHILD = "يوسف"
 @Preview
 @Composable
 private fun ActivityPreview() = ClipKidPreview {
-    val child = ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A4_6, emptySet(), DailyLimit.Minutes(30))
+    val child = ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A6_8, emptySet(), DailyLimit.Minutes(30))
     val today = LocalDate(2026, 11, 4)
     val days = (6 downTo 0).map { back -> DayActivity(today.minus(back, DateTimeUnit.DAY), 3, (14 + back * 2) * 60) }
     ActivityScreen(ActivityUiState.Content(WeeklyActivity(child, days, QuotaUnit.Seconds, 30, emptyList()), showsWeek = true), {})
@@ -321,7 +321,7 @@ private fun ActivityPreview() = ClipKidPreview {
 @Preview
 @Composable
 private fun ActivityFreePreview() = ClipKidPreview {
-    val child = ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A4_6, emptySet(), DailyLimit.Videos(3))
+    val child = ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A6_8, emptySet(), DailyLimit.Videos(3))
     val today = LocalDate(2026, 11, 4)
     val days = (6 downTo 0).map { back -> DayActivity(today.minus(back, DateTimeUnit.DAY), 0, 0) }
     ActivityScreen(ActivityUiState.Content(WeeklyActivity(child, days, QuotaUnit.Videos, 3, emptyList()), showsWeek = false), {})

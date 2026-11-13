@@ -24,10 +24,10 @@ import kotlinx.coroutines.test.runTest
 class ChildSetupUseCasesTest {
 
     private val collections = listOf(
-        collection("numbers", sortOrder = 2, ageBands = setOf(AgeBand.A4_6, AgeBand.A7_9)),
+        collection("numbers", sortOrder = 2, ageBands = setOf(AgeBand.A6_8, AgeBand.A9_12)),
         collection("letters", sortOrder = 1),
         collection("stories", sortOrder = 3),
-        collection("science", sortOrder = 4, ageBands = setOf(AgeBand.A7_9)),
+        collection("science", sortOrder = 4, ageBands = setOf(AgeBand.A9_12)),
     )
     private val catalog = FakeCatalogRepository(collections, emptyList())
     private val profiles = FakeProfileRepository()
@@ -38,14 +38,14 @@ class ChildSetupUseCasesTest {
     private fun newChild(nickname: String = "  ليلى ", allowed: Set<String> = setOf("letters", "numbers")) = NewChild(
         nickname = nickname,
         avatarColor = 0xFF2563D9,
-        ageBand = AgeBand.A4_6,
+        ageBand = AgeBand.A6_8,
         allowedCollectionIds = allowed,
         dailyLimit = DailyLimit.Videos(5),
     )
 
     @Test
     fun collectionsForAgeAreFilteredAndSorted_andAllPreSelected() = runTest {
-        val forAge = GetCollectionsForAgeUseCase(catalog)(AgeBand.A4_6).first()
+        val forAge = GetCollectionsForAgeUseCase(catalog)(AgeBand.A6_8).first()
 
         assertEquals(listOf("letters", "numbers", "stories"), forAge.map { it.id })
         assertEquals(setOf("letters", "numbers", "stories"), GetCollectionsForAgeUseCase.defaultSelection(forAge))

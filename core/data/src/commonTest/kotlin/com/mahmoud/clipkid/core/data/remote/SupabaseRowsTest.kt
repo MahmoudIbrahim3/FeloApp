@@ -21,7 +21,7 @@ class SupabaseRowsTest {
         val row = json.decodeFromString(
             CollectionRow.serializer(),
             """{"id":"5b0f…","slug":"letters","title_ar":"الحروف","cover_bg":"#FFE6B0","cover_fg":"#8a5a00",
-               "cover_glyph":"أ ب","cover_icon":null,"age_bands":["2-3","4-6"],"sort_order":1,
+               "cover_glyph":"أ ب","cover_icon":null,"age_bands":["3-5","6-8"],"sort_order":1,
                "is_published":true,"updated_at":"2026-11-06T03:17:00.123456+00:00"}""",
         )
         assertEquals(
@@ -30,7 +30,7 @@ class SupabaseRowsTest {
                 slug = "letters",
                 titleAr = "الحروف",
                 cover = CoverStyle(0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ ب")),
-                ageBands = setOf(AgeBand.A2_3, AgeBand.A4_6),
+                ageBands = setOf(AgeBand.A3_5, AgeBand.A6_8),
                 sortOrder = 1,
             ),
             row.toModel(),
@@ -39,7 +39,7 @@ class SupabaseRowsTest {
 
     @Test
     fun collectionRow_iconMark_andBadRowsAreSkipped() {
-        val base = CollectionRow("c", "quran-duas", "قرآن", "#D9F2E4", "#1F7A4A", null, "book", listOf("2-3"), 3)
+        val base = CollectionRow("c", "quran-duas", "قرآن", "#D9F2E4", "#1F7A4A", null, "book", listOf("3-5"), 3)
         assertEquals(CoverMark.Icon("book"), base.toModel()?.cover?.mark)
         assertNull(base.copy(coverBg = "green").toModel())
         assertNull(base.copy(coverIcon = null).toModel())
@@ -51,7 +51,7 @@ class SupabaseRowsTest {
         val row = json.decodeFromString(
             VideoRow.serializer(),
             """{"youtube_id":"dQw4w9WgXcQ","collection_id":"c1","title_ar":"أغنية حرف الألف","tags":["أغاني"," "],
-               "age_bands":["2-3","4-6"],"sort_order":2,"status":"approved","yt_duration_sec":185,
+               "age_bands":["3-5","6-8"],"sort_order":2,"status":"approved","yt_duration_sec":185,
                "yt_thumbnail_url":"https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg","yt_made_for_kids":true,
                "yt_embeddable":true,"yt_refreshed_at":"2026-11-06T03:17:12.345678+00:00",
                "updated_at":"2026-11-06T03:17:12.345678+00:00"}""",
@@ -65,7 +65,7 @@ class SupabaseRowsTest {
                     durationSec = 185,
                     thumbnailUrl = "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
                     tags = listOf("أغاني"),
-                    ageBands = setOf(AgeBand.A2_3, AgeBand.A4_6),
+                    ageBands = setOf(AgeBand.A3_5, AgeBand.A6_8),
                     sortOrder = 2,
                     madeForKids = true,
                     embeddable = true,
@@ -80,7 +80,7 @@ class SupabaseRowsTest {
     @Test
     fun videoRow_withoutYouTubeData_isSkipped() {
         val row = VideoRow(
-            youtubeId = "dQw4w9WgXcQ", collectionId = "c1", titleAr = "x", ageBands = listOf("2-3"),
+            youtubeId = "dQw4w9WgXcQ", collectionId = "c1", titleAr = "x", ageBands = listOf("3-5"),
             durationSec = 10, thumbnailUrl = "https://x", madeForKids = true, embeddable = true,
             refreshedAt = "2026-11-06T03:17:12Z", updatedAt = "t",
         )

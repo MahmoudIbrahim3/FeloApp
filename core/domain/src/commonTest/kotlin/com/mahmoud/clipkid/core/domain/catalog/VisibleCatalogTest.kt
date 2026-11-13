@@ -29,10 +29,10 @@ class VisibleCatalogTest {
 
     @Test
     fun followsTheAgeBand() {
-        val toddler = child(ageBand = AgeBand.A2_3, allowed = setOf("letters", "stories"))
+        val toddler = child(ageBand = AgeBand.A3_5, allowed = setOf("letters", "stories"))
         val visible = VisibleCatalog.of(toddler, Catalog.collections, Catalog.videos, emptySet())
 
-        assertEquals(listOf("letters"), visible.collections.map { it.id }, "stories is 4-12: not shown to a 2-3 child")
+        assertEquals(listOf("letters"), visible.collections.map { it.id }, "stories is 6-12: not shown to a 3-5 child")
     }
 
     @Test

@@ -53,7 +53,7 @@ fun video(
 
 fun child(
     limit: DailyLimit = DailyLimit.Videos(3),
-    ageBand: AgeBand = AgeBand.A4_6,
+    ageBand: AgeBand = AgeBand.A6_8,
     allowed: Set<String> = setOf("letters", "numbers", "stories", "science"),
     id: String = CHILD,
 ) = ChildProfile(
@@ -81,15 +81,15 @@ const val COLORS = "الألوان"
 const val MORNING = "الصباح"
 
 /**
- * letters (all ages): L1..L5. numbers (4-9): N1..N3. stories (4-12): S1..S3.
- * science (7-12 only, so hidden from a 4-6 child): C1, C2.
+ * letters (all ages): L1..L5. numbers (6-12): N1..N3. stories (6-12): S1..S3.
+ * science (9-12 only, so hidden from a 6-8 child): C1, C2. N3 is 9-12 only too.
  */
 object Catalog {
     val collections = listOf(
-        collection("stories", sortOrder = 3, ageBands = setOf(AgeBand.A4_6, AgeBand.A7_9, AgeBand.A10_12)),
+        collection("stories", sortOrder = 3, ageBands = setOf(AgeBand.A6_8, AgeBand.A9_12)),
         collection("letters", sortOrder = 1),
-        collection("numbers", sortOrder = 2, ageBands = setOf(AgeBand.A4_6, AgeBand.A7_9)),
-        collection("science", sortOrder = 4, ageBands = setOf(AgeBand.A7_9, AgeBand.A10_12)),
+        collection("numbers", sortOrder = 2, ageBands = setOf(AgeBand.A6_8, AgeBand.A9_12)),
+        collection("science", sortOrder = 4, ageBands = setOf(AgeBand.A9_12)),
     )
 
     val videos = listOf(
@@ -100,7 +100,7 @@ object Catalog {
         video("L5", "letters", 5),
         video("N1", "numbers", 1, tags = listOf(ANIMALS)),
         video("N2", "numbers", 2, tags = listOf(COLORS)),
-        video("N3", "numbers", 3, ageBands = setOf(AgeBand.A7_9)),
+        video("N3", "numbers", 3, ageBands = setOf(AgeBand.A9_12)),
         video("S1", "stories", 1, tags = listOf(ANIMALS)),
         video("S2", "stories", 2, tags = listOf(ANIMALS, MORNING)),
         video("S3", "stories", 3, tags = listOf(MORNING)),

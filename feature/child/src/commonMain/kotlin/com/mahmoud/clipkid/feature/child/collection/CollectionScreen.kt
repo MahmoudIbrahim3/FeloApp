@@ -30,6 +30,7 @@ import com.mahmoud.clipkid.core.designsystem.component.IconButtonTone
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.component.VideoListRow
 import com.mahmoud.clipkid.core.designsystem.component.YouTubeBadgePlaceholder
+import com.mahmoud.clipkid.core.designsystem.component.years
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
@@ -232,24 +233,10 @@ internal fun CoverMarkView(mark: CoverMark, fg: Color) {
     }
 }
 
-/** "٢–٦" from the first and last age band of a collection. */
+/** "٣–٨" from the first and last age band of a collection. */
 internal fun ageRangeLabel(bands: Set<AgeBand>): String {
     val ordered = bands.sortedBy { it.ordinal }
     val first = ordered.firstOrNull() ?: return ""
     val last = ordered.last()
-    return "${first.fromAge().toArabicDigits()}–${last.toAge().toArabicDigits()}"
-}
-
-private fun AgeBand.fromAge(): Int = when (this) {
-    AgeBand.A2_3 -> 2
-    AgeBand.A4_6 -> 4
-    AgeBand.A7_9 -> 7
-    AgeBand.A10_12 -> 10
-}
-
-private fun AgeBand.toAge(): Int = when (this) {
-    AgeBand.A2_3 -> 3
-    AgeBand.A4_6 -> 6
-    AgeBand.A7_9 -> 9
-    AgeBand.A10_12 -> 12
+    return "${first.years().first.toArabicDigits()}–${last.years().second.toArabicDigits()}"
 }

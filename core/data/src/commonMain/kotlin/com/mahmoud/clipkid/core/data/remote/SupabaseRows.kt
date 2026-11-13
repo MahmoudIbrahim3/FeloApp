@@ -72,7 +72,7 @@ internal data class VideoReportRow(
     val reason: String,
 )
 
-private val AGE_BANDS = mapOf("2-3" to AgeBand.A2_3, "4-6" to AgeBand.A4_6, "7-9" to AgeBand.A7_9, "10-12" to AgeBand.A10_12)
+private val AGE_BANDS = mapOf("3-5" to AgeBand.A3_5, "6-8" to AgeBand.A6_8, "9-12" to AgeBand.A9_12)
 
 internal fun parseAgeBands(values: List<String>): Set<AgeBand> = values.mapNotNull { AGE_BANDS[it.trim()] }.toSet()
 

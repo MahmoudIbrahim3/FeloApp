@@ -112,7 +112,7 @@ class GetUpNextUseCaseTest {
 
     @Test
     fun neverOffersVideosOutsideTheChildsAgeBand() = runTest {
-        // Everything with the "animals" tag that a 4-6 child may see is watched; C1 (science, 7-12)
+        // Everything with the "animals" tag that a 6-8 child may see is watched; C1 (science, 9-12)
         // also has the tag but must not appear.
         watchedToday("L2", "L3", "N1", "S1", "S2")
 

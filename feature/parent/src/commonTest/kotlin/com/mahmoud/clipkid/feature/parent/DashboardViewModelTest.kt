@@ -42,7 +42,7 @@ class DashboardViewModelTest {
     private val catalog = Catalog.repository()
     private val profiles = FakeProfileRepository(
         child(DailyLimit.Videos(3), allowed = setOf("letters", "numbers")),
-        child(DailyLimit.Minutes(30), ageBand = AgeBand.A7_9, id = OTHER_CHILD),
+        child(DailyLimit.Minutes(30), ageBand = AgeBand.A9_12, id = OTHER_CHILD),
     )
     private val settings = FakeSettingsRepository(pin = "2468", onboardingDone = true, activeChildId = CHILD)
     private val history = FakeWatchHistoryRepository()

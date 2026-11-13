@@ -108,5 +108,5 @@ private const val PREVIEW_CHILD = "يوسف"
 @Preview
 @Composable
 private fun GrantPreview() = ClipKidPreview {
-    GrantScreen(GrantUiState.Ready(ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A4_6, emptySet(), DailyLimit.Videos(3))), {})
+    GrantScreen(GrantUiState.Ready(ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A6_8, emptySet(), DailyLimit.Videos(3))), {})
 }

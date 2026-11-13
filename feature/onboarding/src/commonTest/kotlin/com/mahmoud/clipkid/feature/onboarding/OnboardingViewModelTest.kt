@@ -29,9 +29,9 @@ class OnboardingViewModelTest {
     private val catalog = FakeCatalogRepository(
         listOf(
             collection("letters", 1),
-            collection("numbers", 2, ageBands = setOf(AgeBand.A4_6)),
+            collection("numbers", 2, ageBands = setOf(AgeBand.A6_8)),
             collection("stories", 3),
-            collection("science", 4, ageBands = setOf(AgeBand.A7_9)),
+            collection("science", 4, ageBands = setOf(AgeBand.A9_12)),
         ),
         emptyList(),
     )
@@ -94,7 +94,7 @@ class OnboardingViewModelTest {
     fun firstRunCannotFinishWithoutConsent() = runViewModelTest {
         val vm = viewModel()
         vm.onEvent(OnboardingEvent.NicknameChanged("يوسف"))
-        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
+        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A6_8))
         runCurrent()
         assertFalse(vm.state.value.canFinish)
 
@@ -144,7 +144,7 @@ class OnboardingViewModelTest {
     @Test
     fun ageBandPreSelectsAllItsCollectionsOnTheFreePlan() = runViewModelTest {
         val vm = viewModel()
-        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
+        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A6_8))
         runCurrent()
 
         val options = vm.state.value.collections
@@ -155,14 +155,14 @@ class OnboardingViewModelTest {
     @Test
     fun collectionsCanBeToggledAndChangingTheAgeResetsTheChoice() = runViewModelTest {
         val vm = viewModel()
-        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
+        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A6_8))
         runCurrent()
         vm.onEvent(OnboardingEvent.CollectionToggled("stories", on = false))
         vm.onEvent(OnboardingEvent.CollectionToggled("numbers", on = false))
         runCurrent()
         assertEquals(setOf("letters"), vm.state.value.collections.filter { it.selected }.map { it.collection.id }.toSet())
 
-        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A7_9))
+        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A9_12))
         runCurrent()
         assertEquals(listOf("letters", "stories", "science"), vm.state.value.collections.filter { it.selected }.map { it.collection.id })
     }
@@ -171,7 +171,7 @@ class OnboardingViewModelTest {
     fun childStepNeedsANicknameAndAnAge() = runViewModelTest {
         val vm = viewModel()
         vm.onEvent(OnboardingEvent.NicknameChanged("   "))
-        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
+        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A6_8))
         runCurrent()
         assertFalse(vm.state.value.canContinueChild)
 
@@ -190,7 +190,7 @@ class OnboardingViewModelTest {
         vm.onEvent(OnboardingEvent.PinNext)
         vm.onEvent(OnboardingEvent.ConsentAgreed)
         vm.onEvent(OnboardingEvent.NicknameChanged("يوسف"))
-        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A4_6))
+        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A6_8))
         vm.onEvent(OnboardingEvent.LimitChanged(DailyLimit.Minutes(30)))
         runCurrent()
         assertNull(settings.pin.value, "nothing is saved before Finish")
@@ -220,7 +220,7 @@ class OnboardingViewModelTest {
         assertEquals(2, vm.state.value.totalSteps)
 
         vm.onEvent(OnboardingEvent.NicknameChanged("مريم"))
-        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A7_9))
+        vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A9_12))
         runCurrent()
         vm.effects.test {
             vm.onEvent(OnboardingEvent.FinishClicked)

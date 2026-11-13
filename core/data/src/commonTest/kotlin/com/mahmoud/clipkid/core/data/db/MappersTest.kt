@@ -16,8 +16,8 @@ class MappersTest {
 
     @Test
     fun profileRoundTripsBothLimitKinds() {
-        val videos = ChildProfile("c1", "يوسف", 0xFFFFB627, AgeBand.A4_6, setOf("letters", "numbers"), DailyLimit.Videos(3))
-        val minutes = videos.copy(id = "c2", ageBand = AgeBand.A10_12, allowedCollectionIds = emptySet(), dailyLimit = DailyLimit.Minutes(30))
+        val videos = ChildProfile("c1", "يوسف", 0xFFFFB627, AgeBand.A6_8, setOf("letters", "numbers"), DailyLimit.Videos(3))
+        val minutes = videos.copy(id = "c2", ageBand = AgeBand.A9_12, allowedCollectionIds = emptySet(), dailyLimit = DailyLimit.Minutes(30))
 
         assertEquals(videos, videos.toEntity().toModel())
         assertEquals(minutes, minutes.toEntity().toModel())
@@ -46,6 +46,6 @@ class MappersTest {
     fun coverIsStoredAsTypedJson() {
         val letters = FakeCatalogDataSource.COLLECTIONS.first().toEntity()
         assertEquals("""{"bg":4294960816,"fg":4287257088,"mark":{"type":"glyph","text":"أ ب"}}""", letters.cover)
-        assertEquals("""["2-3","4-6"]""", letters.ageBands)
+        assertEquals("""["3-5"]""", letters.ageBands)
     }
 }

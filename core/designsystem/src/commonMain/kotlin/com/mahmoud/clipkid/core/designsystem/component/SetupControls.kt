@@ -62,15 +62,14 @@ object AvatarColors {
     val default: Long get() = all.first()
 }
 
-/** The first and last age of a band, e.g. 4 and 6. */
+/** The first and last age of a band, e.g. 6 and 8. */
 fun AgeBand.years(): Pair<Int, Int> = when (this) {
-    AgeBand.A2_3 -> 2 to 3
-    AgeBand.A4_6 -> 4 to 6
-    AgeBand.A7_9 -> 7 to 9
-    AgeBand.A10_12 -> 10 to 12
+    AgeBand.A3_5 -> 3 to 5
+    AgeBand.A6_8 -> 6 to 8
+    AgeBand.A9_12 -> 9 to 12
 }
 
-/** "٤–٦ سنين", or "١٠–١٢ سنة" (Arabic uses the singular after ten). */
+/** "٦–٨ سنين", or "٩–١٢ سنة" (Arabic uses the singular after ten). */
 @Composable
 fun ageBandLabel(band: AgeBand): String {
     val (from, to) = band.years()
@@ -78,7 +77,7 @@ fun ageBandLabel(band: AgeBand): String {
     return stringResource(res, from.toArabicDigits(), to.toArabicDigits())
 }
 
-/** "٤–٦" without the unit, for sentences like "مناسبة لسن ٤–٦". */
+/** "٦–٨" without the unit, for sentences like "مناسبة لسن ٦–٨". */
 fun ageBandRange(band: AgeBand): String {
     val (from, to) = band.years()
     return "${from.toArabicDigits()}–${to.toArabicDigits()}"
@@ -161,20 +160,22 @@ fun AvatarColorPicker(
     }
 }
 
-/** Two-by-two grid of age bands (ChildSetup.png). Selected = ink fill. */
+/**
+ * One row of the three age bands (ChildSetup.png shows the old 2×2 grid of four). Selected = ink
+ * fill.
+ */
 @Composable
 fun AgeBandPicker(
     selected: AgeBand?,
     onSelect: (AgeBand) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.sm)) {
-        AgeBand.entries.chunked(2).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.sm)) {
-                row.forEach { band ->
-                    AgeBandOption(ageBandLabel(band), band == selected, { onSelect(band) }, Modifier.weight(1f))
-                }
-            }
+    Row(
+        modifier.fillMaxWidth().selectableGroup(),
+        horizontalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.sm),
+    ) {
+        AgeBand.entries.forEach { band ->
+            AgeBandOption(ageBandLabel(band), band == selected, { onSelect(band) }, Modifier.weight(1f))
         }
     }
 }
@@ -278,7 +279,7 @@ fun ProgressTrack(
 fun SetupControlsShowcase() {
     var limit by remember { mutableStateOf<DailyLimit>(DailyLimit.Videos(3)) }
     var color by remember { mutableStateOf(AvatarColors.default) }
-    var band by remember { mutableStateOf<AgeBand?>(AgeBand.A4_6) }
+    var band by remember { mutableStateOf<AgeBand?>(AgeBand.A6_8) }
     var letters by remember { mutableStateOf(true) }
     ShowcaseColumn {
         DailyLimitPicker(limit, { limit = it }, listOf(3, 5, 10), listOf(15, 30, 45, 60), 30)

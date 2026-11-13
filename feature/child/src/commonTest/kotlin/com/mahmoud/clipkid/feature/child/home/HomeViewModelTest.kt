@@ -30,7 +30,7 @@ class HomeViewModelTest {
         assertEquals("يوسف", state.childName)
         assertEquals(0, state.quota.used)
         assertEquals(3, state.quota.total)
-        // science is 7-12 only, so a 4-6 child never sees it.
+        // science is 9-12 only, so a 6-8 child never sees it.
         assertEquals(listOf("letters", "numbers", "stories"), state.collections.map { it.id })
         assertEquals(listOf("letters", "numbers", "stories"), state.shelves.map { it.collection.id })
         assertEquals(6, state.newToday.size)

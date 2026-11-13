@@ -98,7 +98,7 @@ class GetCollectionUseCaseTest {
 
     @Test
     fun collectionOutsideTheChildsAgeBandOrAllowanceIsNull() = runTest {
-        // science is 7-12 only; the child is 4-6.
+        // science is 9-12 only; the child is 6-8.
         assertNull(useCase()(CHILD, "science").first())
         // numbers is allowed but not for this child's allowance.
         assertNull(useCase(child(allowed = setOf("letters")))(CHILD, "numbers").first())
@@ -113,7 +113,7 @@ class GetFavoritesUseCaseTest {
         val now = kuwait(2026, 11, 4, 17, 0)
         favorites.add(Favorite(CHILD, "L1", now))
         favorites.add(Favorite(CHILD, "S1", now))
-        favorites.add(Favorite(CHILD, "C1", now)) // science: not visible to a 4-6 child
+        favorites.add(Favorite(CHILD, "C1", now)) // science: not visible to a 6-8 child
         favorites.add(Favorite(CHILD, "L2", now))
         val useCase = GetFavoritesUseCase(
             catalog = Catalog.repository(),
