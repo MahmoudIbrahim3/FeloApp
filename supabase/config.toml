@@ -40,3 +40,7 @@ policy = "per_worker"
 # Called by pg_cron with the x-refresh-secret header, not with a user JWT.
 [functions.refresh-youtube-data]
 verify_jwt = false
+
+# Called through pg_net (internal.scan_youtube_playlist) with the same x-refresh-secret header.
+[functions.scan-youtube-playlist]
+verify_jwt = false
