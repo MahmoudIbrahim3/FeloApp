@@ -7,8 +7,9 @@ supabase/
   config.toml                         local CLI config (API exposes only `public`; function JWT check off)
   migrations/                         schema, RLS, refresh SQL, pg_cron schedule — applied in order
   seed.sql                            the 6 launch collections
-  tests/database/*.test.sql           pgTAP: RLS and the refresh SQL
+  tests/database/*.test.sql           pgTAP: RLS, the refresh SQL and the playlist scan SQL
   functions/refresh-youtube-data/     Edge Function (Deno/TypeScript) + helper tests
+  functions/scan-youtube-playlist/    Edge Function: checks a playlist before you curate it (read-only)
   functions/.env.example              secrets for running the function locally
 ```
 
@@ -50,12 +51,13 @@ enable "YouTube Data API v3" → Credentials → API key → restrict it to YouT
    supabase secrets set YOUTUBE_API_KEY=<your-key> REFRESH_SECRET=<random> TARGET_REGIONS=EG,KW,SA,AE
    ```
    `TARGET_REGIONS` = countries where a video must be playable; blocked in any of them → `unavailable`.
-4. **Deploy the function**:
+4. **Deploy the functions**:
    ```sh
    supabase functions deploy refresh-youtube-data --no-verify-jwt
+   supabase functions deploy scan-youtube-playlist --no-verify-jwt
    ```
-   (`--no-verify-jwt` matches `config.toml`: the function checks `x-refresh-secret` itself, so the
-   app's public key can never trigger it.)
+   (`--no-verify-jwt` matches `config.toml`: both functions check `x-refresh-secret` themselves, so
+   the app's public key can never trigger them. They share the secrets from step 3.)
 5. **Vault secrets for the schedule**: SQL Editor → Run (same `REFRESH_SECRET` as step 3):
    ```sql
    select vault.create_secret('https://<project-ref>.supabase.co', 'project_url');
@@ -72,6 +74,41 @@ enable "YouTube Data API v3" → Credentials → API key → restrict it to YouT
    Without them the app builds and uses the fake catalog (it logs a warning).
 
 ---
+
+## Scanning a playlist (before you curate)
+
+Most family channels are not set as "made for kids", and the refresh marks those videos
+`unavailable`. Scan a playlist first and only watch the videos that pass. The scan uses exactly the
+same rules as the refresh and writes nothing to the database.
+
+1. SQL Editor → Run:
+   ```sql
+   select internal.scan_youtube_playlist('https://www.youtube.com/playlist?list=PL...');
+   ```
+   Any YouTube link with `list=` works (a playlist page, or a video opened from a playlist), or the
+   bare id. It returns a request id, e.g. `42`.
+2. A few seconds later:
+   ```sql
+   select * from internal.playlist_scan_result(42);
+   ```
+   One row per video, in playlist order:
+
+   | Column | Meaning |
+   |---|---|
+   | `position` | order in the playlist (use it for `sort_order`, e.g. × 10) |
+   | `youtube_id` | the id to insert into `videos` |
+   | `title` | YouTube's title, only to recognise the video; write your own `title_ar` |
+   | `duration_sec`, `made_for_kids`, `embeddable` | from the YouTube Data API |
+   | `available` | `true` = it would stay `draft` after a refresh, so it's worth reviewing |
+   | `reasons` | why not: `not_made_for_kids`, `not_embeddable`, `blocked_in:KW`, `age_restricted`, `not_found`, … |
+   | `in_catalog` | its `status` if it's already in `videos`, empty if not |
+
+   Only the available ones: `select * from internal.playlist_scan_result(42) where available;`
+
+- "No answer yet" → wait a few seconds and run step 2 again. pg_net keeps answers for a few hours.
+- "playlist not found" → the playlist is private, deleted, or the link is wrong.
+- A scan stops after 500 videos (a notice says so).
+- Errors and one summary line per scan: Dashboard → Edge Functions → `scan-youtube-playlist` → Logs.
 
 ## Adding a video
 
@@ -122,6 +159,9 @@ so even a daily refresh of thousands of videos uses well under 1 %. Every run lo
 early; videos not refreshed for 30 days are cleared by the sweep and hidden from the app until the
 next successful run.
 
+A playlist scan costs 1 unit per 50 videos for `playlistItems.list` plus 1 per 50 for `videos.list`
+(about 4 units for 100 videos). It doesn't touch `refresh_runs`; its usage is in the function logs.
+
 ---
 
 ## Local development
@@ -133,6 +173,7 @@ supabase start                 # local stack (prints the local API URL and keys)
 supabase db reset              # fresh DB from zero: all migrations + seed.sql
 supabase test db               # pgTAP: RLS (anon can't read drafts, can't write videos, …) and refresh SQL
 deno test supabase/functions/refresh-youtube-data/youtube_test.ts   # duration, thumbnail, availability rules
+deno test supabase/functions/scan-youtube-playlist/playlist_test.ts # playlist links, scan rows
 ```
 
 Run the function locally:
