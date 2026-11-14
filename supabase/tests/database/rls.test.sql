@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(25);
+select plan(27);
 
 -- No paid content: every video is free (YouTube Developer Policies III.F.3.a).
 select hasnt_column('public', 'collections', 'is_premium', 'collections have no premium flag');
@@ -125,6 +125,14 @@ select throws_ok(
 select throws_ok(
   $$ select internal.run_youtube_refresh() $$,
   '42501', null, 'anon cannot trigger the refresh function'
+);
+select throws_ok(
+  $$ select internal.scan_youtube_playlist('PLabcdefghijklmnop') $$,
+  '42501', null, 'anon cannot start a playlist scan'
+);
+select throws_ok(
+  $$ select * from internal.playlist_scan_result(1) $$,
+  '42501', null, 'anon cannot read playlist scan results'
 );
 
 -- Back to the owner: the 30-day sweep -------------------------------------------------------
