@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,8 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import com.mahmoud.clipkid.core.designsystem.component.EmptyState
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonLarge
@@ -102,12 +100,6 @@ private fun CollectionEmpty(onEvent: (CollectionEvent) -> Unit) {
 
 @Composable
 private fun CollectionBody(page: CollectionPage, onEvent: (CollectionEvent) -> Unit) {
-    val colors = ClipKidTheme.colors
-    val cover = page.collection.cover
-    val fg = Color(cover.fg)
-    val bg = Color(cover.bg)
-    val total = page.items.size
-    val fraction = if (total == 0) 0f else page.watchedCount.toFloat() / total
     val gutter = ClipKidTheme.spacing.gutter
     // Phone: one full-width card per row (YouTube Kids style). Tablet: two per row,
     // so a 16:9 thumbnail never fills the whole screen height.
@@ -120,56 +112,8 @@ private fun CollectionBody(page: CollectionPage, onEvent: (CollectionEvent) -> U
         horizontalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.lg),
         verticalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.xl),
     ) {
-        item(key = "banner", span = { GridItemSpan(maxLineSpan) }) {
-            Column(
-                Modifier
-                    .bleedHorizontally(gutter)
-                    .fillMaxWidth()
-                    .background(bg, RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
-                    .padding(horizontal = gutter)
-                    .padding(bottom = ClipKidTheme.spacing.xl),
-                verticalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.sm),
-            ) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    IconButtonLarge(
-                        icon = ClipKidIcons.Back,
-                        contentDescription = stringResource(Res.string.child_back),
-                        onClick = { onEvent(CollectionEvent.BackClicked) },
-                        tone = IconButtonTone.Surface,
-                        compact = true,
-                    )
-                    Spacer(Modifier.width(ClipKidTheme.spacing.md))
-                    Text(
-                        text = page.collection.titleAr,
-                        style = ClipKidTheme.typography.displayMedium,
-                        color = colors.ink,
-                        maxLines = 2,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                Text(
-                    text = stringResource(
-                        Res.string.child_collection_meta,
-                        total.toArabicDigits(),
-                        ageRangeLabel(page.collection.ageBands),
-                    ),
-                    style = ClipKidTheme.typography.bodyMedium,
-                    color = colors.ink,
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(
-                            Res.string.child_collection_progress,
-                            page.watchedCount.toArabicDigits(),
-                            total.toArabicDigits(),
-                        ),
-                        style = ClipKidTheme.typography.labelLarge,
-                        color = fg,
-                    )
-                    Spacer(Modifier.width(ClipKidTheme.spacing.md))
-                    ProgressBar(fraction, fg, Modifier.weight(1f))
-                }
-            }
+        item(key = "header", span = { GridItemSpan(maxLineSpan) }) {
+            CollectionHeader(page, onEvent)
         }
 
         if (page.items.isEmpty()) {
@@ -213,25 +157,86 @@ private fun CollectionVideoCard(item: CollectionItem, onClick: () -> Unit) {
     )
 }
 
-/** Lets the banner ignore the grid's side padding and reach both screen edges. */
-private fun Modifier.bleedHorizontally(bleed: Dp): Modifier = layout { measurable, constraints ->
-    val bleedPx = bleed.roundToPx()
-    val width = constraints.maxWidth + bleedPx * 2
-    val placeable = measurable.measure(constraints.copy(minWidth = width, maxWidth = width))
-    layout(constraints.maxWidth, placeable.height) { placeable.place(-bleedPx, 0) }
+/**
+ * Calm header card: inset from the screen edges with even padding and all corners rounded,
+ * a softened tint of the collection color, back button and title on one line, meta under
+ * the title, and a gentle progress bar.
+ */
+@Composable
+private fun CollectionHeader(page: CollectionPage, onEvent: (CollectionEvent) -> Unit) {
+    val colors = ClipKidTheme.colors
+    val spacing = ClipKidTheme.spacing
+    val cover = page.collection.cover
+    val fg = Color(cover.fg)
+    // Half-way between the collection color and white: keeps its identity, drops the loudness.
+    val tint = lerp(Color(cover.bg), colors.surface, 0.5f)
+    val total = page.items.size
+    val fraction = if (total == 0) 0f else page.watchedCount.toFloat() / total
+
+    Column(
+        Modifier
+            .padding(top = spacing.md)
+            .fillMaxWidth()
+            .background(tint, ClipKidTheme.shapes.card)
+            .padding(spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(spacing.lg),
+    ) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            IconButtonLarge(
+                icon = ClipKidIcons.Back,
+                contentDescription = stringResource(Res.string.child_back),
+                onClick = { onEvent(CollectionEvent.BackClicked) },
+                tone = IconButtonTone.Surface,
+                compact = true,
+            )
+            Spacer(Modifier.width(spacing.md))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = page.collection.titleAr,
+                    style = ClipKidTheme.typography.titleLarge,
+                    color = colors.ink,
+                    maxLines = 2,
+                )
+                Text(
+                    text = stringResource(
+                        Res.string.child_collection_meta,
+                        total.toArabicDigits(),
+                        ageRangeLabel(page.collection.ageBands),
+                    ),
+                    style = ClipKidTheme.typography.bodySmall,
+                    color = colors.muted,
+                    maxLines = 1,
+                )
+            }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ProgressBar(fraction, fg, Modifier.weight(1f))
+            Spacer(Modifier.width(spacing.sm))
+            Text(
+                text = stringResource(
+                    Res.string.child_collection_progress,
+                    page.watchedCount.toArabicDigits(),
+                    total.toArabicDigits(),
+                ),
+                style = ClipKidTheme.typography.labelMedium,
+                color = colors.ink,
+                maxLines = 1,
+            )
+        }
+    }
 }
 
 @Composable
 private fun ProgressBar(fraction: Float, fg: Color, modifier: Modifier = Modifier) {
     Box(
         modifier
-            .height(8.dp)
-            .background(ClipKidTheme.colors.surface.copy(alpha = 0.7f), ClipKidTheme.shapes.pill),
+            .height(10.dp)
+            .background(fg.copy(alpha = 0.15f), ClipKidTheme.shapes.pill),
     ) {
         Box(
             Modifier
                 .fillMaxWidth(fraction.coerceIn(0f, 1f))
-                .height(8.dp)
+                .height(10.dp)
                 .background(fg, ClipKidTheme.shapes.pill),
         )
     }
