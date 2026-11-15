@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 data class ClipKidShapes(
     val card: Shape = RoundedCornerShape(24.dp),
     val cardSmall: Shape = RoundedCornerShape(20.dp),
-    /** Full-width video thumbnails (Collection screen): a gentler curve, YouTube Kids style. */
+    /** Video thumbnails on Home and Collection: a gentler curve, YouTube Kids style. */
     val thumbnail: Shape = RoundedCornerShape(12.dp),
     val button: Shape = RoundedCornerShape(18.dp),
     val iconButton: Shape = RoundedCornerShape(16.dp),

@@ -364,6 +364,7 @@ private fun ThumbWithPlay(video: Video, progress: Float, modifier: Modifier) {
         durationSec = video.durationSec,
         youtubeBadge = { YouTubeBadgePlaceholder() },
         progress = progress,
+        shape = ClipKidTheme.shapes.thumbnail,
         modifier = modifier,
         center = {
             Box(
@@ -397,6 +398,7 @@ private fun HomeVideoCard(
         durationSec = video.durationSec,
         onClick = { onEvent(HomeEvent.VideoClicked(video.youtubeId, source)) },
         youtubeBadge = { YouTubeBadgePlaceholder() },
+        thumbnailShape = ClipKidTheme.shapes.thumbnail,
         modifier = Modifier.width(width),
     )
 }
