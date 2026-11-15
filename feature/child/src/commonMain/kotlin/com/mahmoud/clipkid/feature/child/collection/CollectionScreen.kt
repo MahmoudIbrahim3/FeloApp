@@ -29,7 +29,6 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mahmoud.clipkid.core.designsystem.component.EmptyState
-import com.mahmoud.clipkid.core.designsystem.component.Icon
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonLarge
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonTone
 import com.mahmoud.clipkid.core.designsystem.component.Text
@@ -45,7 +44,6 @@ import com.mahmoud.clipkid.core.domain.usecase.CollectionItem
 import com.mahmoud.clipkid.core.domain.usecase.CollectionPage
 import com.mahmoud.clipkid.core.domain.usecase.VideoStatus
 import com.mahmoud.clipkid.core.model.AgeBand
-import com.mahmoud.clipkid.core.model.CoverMark
 import com.mahmoud.clipkid.feature.child.resources.Res
 import com.mahmoud.clipkid.feature.child.resources.child_back
 import com.mahmoud.clipkid.feature.child.resources.child_collection_empty_message
@@ -140,15 +138,15 @@ private fun CollectionBody(page: CollectionPage, onEvent: (CollectionEvent) -> U
                         tone = IconButtonTone.Surface,
                         compact = true,
                     )
-                    Spacer(Modifier.weight(1f))
-                    CoverMarkView(cover.mark, fg)
+                    Spacer(Modifier.width(ClipKidTheme.spacing.md))
+                    Text(
+                        text = page.collection.titleAr,
+                        style = ClipKidTheme.typography.displayMedium,
+                        color = colors.ink,
+                        maxLines = 2,
+                        modifier = Modifier.weight(1f),
+                    )
                 }
-                Text(
-                    text = page.collection.titleAr,
-                    style = ClipKidTheme.typography.displayMedium,
-                    color = colors.ink,
-                    maxLines = 1,
-                )
                 Text(
                     text = stringResource(
                         Res.string.child_collection_meta,
@@ -235,25 +233,6 @@ private fun ProgressBar(fraction: Float, fg: Color, modifier: Modifier = Modifie
                 .fillMaxWidth(fraction.coerceIn(0f, 1f))
                 .height(8.dp)
                 .background(fg, ClipKidTheme.shapes.pill),
-        )
-    }
-}
-
-/** The cover mark: a glyph in the display font, or a bundled icon. */
-@Composable
-internal fun CoverMarkView(mark: CoverMark, fg: Color) {
-    when (mark) {
-        is CoverMark.Glyph -> Text(
-            text = mark.text,
-            style = ClipKidTheme.typography.displayLarge,
-            color = fg,
-            maxLines = 1,
-        )
-        is CoverMark.Icon -> Icon(
-            icon = ClipKidIcons.forCoverKey(mark.key),
-            contentDescription = null,
-            tint = fg,
-            size = 56.dp,
         )
     }
 }
