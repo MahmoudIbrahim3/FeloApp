@@ -57,6 +57,7 @@ import org.jetbrains.compose.resources.stringResource
  * @param progress 0..1 watch progress, or null to hide the bar.
  * @param placeholderColor background shown while the thumbnail loads or when [thumbnailUrl] is null.
  * @param supportingContent optional content under the title (e.g. a collection tag).
+ * @param thumbnailShape corner shape of the thumbnail; large full-width cards use `ClipKidTheme.shapes.card`.
  */
 @Composable
 fun VideoCard(
@@ -71,6 +72,7 @@ fun VideoCard(
     action: (@Composable () -> Unit)? = null,
     supportingContent: (@Composable () -> Unit)? = null,
     aspectRatio: Float = 16f / 10f,
+    thumbnailShape: Shape = ClipKidTheme.shapes.cardSmall,
 ) {
     val interaction = remember { MutableInteractionSource() }
     Column(
@@ -90,6 +92,7 @@ fun VideoCard(
             progress = progress,
             placeholderColor = placeholderColor,
             action = action,
+            shape = thumbnailShape,
             modifier = Modifier.fillMaxWidth().aspectRatio(aspectRatio),
         )
         Spacer(Modifier.height(ClipKidTheme.spacing.xs))
