@@ -34,7 +34,7 @@ data class ClipKidSpacing(
     val xxl: Dp = 32.dp,
     val xxxl: Dp = 40.dp,
     /** Horizontal screen padding on phones (20dp in the reference screens). */
-    val gutter: Dp = 20.dp,
+    val gutter: Dp = 16.dp,
 )
 
 /** Component sizes. Touch targets: ≥ 48dp everywhere, ≥ 56dp for primary child actions. */
