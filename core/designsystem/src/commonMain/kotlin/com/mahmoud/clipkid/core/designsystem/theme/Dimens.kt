@@ -25,6 +25,7 @@ data class ClipKidShapes(
 /** 4dp spacing grid. */
 @Immutable
 data class ClipKidSpacing(
+    val xxxs: Dp = 2.dp,
     val xxs: Dp = 4.dp,
     val xs: Dp = 8.dp,
     val sm: Dp = 12.dp,

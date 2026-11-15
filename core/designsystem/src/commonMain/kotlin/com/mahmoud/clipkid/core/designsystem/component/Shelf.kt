@@ -118,7 +118,7 @@ fun ShelfHeader(
                         role = Role.Button,
                         onClick = onSeeAll,
                     )
-                    .padding(horizontal = ClipKidTheme.spacing.xs),
+                    .padding(start = ClipKidTheme.spacing.xs),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(seeAllLabel, style = ClipKidTheme.typography.labelLarge, color = ClipKidTheme.colors.primary)
