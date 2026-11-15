@@ -42,7 +42,7 @@
     <string name="showcase_new_today">جديد النهارده</string>
     <string name="showcase_video_moon">ليه القمر بيتغير شكله؟</string>
     <string name="showcase_video_morning_dua">دعاء الصباح</string>
-    <string name="showcase_video_count_fruits">نعد الفواكه لحد ٥</string>
+    <string name="showcase_video_count_fruits">نعد الفواكه لحد 5</string>
     <string name="showcase_video_letter_baa">أغنية حرف الباء</string>
     <string name="showcase_video_rabbit">الأرنب والسلحفاة</string>
     <!-- Placeholder only: replace with the official YouTube brand asset before release (CLAUDE.md rule 6). -->
@@ -51,14 +51,14 @@
     <string name="showcase_one_left">فاضلك فيديو واحد</string>
     <string name="showcase_empty_title">لسه مفيش مفضلة</string>
     <string name="showcase_empty_message">دوس على القلب في أي فيديو عشان تلاقيه هنا بسرعة.</string>
-    <string name="showcase_type_sample">أهلاً يا بطل! فاضلك ٣ فيديوهات النهارده</string>
+    <string name="showcase_type_sample">أهلاً يا بطل! فاضلك 3 فيديوهات النهارده</string>
     <!-- Showcase only: sample prices, never shown in the app (real prices come from the store). -->
     <string name="showcase_plan_annual">سنوي</string>
-    <string name="showcase_plan_annual_price">١٢٫٠٠٠ د.ك</string>
-    <string name="showcase_plan_annual_detail">١٫٠٠٠ د.ك / شهر</string>
-    <string name="showcase_plan_badge">وفّر ٪٣٣</string>
+    <string name="showcase_plan_annual_price">12.000 د.ك</string>
+    <string name="showcase_plan_annual_detail">1.000 د.ك / شهر</string>
+    <string name="showcase_plan_badge">وفّر 33%</string>
     <string name="showcase_plan_monthly">شهري</string>
-    <string name="showcase_plan_monthly_price">١٫٥٠٠ د.ك</string>
+    <string name="showcase_plan_monthly_price">1.500 د.ك</string>
     <!-- Consent (onboarding step and paywall) -->
     <string name="ds_consent_intro">ClipKid مش بيجمع أي بيانات عن ولادك، ومفيش تتبع ولا إعلانات مننا. بس فيه خدمتين لازم تعرفهم:</string>
     <string name="ds_consent_youtube_title">الفيديوهات من YouTube</string>

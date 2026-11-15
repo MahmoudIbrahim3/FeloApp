@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.mahmoud.clipkid.core.designsystem.preview.ClipKidPreview
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 
 /**
@@ -111,9 +110,9 @@ fun WeekBarChart(
 private fun WeekBarChartPreview() = ClipKidPreview {
     WeekBarChart(
         values = listOf(24, 30, 18, 30, 26, 14, 18),
-        labels = (1..7).map { it.toArabicDigits() },
+        labels = (1..7).map { it.toString() },
         limit = 30,
-        limitLabel = 30.toArabicDigits(),
+        limitLabel = 30.toString(),
         contentDescription = "",
     )
 }

@@ -42,7 +42,7 @@ enum class TrialUnit { Day, Week, Month, Year }
 
 /** A free trial as the store describes it, e.g. 1 week or 7 days. */
 data class TrialPeriod(val count: Int, val unit: TrialUnit) {
-    /** Length in days, for "جرّب ٧ أيام بلاش". */
+    /** Length in days, for "جرّب 7 أيام بلاش". */
     val days: Int
         get() = count * when (unit) {
             TrialUnit.Day -> 1

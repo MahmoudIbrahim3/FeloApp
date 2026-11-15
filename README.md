@@ -46,8 +46,7 @@ All versions are in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 - `ClipKidTheme` provides colors, typography (Baloo Bhaijaan 2 + Cairo, bundled), shapes,
   spacing and sizes. Touch targets: ≥ 48dp everywhere, ≥ 56dp for primary child actions.
 - `ProvideRtl` forces right-to-left. `App()` applies it once at the root.
-- `withArabicDigits()`, `toArabicDigits()` and `formatDuration()` format every number with
-  Arabic-Indic digits.
+- Numbers are shown with Western digits (0–9). `formatDuration()` formats video durations.
 - Every component file ends with a public `XxxShowcase()` used by its `@Preview` and by the
   temporary `ComponentGallery` (the current start destination).
 

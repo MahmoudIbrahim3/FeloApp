@@ -68,7 +68,7 @@ Rules: features depend only on core modules, never on each other. Navigation liv
 - RevenueCat runs with an anonymous app user id only: never `logIn`, attributes, device identifiers, integrations or store in-app messages.
 
 ## UI and design
-- RTL everywhere. Display numbers with Arabic-Indic digits.
+- RTL everywhere. Display numbers with Western digits (0–9), never Arabic-Indic.
 - Fonts (bundled): Baloo Bhaijaan 2 (display, 700/800) and Cairo (body, 400/600/700).
 - Colors: ink #17243A · muted #56657A · background #F4F7FB · surface #FFFFFF · primary #2563D9 · primaryDark #1A4FB5 · accent #FFB627 · border #C9D3E0 · divider #E3E9F1 · success #1F7A4A · danger #B23A26 · celebrate #FFF4D6 · dark (player / gate) #0F1724, #17243A, surfaces #1E2B40, #24364F.
 - Collection covers (bg / fg): letters #FFE6B0/#8A5A00 · numbers #D6E8FF/#1A4FB5 · Quran & duas #D9F2E4/#1F7A4A · manners #FFDCD6/#B23A26 · science #E6DEFF/#5B3DC4 · stories #FFE3C7/#A3530E.

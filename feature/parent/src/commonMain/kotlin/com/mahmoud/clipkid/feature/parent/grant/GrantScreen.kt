@@ -26,7 +26,6 @@ import com.mahmoud.clipkid.core.designsystem.component.PrimaryButtonTone
 import com.mahmoud.clipkid.core.designsystem.component.SecondaryButton
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.preview.ClipKidPreview
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.SurfaceTone
 import com.mahmoud.clipkid.core.domain.usecase.MINUTES_PER_EXTRA_VIDEO
@@ -97,7 +96,7 @@ fun GrantScreen(state: GrantUiState, onEvent: (GrantEvent) -> Unit, modifier: Mo
 
 @Composable
 private fun label(videos: Int, minutesMode: Boolean): String = when {
-    minutesMode -> stringResource(Res.string.dash_grant_minutes, (videos * MINUTES_PER_EXTRA_VIDEO).toArabicDigits())
+    minutesMode -> stringResource(Res.string.dash_grant_minutes, (videos * MINUTES_PER_EXTRA_VIDEO).toString())
     videos == 1 -> stringResource(Res.string.dash_grant_one_video)
     else -> stringResource(Res.string.dash_grant_three_videos)
 }

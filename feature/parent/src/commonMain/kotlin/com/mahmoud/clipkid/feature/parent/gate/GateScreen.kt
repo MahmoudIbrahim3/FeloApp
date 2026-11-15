@@ -52,8 +52,6 @@ import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.preview.ClipKidPreview
 import com.mahmoud.clipkid.core.designsystem.text.formatDuration
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
-import com.mahmoud.clipkid.core.designsystem.text.withArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.SurfaceTone
 import com.mahmoud.clipkid.core.domain.parent.AdultChallenge
@@ -147,7 +145,7 @@ private fun PinStage(state: GateUiState, onEvent: (GateEvent) -> Unit, modifier:
         Spacer(Modifier.height(ClipKidTheme.spacing.lg))
         if (locked) {
             Text(
-                text = stringResource(Res.string.gate_locked_message, formatDuration(state.lockoutSecondsLeft).withArabicDigits()),
+                text = stringResource(Res.string.gate_locked_message, formatDuration(state.lockoutSecondsLeft)),
                 style = ClipKidTheme.typography.bodyLarge,
                 color = colors.onDarkMuted,
                 textAlign = TextAlign.Center,
@@ -159,7 +157,7 @@ private fun PinStage(state: GateUiState, onEvent: (GateEvent) -> Unit, modifier:
             ErrorText(
                 when {
                     state.error == GateError.WrongPin && state.attemptsLeft != null ->
-                        pluralStringResource(Res.plurals.gate_wrong_pin, state.attemptsLeft, state.attemptsLeft.toArabicDigits())
+                        pluralStringResource(Res.plurals.gate_wrong_pin, state.attemptsLeft, state.attemptsLeft.toString())
                     else -> null
                 },
             )
@@ -261,7 +259,7 @@ private fun NewPinStage(stage: GateStage.NewPin, state: GateUiState, onEvent: (G
 
 @Composable
 private fun challengeText(challenge: AdultChallenge): String =
-    stringResource(Res.string.gate_adult_question, challenge.left.toArabicDigits(), challenge.right.toArabicDigits())
+    stringResource(Res.string.gate_adult_question, challenge.left.toString(), challenge.right.toString())
 
 @Composable
 private fun LockMedallion() {

@@ -36,7 +36,7 @@ import org.jetbrains.compose.resources.stringResource
 /**
  * One subscription plan on the paywall (Paywall.png): plan name and an optional detail line on
  * the start side, the store price on the end side. Selected = 3dp primary border; an optional
- * [badge] (e.g. "وفّر ٪٣٣") sits on the top edge at the end side.
+ * [badge] (e.g. "وفّر 33%") sits on the top edge at the end side.
  */
 @Composable
 fun PlanCard(

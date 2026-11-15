@@ -32,7 +32,6 @@ import com.mahmoud.clipkid.core.designsystem.resources.showcase_age_range
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_age_range_years
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_child_1
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_child_2
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import org.jetbrains.compose.resources.stringResource
 
@@ -88,9 +87,9 @@ fun ChipShowcase() {
     var child by remember { mutableIntStateOf(0) }
     var age by remember { mutableIntStateOf(1) }
     val ages = listOf(
-        stringResource(Res.string.showcase_age_range, 3.toArabicDigits(), 5.toArabicDigits()),
-        stringResource(Res.string.showcase_age_range, 6.toArabicDigits(), 8.toArabicDigits()),
-        stringResource(Res.string.showcase_age_range_years, 9.toArabicDigits(), 12.toArabicDigits()),
+        stringResource(Res.string.showcase_age_range, 3.toString(), 5.toString()),
+        stringResource(Res.string.showcase_age_range, 6.toString(), 8.toString()),
+        stringResource(Res.string.showcase_age_range_years, 9.toString(), 12.toString()),
     )
     ShowcaseColumn {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -44,7 +44,6 @@ import com.mahmoud.clipkid.core.designsystem.resources.showcase_child_1
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_glyph_letters
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_letters
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_stories
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.CoverPalettes
 import com.mahmoud.clipkid.core.model.AgeBand
@@ -69,22 +68,22 @@ fun AgeBand.years(): Pair<Int, Int> = when (this) {
     AgeBand.A9_12 -> 9 to 12
 }
 
-/** "٦–٨ سنين", or "٩–١٢ سنة" (Arabic uses the singular after ten). */
+/** "6–8 سنين", or "9–12 سنة" (Arabic uses the singular after ten). */
 @Composable
 fun ageBandLabel(band: AgeBand): String {
     val (from, to) = band.years()
     val res = if (to >= 10) Res.string.ds_age_years_ten_plus else Res.string.ds_age_years
-    return stringResource(res, from.toArabicDigits(), to.toArabicDigits())
+    return stringResource(res, from.toString(), to.toString())
 }
 
-/** "٦–٨" without the unit, for sentences like "مناسبة لسن ٦–٨". */
+/** "6–8" without the unit, for sentences like "مناسبة لسن 6–8". */
 fun ageBandRange(band: AgeBand): String {
     val (from, to) = band.years()
-    return "${from.toArabicDigits()}–${to.toArabicDigits()}"
+    return "$from–$to"
 }
 
 /**
- * Daily limit: ٣ / ٥ / ١٠ videos or "بالوقت". Choosing بالوقت shows a second row of minute
+ * Daily limit: 3 / 5 / 10 videos or "بالوقت". Choosing بالوقت shows a second row of minute
  * options. Used in onboarding (SetupCollections.png) and on the dashboard (Parent.png).
  */
 @Composable
@@ -97,7 +96,7 @@ fun DailyLimitPicker(
     modifier: Modifier = Modifier,
 ) {
     val byTime = stringResource(Res.string.ds_by_time)
-    val labels = videoOptions.map { it.toArabicDigits() } + byTime
+    val labels = videoOptions.map { it.toString() } + byTime
     val selected = when (limit) {
         is DailyLimit.Videos -> videoOptions.indexOf(limit.count).takeIf { it >= 0 } ?: -1
         is DailyLimit.Minutes -> videoOptions.size
@@ -117,7 +116,7 @@ fun DailyLimitPicker(
         )
         if (limit is DailyLimit.Minutes) {
             SegmentedControl(
-                options = minuteOptions.map { stringResource(Res.string.ds_minutes_short, it.toArabicDigits()) },
+                options = minuteOptions.map { stringResource(Res.string.ds_minutes_short, it.toString()) },
                 selectedIndex = minuteOptions.indexOf(limit.minutes),
                 onSelect = { index -> onChange(DailyLimit.Minutes(minuteOptions[index])) },
             )
@@ -141,7 +140,7 @@ fun AvatarColorPicker(
     ) {
         colors.forEachIndexed { index, argb ->
             val isSelected = argb == selected
-            val description = stringResource(Res.string.ds_avatar_color, (index + 1).toArabicDigits())
+            val description = stringResource(Res.string.ds_avatar_color, (index + 1).toString())
             Box(
                 Modifier
                     .size(56.dp)

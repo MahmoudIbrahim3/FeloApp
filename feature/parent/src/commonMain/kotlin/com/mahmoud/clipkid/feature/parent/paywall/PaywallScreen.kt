@@ -42,8 +42,6 @@ import com.mahmoud.clipkid.core.designsystem.component.SecondaryButton
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.preview.ClipKidPreview
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
-import com.mahmoud.clipkid.core.designsystem.text.withArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.model.BillingStore
 import com.mahmoud.clipkid.core.model.Entitlement
@@ -177,7 +175,7 @@ private fun ColumnScope.PlansContent(state: PaywallUiState, onEvent: (PaywallEve
             color = colors.ink,
             modifier = Modifier.semantics { heading() },
         )
-        Benefit(stringResource(Res.string.paywall_benefit_children, state.maxChildren.toArabicDigits()))
+        Benefit(stringResource(Res.string.paywall_benefit_children, state.maxChildren.toString()))
         Benefit(stringResource(Res.string.paywall_benefit_activity))
         // Every video is free (YouTube Developer Policies III.F.3.a); said plainly, so no parent
         // thinks the subscription buys content.
@@ -232,7 +230,7 @@ private fun Plans(offering: Offering, state: PaywallUiState, onEvent: (PaywallEv
             selected = state.selectedPlan?.period == PlanPeriod.Annual,
             onClick = { onEvent(PaywallEvent.SelectPlan(PlanPeriod.Annual)) },
             detail = plan.pricePerMonth?.let { stringResource(Res.string.paywall_per_month, it) },
-            badge = state.savingsPercent?.let { stringResource(Res.string.paywall_save, it.toArabicDigits()) },
+            badge = state.savingsPercent?.let { stringResource(Res.string.paywall_save, it.toString()) },
             enabled = enabled,
         )
     }
@@ -301,7 +299,7 @@ private fun BottomActions(state: PaywallUiState, onEvent: (PaywallEvent) -> Unit
 
 @Composable
 private fun trialLabel(trial: TrialPeriod): String =
-    pluralStringResource(Res.plurals.paywall_cta_trial, trial.days, trial.days.toArabicDigits())
+    pluralStringResource(Res.plurals.paywall_cta_trial, trial.days, trial.days.toString())
 
 @Composable
 private fun LegalText(plan: Plan) {
@@ -348,7 +346,7 @@ private fun ColumnScope.SubscribedContent(subscription: Entitlement.Full, justSu
                 modifier = Modifier.semantics { heading() },
             )
             if (justSubscribed) {
-                Text(stringResource(Res.string.paywall_welcome_message, SubscriptionLimits.MAX_FULL_CHILDREN.toArabicDigits()), style = ClipKidTheme.typography.bodyLarge, color = colors.ink)
+                Text(stringResource(Res.string.paywall_welcome_message, SubscriptionLimits.MAX_FULL_CHILDREN.toString()), style = ClipKidTheme.typography.bodyLarge, color = colors.ink)
             }
             if (subscription.isTrial) {
                 Text(stringResource(Res.string.paywall_trial_status), style = ClipKidTheme.typography.bodyLarge, color = colors.muted)
@@ -396,10 +394,10 @@ private fun TextLink(text: String, small: Boolean = false, enabled: Boolean = tr
     }
 }
 
-/** "١٥/١٢/٢٠٢٦" in the device's time zone. */
+/** "15/12/2026" in the device's time zone. */
 private fun Instant.toDisplayDate(): String {
     val date = toLocalDateTime(TimeZone.currentSystemDefault()).date
-    return "${date.day}/${date.month.ordinal + 1}/${date.year}".withArabicDigits()
+    return "${date.day}/${date.month.ordinal + 1}/${date.year}"
 }
 
 private fun PaywallMessage.text(): StringResource = when (this) {

@@ -28,12 +28,11 @@ import com.mahmoud.clipkid.core.designsystem.preview.ClipKidPreview
 import com.mahmoud.clipkid.core.designsystem.preview.ShowcaseColumn
 import com.mahmoud.clipkid.core.designsystem.resources.Res
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_by_time
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * Single choice among a few options (daily limit: ٣ / ٥ / ١٠ / بالوقت).
+ * Single choice among a few options (daily limit: 3 / 5 / 10 / بالوقت).
  * 56dp tall track; each segment is 48dp tall and fills an equal share of the width.
  * The first option sits at the start edge (right in RTL).
  */
@@ -95,7 +94,7 @@ fun SegmentedControl(
 @Composable
 fun SegmentedControlShowcase() {
     var selected by remember { mutableIntStateOf(0) }
-    val options = listOf(3.toArabicDigits(), 5.toArabicDigits(), 10.toArabicDigits(), stringResource(Res.string.showcase_by_time))
+    val options = listOf(3.toString(), 5.toString(), 10.toString(), stringResource(Res.string.showcase_by_time))
     ShowcaseColumn {
         SegmentedControl(options = options, selectedIndex = selected, onSelect = { selected = it })
     }

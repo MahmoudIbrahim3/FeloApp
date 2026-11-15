@@ -34,7 +34,6 @@ import com.mahmoud.clipkid.core.designsystem.component.IconButtonTone
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.text.formatDuration
-import com.mahmoud.clipkid.core.designsystem.text.withArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.player.PlaybackState
 import com.mahmoud.clipkid.core.player.YouTubePlayer
@@ -288,12 +287,12 @@ private fun ProgressSection(player: YouTubePlayerState, catalogDurationSec: Int)
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
-                text = formatDuration(shownSec).withArabicDigits(),
+                text = formatDuration(shownSec),
                 style = ClipKidTheme.typography.labelMedium,
                 color = colors.onDarkMuted,
             )
             Text(
-                text = formatDuration(durationSec).withArabicDigits(),
+                text = formatDuration(durationSec),
                 style = ClipKidTheme.typography.labelMedium,
                 color = colors.onDarkMuted,
             )

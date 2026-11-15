@@ -50,8 +50,8 @@
         <item quantity="other">%1$s فيديو</item>
     </plurals>
     <string name="dash_grant_title">زوّد النهارده بس</string>
-    <string name="dash_grant_one_video">+١ فيديو</string>
-    <string name="dash_grant_three_videos">+٣ فيديوهات</string>
+    <string name="dash_grant_one_video">+1 فيديو</string>
+    <string name="dash_grant_three_videos">+3 فيديوهات</string>
     <string name="dash_grant_minutes">+%1$s دقيقة</string>
     <string name="dash_granted">زودت %1$s النهارده</string>
     <string name="dash_limit_title">الحد اليومي</string>
@@ -67,17 +67,17 @@
 
     <!-- Activity (Activity.png) -->
     <string name="act_title">سجل المشاهدة</string>
-    <string name="act_subtitle">%1$s · آخر ٧ أيام</string>
+    <string name="act_subtitle">%1$s · آخر 7 أيام</string>
     <string name="act_subtitle_today">%1$s · النهارده</string>
     <string name="act_week_locked_title">شوف الأسبوع كله لكل طفل</string>
-    <string name="act_week_locked_message">اعرف كل يوم في آخر ٧ أيام اتفرج كام فيديو وكام دقيقة، مع ClipKid كامل.</string>
+    <string name="act_week_locked_message">اعرف كل يوم في آخر 7 أيام اتفرج كام فيديو وكام دقيقة، مع ClipKid كامل.</string>
     <string name="act_week_locked_button">اعرف أكتر</string>
     <string name="act_avg_label">متوسط اليوم</string>
     <string name="act_avg_value">%1$s دقيقة</string>
     <string name="act_week_videos">فيديوهات الأسبوع</string>
     <string name="act_limit_minutes">الحد %1$s د</string>
     <string name="act_limit_videos">الحد %1$s فيديو</string>
-    <string name="act_chart_description">آخر ٧ أيام: %1$s</string>
+    <string name="act_chart_description">آخر 7 أيام: %1$s</string>
     <string name="act_chart_day">%1$s %2$s</string>
     <string name="act_list_separator">،</string>
     <string name="act_today_title">اتفرج على إيه النهارده</string>
@@ -114,7 +114,7 @@
     <string name="paywall_plan_annual">سنوي</string>
     <string name="paywall_plan_monthly">شهري</string>
     <string name="paywall_per_month">%1$s / شهر</string>
-    <string name="paywall_save">وفّر ٪%1$s</string>
+    <string name="paywall_save">وفّر %1$s%</string>
     <plurals name="paywall_cta_trial">
         <item quantity="zero">جرّب %1$s يوم بلاش</item>
         <item quantity="one">جرّب يوم بلاش</item>
@@ -130,7 +130,7 @@
     <string name="paywall_price_year">%1$s في السنة.</string>
     <string name="paywall_price_month">%1$s في الشهر.</string>
     <string name="paywall_renew_play">الاشتراك بيتجدد تلقائي، وتقدر تلغيه في أي وقت من Google Play.</string>
-    <string name="paywall_renew_app_store">الدفع بيتسحب من حساب Apple لما تأكد. الاشتراك بيتجدد تلقائي إلا لو لغيته قبل نهاية المدة بـ٢٤ ساعة على الأقل من إعدادات حسابك.</string>
+    <string name="paywall_renew_app_store">الدفع بيتسحب من حساب Apple لما تأكد. الاشتراك بيتجدد تلقائي إلا لو لغيته قبل نهاية المدة بـ24 ساعة على الأقل من إعدادات حسابك.</string>
     <string name="paywall_free_tier">المجاني: طفل واحد وسجل مشاهدة النهارده.</string>
     <string name="paywall_consent_title">قبل ما تشترك</string>
     <string name="paywall_consent_agree">موافق</string>

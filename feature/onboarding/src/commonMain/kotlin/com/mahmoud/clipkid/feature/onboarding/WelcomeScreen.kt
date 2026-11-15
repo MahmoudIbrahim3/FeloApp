@@ -32,7 +32,6 @@ import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcon
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.preview.ClipKidPreview
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.CoverPalettes
 import com.mahmoud.clipkid.feature.onboarding.resources.Res
@@ -116,7 +115,7 @@ private fun Mosaic() {
             Tile(CoverPalettes.Letters.bg) { Text(letter, style = ClipKidTheme.typography.displayLarge, color = CoverPalettes.Letters.fg) }
             Tile(colors.primary) { Icon(ClipKidIcons.PlayFilled, contentDescription = null, tint = colors.onPrimary, size = 32.dp) }
             Tile(CoverPalettes.Numbers.bg) {
-                Text(1.toArabicDigits(), style = ClipKidTheme.typography.displayLarge, color = CoverPalettes.Numbers.fg)
+                Text("1", style = ClipKidTheme.typography.displayLarge, color = CoverPalettes.Numbers.fg)
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.md)) {

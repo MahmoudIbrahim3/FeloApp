@@ -34,7 +34,6 @@ import com.mahmoud.clipkid.core.designsystem.resources.showcase_numbers
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_quran
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_science
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_stories
-import com.mahmoud.clipkid.core.designsystem.text.withArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.CoverColors
 import com.mahmoud.clipkid.core.designsystem.theme.CoverPalettes
@@ -116,7 +115,7 @@ fun CollectionCoverShowcase() {
     val covers = listOf(
         CoverPalettes.Letters.toCoverStyle(CoverMark.Glyph(stringResource(Res.string.showcase_glyph_letters))) to
             stringResource(Res.string.showcase_letters),
-        CoverPalettes.Numbers.toCoverStyle(CoverMark.Glyph("123".withArabicDigits())) to
+        CoverPalettes.Numbers.toCoverStyle(CoverMark.Glyph("123")) to
             stringResource(Res.string.showcase_numbers),
         CoverPalettes.QuranAndDuas.toCoverStyle(CoverMark.Icon("book")) to stringResource(Res.string.showcase_quran),
         CoverPalettes.Manners.toCoverStyle(CoverMark.Icon("heart")) to stringResource(Res.string.showcase_manners),

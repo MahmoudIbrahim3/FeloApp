@@ -76,7 +76,7 @@ class FakeCatalogDataSource(
 
         val COLLECTIONS: List<Collection> = listOf(
             collection("letters", "الحروف", 0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ ب"), SMALL, 1),
-            collection("numbers", "الأرقام", 0xFFD6E8FF, 0xFF1A4FB5, CoverMark.Glyph("١٢٣"), YOUNG, 2),
+            collection("numbers", "الأرقام", 0xFFD6E8FF, 0xFF1A4FB5, CoverMark.Glyph("123"), YOUNG, 2),
             collection("quran-duas", "قرآن وأدعية", 0xFFD9F2E4, 0xFF1F7A4A, CoverMark.Icon("book"), ALL, 3),
             collection("manners", "أخلاق وسلوك", 0xFFFFDCD6, 0xFFB23A26, CoverMark.Icon("heart"), YOUNG, 4),
             collection("science", "علوم", 0xFFE6DEFF, 0xFF5B3DC4, CoverMark.Icon("leaf"), OLDER, 5),
@@ -103,8 +103,8 @@ class FakeCatalogDataSource(
             )
             videos(
                 "numbers", 'N', YOUNG,
-                "نعد من ١ لـ ٥" to listOf(SONGS),
-                "نعد من ٦ لـ ١٠" to listOf(SONGS),
+                "نعد من 1 لـ 5" to listOf(SONGS),
+                "نعد من 6 لـ 10" to listOf(SONGS),
                 "نعد الحيوانات في المزرعة" to listOf(ANIMALS),
                 "الأشكال حوالينا" to emptyList(),
                 "نجمع بالتفاح" to listOf(FOOD),

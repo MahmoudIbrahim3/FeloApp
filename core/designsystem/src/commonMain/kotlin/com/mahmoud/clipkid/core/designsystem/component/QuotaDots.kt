@@ -24,7 +24,6 @@ import com.mahmoud.clipkid.core.designsystem.preview.ShowcaseColumn
 import com.mahmoud.clipkid.core.designsystem.resources.Res
 import com.mahmoud.clipkid.core.designsystem.resources.ds_quota_of
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_one_left
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.SurfaceTone
 import org.jetbrains.compose.resources.stringResource
@@ -47,7 +46,7 @@ fun QuotaDots(
         SurfaceTone.Light -> colors.border
         SurfaceTone.Dark -> colors.darkSurfaceHigh
     }
-    val description = stringResource(Res.string.ds_quota_of, used.toArabicDigits(), total.toArabicDigits())
+    val description = stringResource(Res.string.ds_quota_of, used.toString(), total.toString())
     Row(
         modifier = modifier.clearAndSetSemantics { contentDescription = description },
         horizontalArrangement = Arrangement.spacedBy(dotSize * 0.5f),
@@ -68,7 +67,7 @@ fun QuotaDots(
 }
 
 /**
- * Quota pill: dots on the start side, then a label ("٢ من ٣" by default, or e.g. "فاضلك فيديو واحد").
+ * Quota pill: dots on the start side, then a label ("2 من 3" by default, or e.g. "فاضلك فيديو واحد").
  * Informational only (not clickable).
  */
 @Composable
@@ -76,7 +75,7 @@ fun QuotaPill(
     used: Int,
     total: Int,
     modifier: Modifier = Modifier,
-    label: String = stringResource(Res.string.ds_quota_of, used.toArabicDigits(), total.toArabicDigits()),
+    label: String = stringResource(Res.string.ds_quota_of, used.toString(), total.toString()),
     tone: SurfaceTone = SurfaceTone.Light,
 ) {
     val colors = ClipKidTheme.colors

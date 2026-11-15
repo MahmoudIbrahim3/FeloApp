@@ -20,7 +20,6 @@ import com.mahmoud.clipkid.core.designsystem.preview.ClipKidPreview
 import com.mahmoud.clipkid.core.designsystem.preview.ShowcaseColumn
 import com.mahmoud.clipkid.core.designsystem.resources.Res
 import com.mahmoud.clipkid.core.designsystem.resources.ds_step_of
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import org.jetbrains.compose.resources.stringResource
 
@@ -35,7 +34,7 @@ fun StepProgress(
     modifier: Modifier = Modifier,
 ) {
     val colors = ClipKidTheme.colors
-    val description = stringResource(Res.string.ds_step_of, current.toArabicDigits(), total.toArabicDigits())
+    val description = stringResource(Res.string.ds_step_of, current.toString(), total.toString())
     Row(
         modifier = modifier
             .fillMaxWidth()

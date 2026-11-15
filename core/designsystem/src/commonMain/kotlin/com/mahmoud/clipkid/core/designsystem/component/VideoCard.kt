@@ -179,7 +179,7 @@ fun VideoThumbnail(
     }
 }
 
-/** "٣:٤٠" on a dark scrim. */
+/** "3:40" on a dark scrim. */
 @Composable
 fun DurationBadge(durationSec: Int, modifier: Modifier = Modifier) {
     val text = formatDuration(durationSec)

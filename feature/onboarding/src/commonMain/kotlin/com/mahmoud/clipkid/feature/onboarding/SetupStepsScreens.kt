@@ -357,7 +357,7 @@ private const val PREVIEW_NICKNAME = "يوسف"
 
 private val previewCollections = listOf(
     CollectionOption(Collection("letters", "letters", "الحروف", CoverStyle(0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ")), setOf(AgeBand.A6_8), 1), true),
-    CollectionOption(Collection("numbers", "numbers", "الأرقام", CoverStyle(0xFFD6E8FF, 0xFF1A4FB5, CoverMark.Glyph("١")), setOf(AgeBand.A6_8), 2), true),
+    CollectionOption(Collection("numbers", "numbers", "الأرقام", CoverStyle(0xFFD6E8FF, 0xFF1A4FB5, CoverMark.Glyph("1")), setOf(AgeBand.A6_8), 2), true),
     CollectionOption(Collection("stories", "stories", "حواديت", CoverStyle(0xFFFFE3C7, 0xFFA3530E, CoverMark.Icon("moon")), setOf(AgeBand.A6_8), 3), false),
 )
 

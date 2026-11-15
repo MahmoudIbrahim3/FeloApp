@@ -50,7 +50,6 @@ import com.mahmoud.clipkid.core.designsystem.component.ageBandRange
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcon
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.preview.ClipKidPreview
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.domain.usecase.DailyLimitOptions
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
@@ -246,9 +245,9 @@ private fun TodayCard(quota: DailyQuota, onGrant: (Int) -> Unit) {
             Text(stringResource(Res.string.dash_today), style = ClipKidTheme.typography.titleMedium, color = colors.ink, modifier = Modifier.weight(1f))
             Text(
                 text = if (minutesMode) {
-                    pluralStringResource(Res.plurals.dash_videos_watched, quota.videosWatched, quota.videosWatched.toArabicDigits())
+                    pluralStringResource(Res.plurals.dash_videos_watched, quota.videosWatched, quota.videosWatched.toString())
                 } else {
-                    stringResource(Res.string.dash_minutes_watched, minutesWatched.toArabicDigits())
+                    stringResource(Res.string.dash_minutes_watched, minutesWatched.toString())
                 },
                 style = ClipKidTheme.typography.bodyMedium,
                 color = colors.muted,
@@ -256,11 +255,11 @@ private fun TodayCard(quota: DailyQuota, onGrant: (Int) -> Unit) {
         }
         Row(verticalAlignment = Alignment.Bottom) {
             val (big, small) = if (minutesMode) {
-                (quota.used / 60) to stringResource(Res.string.dash_minutes_of, (quota.total / 60).toArabicDigits())
+                (quota.used / 60) to stringResource(Res.string.dash_minutes_of, (quota.total / 60).toString())
             } else {
-                quota.used to stringResource(Res.string.dash_videos_of, quota.total.toArabicDigits())
+                quota.used to stringResource(Res.string.dash_videos_of, quota.total.toString())
             }
-            Text(big.toArabicDigits(), style = ClipKidTheme.typography.displayLarge, color = colors.ink)
+            Text(big.toString(), style = ClipKidTheme.typography.displayLarge, color = colors.ink)
             Spacer(Modifier.size(ClipKidTheme.spacing.xs))
             Text(small, style = ClipKidTheme.typography.bodyLarge, color = colors.muted, modifier = Modifier.padding(bottom = 6.dp))
         }
@@ -282,21 +281,21 @@ private fun TodayCard(quota: DailyQuota, onGrant: (Int) -> Unit) {
     }
 }
 
-/** "+١ فيديو" / "+٣ فيديوهات" (the only two grants), or in minutes mode "+١٠ دقيقة" / "+٣٠ دقيقة". */
+/** "+1 فيديو" / "+3 فيديوهات" (the only two grants), or in minutes mode "+10 دقيقة" / "+30 دقيقة". */
 @Composable
 private fun grantLabel(videos: Int, minutesMode: Boolean): String = when {
-    minutesMode -> stringResource(Res.string.dash_grant_minutes, (videos * MINUTES_PER_EXTRA_VIDEO).toArabicDigits())
+    minutesMode -> stringResource(Res.string.dash_grant_minutes, (videos * MINUTES_PER_EXTRA_VIDEO).toString())
     videos == 1 -> stringResource(Res.string.dash_grant_one_video)
     else -> stringResource(Res.string.dash_grant_three_videos)
 }
 
-/** Extras already granted today: "٣ فيديوهات" or "٣٠ دقيقة". */
+/** Extras already granted today: "3 فيديوهات" or "30 دقيقة". */
 @Composable
 private fun grantedAmount(videos: Int, minutesMode: Boolean): String =
     if (minutesMode) {
-        stringResource(Res.string.dash_minutes_watched, (videos * MINUTES_PER_EXTRA_VIDEO).toArabicDigits())
+        stringResource(Res.string.dash_minutes_watched, (videos * MINUTES_PER_EXTRA_VIDEO).toString())
     } else {
-        pluralStringResource(Res.plurals.dash_videos_watched, videos, videos.toArabicDigits())
+        pluralStringResource(Res.plurals.dash_videos_watched, videos, videos.toString())
     }
 
 /** One collection switch. */

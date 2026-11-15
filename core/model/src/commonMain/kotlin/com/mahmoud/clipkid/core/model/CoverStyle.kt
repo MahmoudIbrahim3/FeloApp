@@ -18,7 +18,7 @@ data class CoverStyle(
 /** Serialized with a `type` discriminator: `{"type":"glyph","text":"أ ب"}` / `{"type":"icon","key":"book"}`. */
 @Serializable
 sealed interface CoverMark {
-    /** Short text drawn in the display font, e.g. "أ ب" or "١٢٣". */
+    /** Short text drawn in the display font, e.g. "أ ب" or "123". */
     @Serializable
     @SerialName("glyph")
     data class Glyph(val text: String) : CoverMark

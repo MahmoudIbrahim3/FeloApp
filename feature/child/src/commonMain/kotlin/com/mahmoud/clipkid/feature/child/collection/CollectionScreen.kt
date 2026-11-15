@@ -34,7 +34,6 @@ import com.mahmoud.clipkid.core.designsystem.component.VideoCard
 import com.mahmoud.clipkid.core.designsystem.component.YouTubeBadgePlaceholder
 import com.mahmoud.clipkid.core.designsystem.component.years
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.LocalWindowSize
 import com.mahmoud.clipkid.core.designsystem.theme.WindowSize
@@ -200,7 +199,7 @@ private fun CollectionHeader(page: CollectionPage, onEvent: (CollectionEvent) ->
                 Text(
                     text = stringResource(
                         Res.string.child_collection_meta,
-                        total.toArabicDigits(),
+                        total.toString(),
                         ageRangeLabel(page.collection.ageBands),
                     ),
                     style = ClipKidTheme.typography.bodySmall,
@@ -215,8 +214,8 @@ private fun CollectionHeader(page: CollectionPage, onEvent: (CollectionEvent) ->
             Text(
                 text = stringResource(
                     Res.string.child_collection_progress,
-                    page.watchedCount.toArabicDigits(),
-                    total.toArabicDigits(),
+                    page.watchedCount.toString(),
+                    total.toString(),
                 ),
                 style = ClipKidTheme.typography.labelMedium,
                 color = colors.ink,
@@ -242,10 +241,10 @@ private fun ProgressBar(fraction: Float, fg: Color, modifier: Modifier = Modifie
     }
 }
 
-/** "٣–٨" from the first and last age band of a collection. */
+/** "3–8" from the first and last age band of a collection. */
 internal fun ageRangeLabel(bands: Set<AgeBand>): String {
     val ordered = bands.sortedBy { it.ordinal }
     val first = ordered.firstOrNull() ?: return ""
     val last = ordered.last()
-    return "${first.years().first.toArabicDigits()}–${last.years().second.toArabicDigits()}"
+    return "${first.years().first}–${last.years().second}"
 }

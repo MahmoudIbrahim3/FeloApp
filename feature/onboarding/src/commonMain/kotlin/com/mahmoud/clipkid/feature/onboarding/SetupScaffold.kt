@@ -26,7 +26,6 @@ import com.mahmoud.clipkid.core.designsystem.component.IconButtonTone
 import com.mahmoud.clipkid.core.designsystem.component.StepProgress
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.feature.onboarding.resources.Res
 import com.mahmoud.clipkid.feature.onboarding.resources.onb_back
@@ -78,7 +77,7 @@ internal fun SetupScaffold(
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
-                    text = stringResource(Res.string.onb_step_of, step.toArabicDigits(), totalSteps.toArabicDigits()),
+                    text = stringResource(Res.string.onb_step_of, step.toString(), totalSteps.toString()),
                     style = ClipKidTheme.typography.bodyMedium,
                     color = colors.muted,
                 )

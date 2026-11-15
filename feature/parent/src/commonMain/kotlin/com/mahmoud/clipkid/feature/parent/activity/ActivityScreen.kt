@@ -34,8 +34,6 @@ import com.mahmoud.clipkid.core.designsystem.component.WeekBarChart
 import com.mahmoud.clipkid.core.designsystem.component.YouTubeBadgePlaceholder
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.preview.ClipKidPreview
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
-import com.mahmoud.clipkid.core.designsystem.text.withArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.domain.usecase.DayActivity
 import com.mahmoud.clipkid.core.domain.usecase.WatchedToday
@@ -158,7 +156,7 @@ private fun ChartCard(activity: WeeklyActivity) {
     val chartDescription = stringResource(
         Res.string.act_chart_description,
         activity.days.zip(dayLabels)
-            .map { (day, label) -> stringResource(Res.string.act_chart_day, label, activity.barValue(day).toArabicDigits()) }
+            .map { (day, label) -> stringResource(Res.string.act_chart_day, label, activity.barValue(day).toString()) }
             .joinToString(stringResource(Res.string.act_list_separator)),
     )
     Column(
@@ -168,12 +166,12 @@ private fun ChartCard(activity: WeeklyActivity) {
         Row {
             Stat(
                 label = stringResource(Res.string.act_avg_label),
-                value = stringResource(Res.string.act_avg_value, activity.averageMinutesPerDay.toArabicDigits()),
+                value = stringResource(Res.string.act_avg_value, activity.averageMinutesPerDay.toString()),
                 modifier = Modifier.weight(1f),
             )
             Stat(
                 label = stringResource(Res.string.act_week_videos),
-                value = activity.weekVideos.toArabicDigits(),
+                value = activity.weekVideos.toString(),
                 modifier = Modifier.weight(1f),
             )
         }
@@ -183,7 +181,7 @@ private fun ChartCard(activity: WeeklyActivity) {
             limit = activity.limitLine,
             limitLabel = stringResource(
                 if (activity.unit == QuotaUnit.Seconds) Res.string.act_limit_minutes else Res.string.act_limit_videos,
-                activity.limitLine.toArabicDigits(),
+                activity.limitLine.toString(),
             ),
             contentDescription = chartDescription,
         )
@@ -230,7 +228,7 @@ private fun TodaySection(rows: List<WatchedToday>, onHide: (String) -> Unit) {
             Text(
                 stringResource(
                     Res.string.act_today_attribution,
-                    pluralStringResource(Res.plurals.dash_videos_watched, rows.size, rows.size.toArabicDigits()),
+                    pluralStringResource(Res.plurals.dash_videos_watched, rows.size, rows.size.toString()),
                 ),
                 style = ClipKidTheme.typography.bodySmall,
                 color = colors.muted,
@@ -296,11 +294,11 @@ private val DAY_NAMES: Map<DayOfWeek, StringResource> = mapOf(
     DayOfWeek.SUNDAY to Res.string.day_sun,
 )
 
-/** "٤:١٥ م": 12-hour clock with ص / م, Arabic-Indic digits. */
+/** "4:15 م": 12-hour clock with ص / م, Arabic-Indic digits. */
 @Composable
 private fun timeLabel(time: LocalTime): String {
     val hour12 = (time.hour % 12).let { if (it == 0) 12 else it }
-    val clock = "$hour12:${time.minute.toString().padStart(2, '0')}".withArabicDigits()
+    val clock = "$hour12:${time.minute.toString().padStart(2, '0')}"
     return stringResource(if (time.hour < 12) Res.string.act_time_am else Res.string.act_time_pm, clock)
 }
 

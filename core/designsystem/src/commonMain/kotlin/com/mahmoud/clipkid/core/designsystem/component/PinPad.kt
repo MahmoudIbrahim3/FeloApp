@@ -39,7 +39,6 @@ import com.mahmoud.clipkid.core.designsystem.preview.ShowcaseColumn
 import com.mahmoud.clipkid.core.designsystem.resources.Res
 import com.mahmoud.clipkid.core.designsystem.resources.ds_backspace
 import com.mahmoud.clipkid.core.designsystem.resources.ds_pin_progress
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.SurfaceTone
 import org.jetbrains.compose.resources.stringResource
@@ -81,7 +80,7 @@ private fun RowScope.DigitKey(digit: Int, tone: SurfaceTone, enabled: Boolean, o
     val colors = ClipKidTheme.colors
     val shape = ClipKidTheme.shapes.button
     val interaction = remember { MutableInteractionSource() }
-    val label = digit.toArabicDigits()
+    val label = digit.toString()
     Box(
         modifier = Modifier
             .weight(1f)
@@ -146,7 +145,7 @@ fun PinDots(
     val colors = ClipKidTheme.colors
     val fill = if (tone == SurfaceTone.Light) colors.ink else colors.onDark
     val ring = if (tone == SurfaceTone.Light) colors.muted.copy(alpha = 0.45f) else colors.onDark.copy(alpha = 0.35f)
-    val description = stringResource(Res.string.ds_pin_progress, filled.toArabicDigits(), length.toArabicDigits())
+    val description = stringResource(Res.string.ds_pin_progress, filled.toString(), length.toString())
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Row(
             modifier = modifier.clearAndSetSemantics { contentDescription = description },

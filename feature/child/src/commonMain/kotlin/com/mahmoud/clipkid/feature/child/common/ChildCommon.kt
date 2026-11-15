@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
-import com.mahmoud.clipkid.core.designsystem.text.toArabicDigits
 import com.mahmoud.clipkid.core.model.DailyQuota
 import com.mahmoud.clipkid.core.model.QuotaUnit
 import com.mahmoud.clipkid.feature.child.resources.Res
@@ -23,22 +22,22 @@ import com.mahmoud.clipkid.feature.child.resources.child_quota_remaining_many
 import com.mahmoud.clipkid.feature.child.resources.child_quota_remaining_one
 import org.jetbrains.compose.resources.stringResource
 
-/** "٢ من ٣" for videos, "٤ من ١٠ دقيقة" for minutes. */
+/** "2 من 3" for videos, "4 من 10 دقيقة" for minutes. */
 @Composable
 fun quotaLabel(quota: DailyQuota): String = when (quota.unit) {
     QuotaUnit.Videos -> stringResource(
         Res.string.child_quota_pill,
-        quota.used.toArabicDigits(),
-        quota.total.toArabicDigits(),
+        quota.used.toString(),
+        quota.total.toString(),
     )
     QuotaUnit.Seconds -> stringResource(
         Res.string.child_quota_minutes_pill,
-        (quota.used / 60).toArabicDigits(),
-        (quota.total / 60).toArabicDigits(),
+        (quota.used / 60).toString(),
+        (quota.total / 60).toString(),
     )
 }
 
-/** "فاضلك فيديو واحد" / "فاضلك ٢ فيديو" / "خلصت فيديوهات النهارده". */
+/** "فاضلك فيديو واحد" / "فاضلك 2 فيديو" / "خلصت فيديوهات النهارده". */
 @Composable
 fun remainingLabel(quota: DailyQuota): String {
     val remaining = quota.remaining
@@ -46,9 +45,9 @@ fun remainingLabel(quota: DailyQuota): String {
     return when (quota.unit) {
         QuotaUnit.Videos ->
             if (remaining == 1) stringResource(Res.string.child_quota_remaining_one)
-            else stringResource(Res.string.child_quota_remaining_many, remaining.toArabicDigits())
+            else stringResource(Res.string.child_quota_remaining_many, remaining.toString())
         QuotaUnit.Seconds ->
-            stringResource(Res.string.child_quota_minutes_remaining, (remaining / 60).coerceAtLeast(1).toArabicDigits())
+            stringResource(Res.string.child_quota_minutes_remaining, (remaining / 60).coerceAtLeast(1).toString())
     }
 }
 
