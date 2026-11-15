@@ -57,6 +57,8 @@ import org.jetbrains.compose.resources.stringResource
  * @param progress 0..1 watch progress, or null to hide the bar.
  * @param placeholderColor background shown while the thumbnail loads or when [thumbnailUrl] is null.
  * @param supportingContent optional content under the title (e.g. a collection tag).
+ * @param titleTrailing optional short content on the title's line, at the end side (e.g. a watch status),
+ *   aligned to the title's first baseline.
  * @param thumbnailShape corner shape of the thumbnail; large full-width cards use `ClipKidTheme.shapes.thumbnail`.
  */
 @Composable
@@ -71,6 +73,7 @@ fun VideoCard(
     placeholderColor: Color = ClipKidTheme.colors.thumbnailPlaceholder,
     action: (@Composable () -> Unit)? = null,
     supportingContent: (@Composable () -> Unit)? = null,
+    titleTrailing: (@Composable () -> Unit)? = null,
     aspectRatio: Float = 16f / 10f,
     thumbnailShape: Shape = ClipKidTheme.shapes.cardSmall,
 ) {
@@ -96,13 +99,20 @@ fun VideoCard(
             modifier = Modifier.fillMaxWidth().aspectRatio(aspectRatio),
         )
         Spacer(Modifier.height(ClipKidTheme.spacing.xs))
-        Text(
-            text = title,
-            style = ClipKidTheme.typography.titleMedium,
-            color = ClipKidTheme.colors.ink,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Row(Modifier.fillMaxWidth()) {
+            Text(
+                text = title,
+                style = ClipKidTheme.typography.titleMedium,
+                color = ClipKidTheme.colors.ink,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f).alignByBaseline(),
+            )
+            if (titleTrailing != null) {
+                Spacer(Modifier.width(ClipKidTheme.spacing.sm))
+                Box(Modifier.alignByBaseline()) { titleTrailing() }
+            }
+        }
         if (supportingContent != null) {
             Spacer(Modifier.height(ClipKidTheme.spacing.xxs))
             supportingContent()

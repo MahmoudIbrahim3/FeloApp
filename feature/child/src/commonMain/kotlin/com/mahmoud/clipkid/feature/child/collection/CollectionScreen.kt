@@ -149,7 +149,7 @@ private fun CollectionVideoCard(item: CollectionItem, onClick: () -> Unit) {
         progress = if (item.status is VideoStatus.InProgress) item.progress else null,
         aspectRatio = 16f / 9f,
         thumbnailShape = ClipKidTheme.shapes.thumbnail,
-        supportingContent = {
+        titleTrailing = {
             Text(text = label, style = ClipKidTheme.typography.labelLarge, color = color, maxLines = 1)
         },
         modifier = Modifier.fillMaxWidth(),
