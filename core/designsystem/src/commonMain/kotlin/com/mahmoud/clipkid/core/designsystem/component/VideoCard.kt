@@ -57,7 +57,7 @@ import org.jetbrains.compose.resources.stringResource
  * @param progress 0..1 watch progress, or null to hide the bar.
  * @param placeholderColor background shown while the thumbnail loads or when [thumbnailUrl] is null.
  * @param supportingContent optional content under the title (e.g. a collection tag).
- * @param thumbnailShape corner shape of the thumbnail; large full-width cards use `ClipKidTheme.shapes.card`.
+ * @param thumbnailShape corner shape of the thumbnail; large full-width cards use `ClipKidTheme.shapes.thumbnail`.
  */
 @Composable
 fun VideoCard(

@@ -207,7 +207,7 @@ private fun CollectionVideoCard(item: CollectionItem, onClick: () -> Unit) {
         youtubeBadge = { YouTubeBadgePlaceholder() },
         progress = if (item.status is VideoStatus.InProgress) item.progress else null,
         aspectRatio = 16f / 9f,
-        thumbnailShape = ClipKidTheme.shapes.card,
+        thumbnailShape = ClipKidTheme.shapes.thumbnail,
         supportingContent = {
             Text(text = label, style = ClipKidTheme.typography.labelLarge, color = color, maxLines = 1)
         },
