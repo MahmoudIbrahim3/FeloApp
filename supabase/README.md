@@ -48,9 +48,10 @@ enable "YouTube Data API v3" → Credentials → API key → restrict it to YouT
    (Safe to run again; existing slugs are skipped.)
 3. **Function secrets** (pick a long random value for `REFRESH_SECRET`, e.g. `openssl rand -hex 32`):
    ```sh
-   supabase secrets set YOUTUBE_API_KEY=<your-key> REFRESH_SECRET=<random> TARGET_REGIONS=EG,KW,SA,AE
+   supabase secrets set YOUTUBE_API_KEY=<your-key> REFRESH_SECRET=<random> TARGET_REGIONS=EG,SA,AE,KW,QA,BH,OM,JO,LB,SY,IQ,PS,YE,SD,LY,TN,DZ,MA,MR,SO,DJ,KM
    ```
    `TARGET_REGIONS` = countries where a video must be playable; blocked in any of them → `unavailable`.
+   The list above is all 22 Arab League countries (also the default when the secret is unset).
 4. **Deploy the functions**:
    ```sh
    supabase functions deploy refresh-youtube-data --no-verify-jwt

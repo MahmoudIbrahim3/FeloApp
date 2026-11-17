@@ -10,7 +10,8 @@
 // Auth: header `x-refresh-secret` must equal the REFRESH_SECRET function secret (verify_jwt is off,
 // so the app's public key can never trigger a run or spend quota).
 //
-// Secrets: YOUTUBE_API_KEY, REFRESH_SECRET, TARGET_REGIONS (optional, default EG,KW,SA,AE).
+// Secrets: YOUTUBE_API_KEY, REFRESH_SECRET, TARGET_REGIONS (optional, default: the 22 Arab League
+// countries, see DEFAULT_TARGET_REGIONS in refresh-youtube-data/youtube.ts).
 // Injected by Supabase: SUPABASE_URL, SUPABASE_SECRET_KEYS.
 
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.119.0";

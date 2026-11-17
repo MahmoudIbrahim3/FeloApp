@@ -33,7 +33,15 @@ export interface RefreshItem {
 }
 
 export const BATCH_SIZE = 50;
-export const DEFAULT_TARGET_REGIONS = ["EG", "KW", "SA", "AE"];
+/** The 22 Arab League countries: a video must be playable in every one of them. */
+export const DEFAULT_TARGET_REGIONS = [
+  // Egypt and the Gulf
+  "EG", "SA", "AE", "KW", "QA", "BH", "OM",
+  // Levant and Iraq
+  "JO", "LB", "SY", "IQ", "PS",
+  // Yemen, Sudan, the Maghreb and the Horn of Africa
+  "YE", "SD", "LY", "TN", "DZ", "MA", "MR", "SO", "DJ", "KM",
+];
 
 /** Only what we store or decide on: keeps responses small. Quota is 1 unit per call either way. */
 export const FIELDS =

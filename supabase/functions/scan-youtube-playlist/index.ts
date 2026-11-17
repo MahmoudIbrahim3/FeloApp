@@ -13,7 +13,8 @@
 // Quota: playlistItems.list and videos.list cost 1 unit per call of up to 50 videos, so a
 // 100-video playlist costs about 4 units. A scan stops after MAX_VIDEOS.
 //
-// Secrets: YOUTUBE_API_KEY, REFRESH_SECRET, TARGET_REGIONS (optional, default EG,KW,SA,AE).
+// Secrets: YOUTUBE_API_KEY, REFRESH_SECRET, TARGET_REGIONS (optional, default: the 22 Arab League
+// countries, see DEFAULT_TARGET_REGIONS in refresh-youtube-data/youtube.ts).
 
 import { BATCH_SIZE, chunk, parseRegions, safeEqual } from "../refresh-youtube-data/youtube.ts";
 import {

@@ -123,7 +123,7 @@ Apple's reason-code page didn't render as text for me, so the code meanings abov
 | E2 | Persistent identifiers count as personal information (FTC COPPA FAQ A.3, C.5) | OK (Phase 8) | RevenueCat's anonymous id is created only after the parent's consent, from parent mode, and used only to validate and restore the purchase (COPPA "support for internal operations", FAQ C.5, F.2). YouTube: A19 (privacy-enhanced mode) plus self-designation M1/M2. | D4 decided. Note: once configured in a process, the RevenueCat SDK may refresh by itself when the app returns to the foreground, until the process ends. |
 | E3 | Written retention and security policy (amended COPPA Rule, April 22, 2025) | OK | Included in the policy drafts below (retention section) | It becomes real once you publish it (D7). |
 | E4 | Parents can review or delete | OK | Everything about a child is on the device: the dashboard edits it, uninstall deletes it. Reports are anonymous and can't be matched to anyone. RevenueCat records can be deleted on request (dashboard / REST API). The policy explains how. | |
-| E5 | GDPR Art. 8: consent from the parent for under-16s where consent is the legal basis | OK | No consent-based processing of a child's data. Purchase processing is the parent's contract. | Only matters if you publish in the EU. Your `TARGET_REGIONS` are EG, KW, SA, AE. |
+| E5 | GDPR Art. 8: consent from the parent for under-16s where consent is the legal basis | OK | No consent-based processing of a child's data. Purchase processing is the parent's contract. | Only matters if you publish in the EU. Your `TARGET_REGIONS` are the 22 Arab League countries (none in the EU). |
 
 ## F. Release build
 
