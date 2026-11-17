@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,8 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,7 +28,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mahmoud.clipkid.core.designsystem.component.CollectionCover
 import com.mahmoud.clipkid.core.designsystem.component.EmptyState
@@ -33,10 +39,8 @@ import com.mahmoud.clipkid.core.designsystem.component.IconButtonTone
 import com.mahmoud.clipkid.core.designsystem.component.PrimaryButton
 import com.mahmoud.clipkid.core.designsystem.component.QuotaDots
 import com.mahmoud.clipkid.core.designsystem.component.QuotaPill
-import com.mahmoud.clipkid.core.designsystem.component.Shelf
 import com.mahmoud.clipkid.core.designsystem.component.ShelfHeader
 import com.mahmoud.clipkid.core.designsystem.component.Text
-import com.mahmoud.clipkid.core.designsystem.component.VideoCard
 import com.mahmoud.clipkid.core.designsystem.component.VideoThumbnail
 import com.mahmoud.clipkid.core.designsystem.component.YouTubeBadgePlaceholder
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
@@ -44,17 +48,16 @@ import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.LocalWindowSize
 import com.mahmoud.clipkid.core.designsystem.theme.WindowSize
 import com.mahmoud.clipkid.core.domain.usecase.ContinueWatching
-import com.mahmoud.clipkid.core.domain.usecase.Shelf as VideoShelf
 import com.mahmoud.clipkid.core.model.Video
 import com.mahmoud.clipkid.core.model.WatchSource
 import com.mahmoud.clipkid.feature.child.common.ChildAvatar
 import com.mahmoud.clipkid.feature.child.common.ChildTab
 import com.mahmoud.clipkid.feature.child.common.ChildTabsScaffold
+import com.mahmoud.clipkid.feature.child.common.WideVideoCard
 import com.mahmoud.clipkid.feature.child.common.quotaLabel
 import com.mahmoud.clipkid.feature.child.common.remainingLabel
 import com.mahmoud.clipkid.feature.child.resources.Res
 import com.mahmoud.clipkid.feature.child.resources.child_greeting
-import com.mahmoud.clipkid.feature.child.resources.child_home_collections
 import com.mahmoud.clipkid.feature.child.resources.child_home_continue_label
 import com.mahmoud.clipkid.feature.child.resources.child_home_empty_message
 import com.mahmoud.clipkid.feature.child.resources.child_home_empty_title
@@ -103,7 +106,12 @@ fun HomeLoading(modifier: Modifier = Modifier) {
     }
 }
 
-/** Home content, stateless. Phone: header, full-width hero, rails. Tablet: hero beside the quota card. */
+/**
+ * Home content, stateless. One vertical list, YouTube Kids style: header, the collection
+ * covers (the only sideways row), the continue card, then today's picks as full-width cards.
+ * The list ends after the picks (no infinite feed). Tablet: the same order in two columns,
+ * with the wide continue card beside the quota card on top.
+ */
 @Composable
 fun HomeContent(
     state: HomeUiState.Content,
@@ -112,94 +120,87 @@ fun HomeContent(
 ) {
     val expanded = LocalWindowSize.current == WindowSize.Expanded
     val gutter = ClipKidTheme.spacing.gutter
-    val cardWidth = if (expanded) 280.dp else 200.dp
+    val spacing = ClipKidTheme.spacing
+    val fullLine: LazyGridItemSpanScope.() -> GridItemSpan = { GridItemSpan(maxLineSpan) }
 
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(if (expanded) 2 else 1),
         modifier = modifier.fillMaxSize().statusBarsPadding(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = ClipKidTheme.spacing.xxl),
-        verticalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.lg),
+        contentPadding = PaddingValues(start = gutter, end = gutter, top = spacing.md, bottom = spacing.xxl),
+        horizontalArrangement = Arrangement.spacedBy(spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(spacing.xl),
     ) {
-        item(key = "top") {
-            if (expanded) {
-                TabletTop(state, onEvent, gutter)
-            } else {
-                PhoneHeader(state, onEvent, gutter)
-            }
-        }
-
-        if (!expanded) {
-            state.continueWatching?.let { cw ->
-                item(key = "hero") {
-                    ContinueHero(
-                        cw = cw,
-                        onClick = { onEvent(HomeEvent.VideoClicked(cw.video.youtubeId, WatchSource.ContinueWatching)) },
-                        modifier = Modifier.padding(horizontal = gutter),
-                    )
-                }
-            }
+        item(key = "top", span = fullLine) {
+            if (expanded) TabletTop(state, onEvent) else PhoneHeader(state, onEvent)
         }
 
         if (state.isEmpty) {
-            item(key = "empty") {
+            item(key = "empty", span = fullLine) {
                 EmptyState(
                     icon = ClipKidIcons.Play,
                     title = stringResource(Res.string.child_home_empty_title),
                     message = stringResource(Res.string.child_home_empty_message),
                 )
             }
-        } else {
-            item(key = "collections-title") {
-                ShelfHeader(
-                    title = stringResource(Res.string.child_home_collections),
-                    modifier = Modifier.padding(horizontal = gutter),
+            return@LazyVerticalGrid
+        }
+
+        item(key = "collections", span = fullLine) {
+            // Scrolls edge to edge, so it ignores the grid's side padding.
+            LazyRow(
+                modifier = Modifier.bleedHorizontally(gutter),
+                contentPadding = PaddingValues(horizontal = gutter),
+                horizontalArrangement = Arrangement.spacedBy(spacing.md),
+            ) {
+                items(state.collections, key = { it.id }) { collection ->
+                    CollectionCover(
+                        style = collection.cover,
+                        title = collection.titleAr,
+                        onClick = { onEvent(HomeEvent.CollectionClicked(collection.id)) },
+                    )
+                }
+            }
+        }
+
+        if (!expanded) {
+            state.continueWatching?.let { cw ->
+                item(key = "continue", span = fullLine) {
+                    WideVideoCard(
+                        video = cw.video,
+                        progress = cw.progress,
+                        onClick = { onEvent(HomeEvent.VideoClicked(cw.video.youtubeId, WatchSource.ContinueWatching)) },
+                        titleTrailing = { ContinueChip() },
+                    )
+                }
+            }
+        }
+
+        if (state.newToday.isNotEmpty()) {
+            item(key = "new-today-title", span = fullLine) {
+                ShelfHeader(title = stringResource(Res.string.child_home_new_today))
+            }
+            gridItems(state.newToday, key = { it.youtubeId }) { video ->
+                WideVideoCard(
+                    video = video,
+                    onClick = { onEvent(HomeEvent.VideoClicked(video.youtubeId, WatchSource.NewToday)) },
                 )
-            }
-            item(key = "collections") {
-                LazyRow(
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = gutter),
-                    horizontalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.md),
-                ) {
-                    items(state.collections, key = { it.id }) { collection ->
-                        CollectionCover(
-                            style = collection.cover,
-                            title = collection.titleAr,
-                            onClick = { onEvent(HomeEvent.CollectionClicked(collection.id)) },
-                        )
-                    }
-                }
-            }
-
-            if (state.newToday.isNotEmpty()) {
-                item(key = "new-today") {
-                    Shelf(title = stringResource(Res.string.child_home_new_today)) {
-                        items(state.newToday, key = { it.youtubeId }) { video ->
-                            HomeVideoCard(video, WatchSource.NewToday, cardWidth, onEvent)
-                        }
-                    }
-                }
-            }
-
-            state.shelves.forEach { shelf: VideoShelf ->
-                item(key = "shelf-${shelf.collection.id}") {
-                    Shelf(
-                        title = shelf.collection.titleAr,
-                        accentColor = Color(shelf.collection.cover.fg),
-                        onSeeAll = { onEvent(HomeEvent.CollectionClicked(shelf.collection.id)) },
-                    ) {
-                        items(shelf.videos, key = { it.youtubeId }) { video ->
-                            HomeVideoCard(video, WatchSource.Home, cardWidth, onEvent)
-                        }
-                    }
-                }
             }
         }
     }
 }
 
+/** Lets a full-width row ignore the grid's side padding and reach both screen edges. */
+private fun Modifier.bleedHorizontally(bleed: Dp): Modifier = layout { measurable, constraints ->
+    val bleedPx = bleed.roundToPx()
+    val width = constraints.maxWidth + bleedPx * 2
+    val placeable = measurable.measure(constraints.copy(minWidth = width, maxWidth = width))
+    layout(constraints.maxWidth, placeable.height) { placeable.place(-bleedPx, 0) }
+}
+
 @Composable
-private fun PhoneHeader(state: HomeUiState.Content, onEvent: (HomeEvent) -> Unit, gutter: androidx.compose.ui.unit.Dp) {
+private fun PhoneHeader(state: HomeUiState.Content, onEvent: (HomeEvent) -> Unit) {
     Row(
-        Modifier.fillMaxWidth().padding(horizontal = gutter),
+        Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         ChildAvatar(state.childName, state.avatarColor, size = 56.dp)
@@ -228,9 +229,9 @@ private fun PhoneHeader(state: HomeUiState.Content, onEvent: (HomeEvent) -> Unit
 }
 
 @Composable
-private fun TabletTop(state: HomeUiState.Content, onEvent: (HomeEvent) -> Unit, gutter: androidx.compose.ui.unit.Dp) {
+private fun TabletTop(state: HomeUiState.Content, onEvent: (HomeEvent) -> Unit) {
     Row(
-        Modifier.fillMaxWidth().padding(horizontal = gutter),
+        Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.md),
     ) {
         state.continueWatching?.let { cw ->
@@ -273,37 +274,6 @@ private fun QuotaCard(state: HomeUiState.Content, modifier: Modifier = Modifier)
             style = ClipKidTheme.typography.titleMedium,
             color = colors.ink,
         )
-    }
-}
-
-/** Phone hero: full-width thumbnail with progress, title and the continue chip. */
-@Composable
-private fun ContinueHero(cw: ContinueWatching, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val colors = ClipKidTheme.colors
-    val shape = ClipKidTheme.shapes.card
-    Column(
-        modifier
-            .fillMaxWidth()
-            .background(colors.surface, shape)
-            .clickable(onClick = onClick)
-            .padding(ClipKidTheme.spacing.sm),
-        verticalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.sm),
-    ) {
-        ThumbWithPlay(cw.video, cw.progress, Modifier.fillMaxWidth().aspectRatio(16f / 9f))
-        Row(
-            Modifier.padding(horizontal = ClipKidTheme.spacing.xs),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = cw.video.titleAr,
-                style = ClipKidTheme.typography.titleMedium,
-                color = colors.ink,
-                modifier = Modifier.weight(1f),
-                maxLines = 2,
-            )
-            Spacer(Modifier.width(ClipKidTheme.spacing.sm))
-            ContinueChip()
-        }
     }
 }
 
@@ -382,23 +352,5 @@ private fun ThumbWithPlay(video: Video, progress: Float, modifier: Modifier) {
                 )
             }
         },
-    )
-}
-
-@Composable
-private fun HomeVideoCard(
-    video: Video,
-    source: WatchSource,
-    width: androidx.compose.ui.unit.Dp,
-    onEvent: (HomeEvent) -> Unit,
-) {
-    VideoCard(
-        title = video.titleAr,
-        thumbnailUrl = video.thumbnailUrl,
-        durationSec = video.durationSec,
-        onClick = { onEvent(HomeEvent.VideoClicked(video.youtubeId, source)) },
-        youtubeBadge = { YouTubeBadgePlaceholder() },
-        thumbnailShape = ClipKidTheme.shapes.thumbnail,
-        modifier = Modifier.width(width),
     )
 }

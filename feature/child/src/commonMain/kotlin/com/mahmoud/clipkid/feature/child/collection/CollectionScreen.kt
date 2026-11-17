@@ -30,8 +30,6 @@ import com.mahmoud.clipkid.core.designsystem.component.EmptyState
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonLarge
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonTone
 import com.mahmoud.clipkid.core.designsystem.component.Text
-import com.mahmoud.clipkid.core.designsystem.component.VideoCard
-import com.mahmoud.clipkid.core.designsystem.component.YouTubeBadgePlaceholder
 import com.mahmoud.clipkid.core.designsystem.component.years
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
@@ -41,6 +39,7 @@ import com.mahmoud.clipkid.core.domain.usecase.CollectionItem
 import com.mahmoud.clipkid.core.domain.usecase.CollectionPage
 import com.mahmoud.clipkid.core.domain.usecase.VideoStatus
 import com.mahmoud.clipkid.core.model.AgeBand
+import com.mahmoud.clipkid.feature.child.common.WideVideoCard
 import com.mahmoud.clipkid.feature.child.resources.Res
 import com.mahmoud.clipkid.feature.child.resources.child_back
 import com.mahmoud.clipkid.feature.child.resources.child_collection_empty_message
@@ -140,19 +139,13 @@ private fun CollectionVideoCard(item: CollectionItem, onClick: () -> Unit) {
         is VideoStatus.InProgress -> stringResource(Res.string.child_status_in_progress) to colors.primary
         VideoStatus.New -> stringResource(Res.string.child_status_new) to colors.muted
     }
-    VideoCard(
-        title = item.video.titleAr,
-        thumbnailUrl = item.video.thumbnailUrl,
-        durationSec = item.video.durationSec,
+    WideVideoCard(
+        video = item.video,
         onClick = onClick,
-        youtubeBadge = { YouTubeBadgePlaceholder() },
         progress = if (item.status is VideoStatus.InProgress) item.progress else null,
-        aspectRatio = 16f / 9f,
-        thumbnailShape = ClipKidTheme.shapes.thumbnail,
         titleTrailing = {
             Text(text = label, style = ClipKidTheme.typography.labelLarge, color = color, maxLines = 1)
         },
-        modifier = Modifier.fillMaxWidth(),
     )
 }
 

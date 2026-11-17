@@ -3,7 +3,6 @@
     <!-- Home -->
     <string name="child_greeting">أهلاً يا بطل!</string>
     <string name="child_home_lock_description">للأهل بس</string>
-    <string name="child_home_collections">الكوليكشنز</string>
     <string name="child_home_new_today">جديد النهارده</string>
     <string name="child_home_continue_label">كمّل اتفرج</string>
     <string name="child_home_play">شغّل</string>
