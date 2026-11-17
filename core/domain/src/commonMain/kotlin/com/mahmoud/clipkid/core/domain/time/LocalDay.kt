@@ -15,6 +15,9 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
+/** The start of watch history: queries that need "ever" (finished at any time) begin here. */
+internal val HISTORY_START: Instant = Instant.fromEpochSeconds(0)
+
 /** One local calendar day as the half-open instant range `[start, end)`. */
 data class DayRange(val date: LocalDate, val start: Instant, val end: Instant)
 

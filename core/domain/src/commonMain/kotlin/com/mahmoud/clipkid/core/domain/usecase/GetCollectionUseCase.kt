@@ -5,6 +5,7 @@ import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
+import com.mahmoud.clipkid.core.domain.time.HISTORY_START
 import com.mahmoud.clipkid.core.model.ChildProfile
 import com.mahmoud.clipkid.core.model.Collection
 import com.mahmoud.clipkid.core.model.Video
@@ -15,7 +16,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Instant
 
 /** What the child has done with one video. */
 sealed interface VideoStatus {
@@ -76,14 +76,13 @@ class GetCollectionUseCase(
             catalog.observeCollections(),
             catalog.observeVideos(),
             hidden.observeHiddenIds(childId),
-            history.observeEvents(childId, EPOCH, until),
+            history.observeEvents(childId, HISTORY_START, until),
         ) { child, collections, videos, hiddenIds, events ->
             page(child, collections, videos, hiddenIds, events, collectionId)
         }
     }
 
     companion object {
-        private val EPOCH: Instant = Instant.fromEpochSeconds(0)
         private val HISTORY_HORIZON = 366.days
 
         internal fun page(

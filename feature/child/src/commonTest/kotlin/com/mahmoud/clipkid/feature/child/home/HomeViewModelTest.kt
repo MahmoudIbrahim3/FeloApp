@@ -22,7 +22,7 @@ class HomeViewModelTest {
         HomeViewModel(CHILD, f.homeFeed, f.quota).also { advanceUntilIdle() }
 
     @Test
-    fun contentHasNameQuotaAndVisibleCollections() = runViewModelTest {
+    fun contentHasNameQuotaCollectionsAndShelves() = runViewModelTest {
         val f = ChildFixture(this)
         val vm = viewModel(f)
 
@@ -32,7 +32,12 @@ class HomeViewModelTest {
         assertEquals(3, state.quota.total)
         // science is 9-12 only, so a 6-8 child never sees it.
         assertEquals(listOf("letters", "numbers", "stories"), state.collections.map { it.id })
-        assertEquals(6, state.newToday.size)
+        assertEquals(3, state.newToday.size)
+        // letters has 5 videos, so at most 3 go to "جديد النهارده" and its shelf is never empty.
+        assertTrue(state.shelves.any { it.collection.id == "letters" })
+        assertTrue(state.shelves.all { it.videos.size <= 3 })
+        val onHome = state.newToday.map { it.youtubeId } + state.shelves.flatMap { s -> s.videos.map { it.youtubeId } }
+        assertEquals(onHome.distinct(), onHome)
         assertTrue(!state.isEmpty)
     }
 

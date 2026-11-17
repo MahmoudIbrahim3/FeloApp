@@ -28,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -108,9 +109,10 @@ fun HomeLoading(modifier: Modifier = Modifier) {
 
 /**
  * Home content, stateless. One vertical list, YouTube Kids style: header, the collection
- * covers (the only sideways row), the continue card, then today's picks as full-width cards.
- * The list ends after the picks (no infinite feed). Tablet: the same order in two columns,
- * with the wide continue card beside the quota card on top.
+ * covers (the only sideways row), the continue card, today's 3 picks, then one section per
+ * collection (its name, "الكل", and its next 3 videos). No video appears twice, and the list
+ * ends after the last section (no infinite feed). Tablet: the same order in three columns, so
+ * every 3-video section is one row, with the wide continue card beside the quota card on top.
  */
 @Composable
 fun HomeContent(
@@ -124,7 +126,7 @@ fun HomeContent(
     val fullLine: LazyGridItemSpanScope.() -> GridItemSpan = { GridItemSpan(maxLineSpan) }
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(if (expanded) 2 else 1),
+        columns = GridCells.Fixed(if (expanded) 3 else 1),
         modifier = modifier.fillMaxSize().statusBarsPadding(),
         contentPadding = PaddingValues(start = gutter, end = gutter, top = spacing.md, bottom = spacing.xxl),
         horizontalArrangement = Arrangement.spacedBy(spacing.lg),
@@ -183,6 +185,23 @@ fun HomeContent(
                 WideVideoCard(
                     video = video,
                     onClick = { onEvent(HomeEvent.VideoClicked(video.youtubeId, WatchSource.NewToday)) },
+                )
+            }
+        }
+
+        state.shelves.forEach { shelf ->
+            val collection = shelf.collection
+            item(key = "shelf-${collection.id}", span = fullLine) {
+                ShelfHeader(
+                    title = collection.titleAr,
+                    accentColor = Color(collection.cover.fg),
+                    onSeeAll = { onEvent(HomeEvent.CollectionClicked(collection.id)) },
+                )
+            }
+            gridItems(shelf.videos, key = { "${collection.id}/${it.youtubeId}" }) { video ->
+                WideVideoCard(
+                    video = video,
+                    onClick = { onEvent(HomeEvent.VideoClicked(video.youtubeId, WatchSource.Home)) },
                 )
             }
         }

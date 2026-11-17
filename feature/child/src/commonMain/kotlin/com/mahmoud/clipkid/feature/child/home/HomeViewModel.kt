@@ -6,6 +6,7 @@ import com.mahmoud.clipkid.core.domain.usecase.ContinueWatching
 import com.mahmoud.clipkid.core.domain.usecase.GetDailyQuotaUseCase
 import com.mahmoud.clipkid.core.domain.usecase.GetHomeFeedUseCase
 import com.mahmoud.clipkid.core.domain.usecase.HomeFeed
+import com.mahmoud.clipkid.core.domain.usecase.Shelf
 import com.mahmoud.clipkid.core.model.Collection
 import com.mahmoud.clipkid.core.model.DailyQuota
 import com.mahmoud.clipkid.core.model.Video
@@ -30,9 +31,11 @@ sealed interface HomeUiState {
         /** The covers row, in catalog order. */
         val collections: List<Collection>,
         val newToday: List<Video>,
+        /** One section per collection: its next videos, none repeated from above. */
+        val shelves: List<Shelf>,
     ) : HomeUiState {
         /** Nothing is visible to this child right now: show the empty state instead of rails. */
-        val isEmpty: Boolean get() = newToday.isEmpty() && continueWatching == null
+        val isEmpty: Boolean get() = newToday.isEmpty() && continueWatching == null && shelves.isEmpty()
     }
 }
 
@@ -84,6 +87,7 @@ class HomeViewModel(
             continueWatching = feed.continueWatching,
             collections = feed.collections,
             newToday = feed.newToday,
+            shelves = feed.shelves,
         )
     }
 }

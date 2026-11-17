@@ -5,6 +5,7 @@ import com.mahmoud.clipkid.core.domain.repository.CatalogRepository
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
+import com.mahmoud.clipkid.core.domain.time.HISTORY_START
 import com.mahmoud.clipkid.core.domain.time.currentDayFlow
 import com.mahmoud.clipkid.core.domain.time.rangeIn
 import com.mahmoud.clipkid.core.domain.time.startOfDaysBefore
@@ -30,7 +31,11 @@ data class HomeFeed(
     val continueWatching: ContinueWatching?,
     /** "جديد النهارده": a daily rotating pick, stable for the whole local day. */
     val newToday: List<Video>,
-    /** One shelf per visible collection that has visible videos. */
+    /**
+     * One shelf per visible collection, in catalog order: up to [GetHomeFeedUseCase.SHELF_SIZE]
+     * videos next in line. Videos already in [continueWatching] or [newToday] are left out, so
+     * nothing appears twice on Home; a collection with nothing left has no shelf.
+     */
     val shelves: List<Shelf>,
 )
 
@@ -60,16 +65,26 @@ class GetHomeFeedUseCase(
                 catalog.observeCollections(),
                 catalog.observeVideos(),
                 hidden.observeHiddenIds(childId),
-                history.observeEvents(childId, windowStart, day.end),
-            ) { child, collections, videos, hiddenIds, events ->
+                // All history: a shelf needs "finished ever", like the Collection screen.
+                history.observeEvents(childId, HISTORY_START, day.end),
+            ) { child, collections, videos, hiddenIds, allEvents ->
                 val visible = VisibleCatalog.of(child, collections, videos, hiddenIds)
+                // Continue watching and "already seen" only look back HISTORY_WINDOW_DAYS.
+                val recent = allEvents.filter { it.startedAt >= windowStart }
+                val continueWatching = continueWatching(visible, recent)
+                val newToday = newToday(child.id, date, visible, recent, day.start)
+                val shownIds = buildSet {
+                    continueWatching?.let { add(it.video.youtubeId) }
+                    newToday.mapTo(this) { it.youtubeId }
+                }
+                val completedIds = allEvents.filter { it.completed }.mapTo(HashSet()) { it.youtubeId }
                 HomeFeed(
                     child = child,
                     collections = visible.collections,
-                    continueWatching = continueWatching(visible, events),
-                    newToday = newToday(child.id, date, visible, events, day.start),
+                    continueWatching = continueWatching,
+                    newToday = newToday,
                     shelves = visible.collections.mapNotNull { collection ->
-                        visible.videosByCollection[collection.id]?.let { Shelf(collection, it) }
+                        shelf(collection, visible.videosByCollection[collection.id].orEmpty(), completedIds, shownIds)
                     },
                 )
             }
@@ -79,7 +94,28 @@ class GetHomeFeedUseCase(
         /** How far back continue-watching and "already seen" look. */
         const val HISTORY_WINDOW_DAYS = 7
         const val MIN_CONTINUE_SEC = 5
-        const val NEW_TODAY_SIZE = 6
+        const val NEW_TODAY_SIZE = 3
+        const val SHELF_SIZE = 3
+
+        /**
+         * The next [SHELF_SIZE] videos of one collection, like episodes of a series: the first
+         * ones not finished yet (in collection order), topped up with finished ones from the
+         * start once fewer are left, so a fully watched collection starts over. Videos in
+         * [shownIds] (already elsewhere on Home) are skipped. Null when nothing is left.
+         *
+         * @param videos the collection's visible videos, in sortOrder.
+         */
+        internal fun shelf(
+            collection: Collection,
+            videos: List<Video>,
+            completedIds: Set<String>,
+            shownIds: Set<String>,
+        ): Shelf? {
+            val candidates = videos.filter { it.youtubeId !in shownIds }
+            val (finished, notFinished) = candidates.partition { it.youtubeId in completedIds }
+            val picks = (notFinished + finished).take(SHELF_SIZE)
+            return if (picks.isEmpty()) null else Shelf(collection, picks)
+        }
 
         /** The latest playback of each video; the most recent unfinished one (≥ 5 s) wins. */
         internal fun continueWatching(visible: VisibleCatalog, events: List<WatchEvent>): ContinueWatching? {

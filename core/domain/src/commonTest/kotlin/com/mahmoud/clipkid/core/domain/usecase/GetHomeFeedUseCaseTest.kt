@@ -43,23 +43,47 @@ class GetHomeFeedUseCaseTest {
         origin: Instant = start,
     ) = GetHomeFeedUseCase(catalog, FakeProfileRepository(profile), history, hidden, TestClock(testScheduler, origin), KUWAIT)
 
+    /**
+     * What the shelves should hold: each collection's videos in [order] (not finished first),
+     * minus what Home already shows above them, at most SHELF_SIZE, empty shelves dropped.
+     */
+    private fun expectedShelves(feed: HomeFeed, order: Map<String, List<String>>): Map<String, List<String>> {
+        val shown = feed.newToday.map { it.youtubeId }.toSet() + listOfNotNull(feed.continueWatching?.video?.youtubeId)
+        return order
+            .mapValues { (_, ids) -> ids.filterNot { it in shown }.take(GetHomeFeedUseCase.SHELF_SIZE) }
+            .filterValues { it.isNotEmpty() }
+    }
+
+    private fun HomeFeed.shelfIds(): Map<String, List<String>> =
+        shelves.associate { shelf -> shelf.collection.id to shelf.videos.map { it.youtubeId } }
+
+    private fun HomeFeed.everythingShown(): List<String> =
+        listOfNotNull(continueWatching?.video?.youtubeId) + newToday.map { it.youtubeId } +
+            shelves.flatMap { shelf -> shelf.videos.map { it.youtubeId } }
+
     @Test
     fun oneShelfPerAllowedCollectionMatchingTheAgeBand_inSortOrder() = runTest {
         val feed = homeFeed()(CHILD).first()
 
-        // science is 9-12 only; the child is 6-8.
+        // science is 9-12 only; the child is 6-8. N3 is 9-12 only.
         assertEquals(listOf("letters", "numbers", "stories"), feed.collections.map { it.id })
-        assertEquals(listOf("letters", "numbers", "stories"), feed.shelves.map { it.collection.id })
-        assertEquals(listOf("L1", "L2", "L3", "L4", "L5"), feed.shelves[0].videos.map { it.youtubeId })
-        // N3 is 9-12 only.
-        assertEquals(listOf("N1", "N2"), feed.shelves[1].videos.map { it.youtubeId })
+        val expected = expectedShelves(
+            feed,
+            linkedMapOf(
+                "letters" to listOf("L1", "L2", "L3", "L4", "L5"),
+                "numbers" to listOf("N1", "N2"),
+                "stories" to listOf("S1", "S2", "S3"),
+            ),
+        )
+        assertEquals(expected.keys.toList(), feed.shelves.map { it.collection.id })
+        assertEquals(expected, feed.shelfIds())
     }
 
     @Test
     fun collectionsTheParentDidNotAllowAreLeftOut() = runTest {
         val feed = homeFeed(child(allowed = setOf("stories")))(CHILD).first()
 
-        assertEquals(listOf("stories"), feed.shelves.map { it.collection.id })
+        assertTrue(feed.shelves.all { it.collection.id == "stories" })
         assertTrue(feed.newToday.all { it.collectionId == "stories" })
     }
 
@@ -67,8 +91,18 @@ class GetHomeFeedUseCaseTest {
     fun olderChildSeesTheirBand() = runTest {
         val feed = homeFeed(child(ageBand = AgeBand.A9_12))(CHILD).first()
 
-        assertEquals(listOf("letters", "numbers", "stories", "science"), feed.shelves.map { it.collection.id })
-        assertEquals(listOf("N1", "N2", "N3"), feed.shelves[1].videos.map { it.youtubeId })
+        assertEquals(listOf("letters", "numbers", "stories", "science"), feed.collections.map { it.id })
+        val expected = expectedShelves(
+            feed,
+            linkedMapOf(
+                "letters" to listOf("L1", "L2", "L3", "L4", "L5"),
+                "numbers" to listOf("N1", "N2", "N3"),
+                "stories" to listOf("S1", "S2", "S3"),
+                "science" to listOf("C1", "C2"),
+            ),
+        )
+        assertEquals(expected.keys.toList(), feed.shelves.map { it.collection.id })
+        assertEquals(expected, feed.shelfIds())
     }
 
     @Test
@@ -80,7 +114,9 @@ class GetHomeFeedUseCaseTest {
         val feed = homeFeed(child(allowed = setOf("empty", "letters")), catalog)(CHILD).first()
 
         assertEquals(listOf("empty", "letters"), feed.collections.map { it.id })
+        // letters has 5 videos: 3 go to "جديد النهارده", the other 2 stay on its shelf.
         assertEquals(listOf("letters"), feed.shelves.map { it.collection.id })
+        assertEquals(2, feed.shelves.single().videos.size)
     }
 
     @Test
@@ -90,17 +126,17 @@ class GetHomeFeedUseCaseTest {
 
         val feed = homeFeed()(CHILD).first()
 
-        val everywhere = feed.shelves.flatMap { it.videos } + feed.newToday + listOfNotNull(feed.continueWatching?.video)
-        assertTrue(everywhere.none { it.youtubeId == "L2" || it.youtubeId == "N1" })
+        assertTrue(feed.everythingShown().none { it == "L2" || it == "N1" })
         assertNull(feed.continueWatching)
     }
 
     @Test
     fun feedUpdatesWhenAParentHidesAVideo() = runTest {
         homeFeed()(CHILD).test {
-            assertTrue(awaitItem().shelves[0].videos.any { it.youtubeId == "L1" })
+            // 10 visible videos, 3 + 3 + 2 on Home: L1 (first of the first shelf) is always shown.
+            assertTrue("L1" in awaitItem().everythingShown())
             hidden.hide(HiddenVideo(CHILD, "L1", start))
-            assertTrue(awaitItem().shelves[0].videos.none { it.youtubeId == "L1" })
+            assertTrue("L1" !in awaitItem().everythingShown())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -141,10 +177,11 @@ class GetHomeFeedUseCaseTest {
     }
 
     @Test
-    fun newToday_isAtMostSixVisibleVideos() = runTest {
+    fun newToday_isThreeVisibleVideos() = runTest {
         val feed = homeFeed()(CHILD).first()
-        val visible = feed.shelves.flatMap { it.videos }.map { it.youtubeId }.toSet()
+        val visible = setOf("L1", "L2", "L3", "L4", "L5", "N1", "N2", "S1", "S2", "S3")
 
+        assertEquals(3, GetHomeFeedUseCase.NEW_TODAY_SIZE)
         assertEquals(GetHomeFeedUseCase.NEW_TODAY_SIZE, feed.newToday.size)
         assertTrue(feed.newToday.all { it.youtubeId in visible })
         assertEquals(feed.newToday.distinct(), feed.newToday)
@@ -185,6 +222,72 @@ class GetHomeFeedUseCaseTest {
 
         history.events.value += event("C", kuwait(2026, 11, 3, 13, 0), watchedSec = 180, completed = true)
         assertEquals(setOf("A", "B", "C"), homeFeed(profile, catalog)(CHILD).first().newToday.map { it.youtubeId }.toSet())
+    }
+
+    @Test
+    fun shelf_isTheNextUnfinishedVideosInCollectionOrder() {
+        val videos = (1..5).map { video("L$it", "letters", it) }
+        val shelf = GetHomeFeedUseCase.shelf(collection("letters", 1), videos, setOf("L1", "L3"), emptySet())
+
+        assertEquals(listOf("L2", "L4", "L5"), shelf?.videos?.map { it.youtubeId })
+    }
+
+    @Test
+    fun shelf_topsUpWithFinishedVideosFromTheStart_andStartsOverWhenAllAreFinished() {
+        val letters = collection("letters", 1)
+        val videos = (1..5).map { video("L$it", "letters", it) }
+        val ids = { finished: Set<String> ->
+            GetHomeFeedUseCase.shelf(letters, videos, finished, emptySet())?.videos?.map { it.youtubeId }
+        }
+
+        assertEquals(listOf("L5", "L1", "L2"), ids(setOf("L1", "L2", "L3", "L4")))
+        assertEquals(listOf("L1", "L2", "L3"), ids(videos.map { it.youtubeId }.toSet()))
+    }
+
+    @Test
+    fun shelf_skipsVideosShownElsewhere_andIsNullWhenNothingIsLeft() {
+        val letters = collection("letters", 1)
+        val videos = (1..5).map { video("L$it", "letters", it) }
+
+        assertEquals(
+            listOf("L3", "L4", "L5"),
+            GetHomeFeedUseCase.shelf(letters, videos, emptySet(), setOf("L1", "L2"))?.videos?.map { it.youtubeId },
+        )
+        assertNull(GetHomeFeedUseCase.shelf(letters, videos.take(2), emptySet(), setOf("L1", "L2")))
+        assertNull(GetHomeFeedUseCase.shelf(letters, emptyList(), emptySet(), emptySet()))
+    }
+
+    @Test
+    fun shelves_countVideosFinishedLongAgo() = runTest {
+        // Finished 30 days ago: outside the 7-day window, but still done for the shelf.
+        history.events.value = listOf(event("L1", kuwait(2026, 10, 5, 10, 0), watchedSec = 180, completed = true))
+
+        val feed = homeFeed()(CHILD).first()
+
+        val expected = expectedShelves(
+            feed,
+            linkedMapOf(
+                "letters" to listOf("L2", "L3", "L4", "L5", "L1"),
+                "numbers" to listOf("N1", "N2"),
+                "stories" to listOf("S1", "S2", "S3"),
+            ),
+        )
+        assertEquals(expected, feed.shelfIds())
+    }
+
+    @Test
+    fun nothingAppearsTwiceOnHome() = runTest {
+        history.events.value = listOf(
+            event("S1", start - 2.hours, watchedSec = 90),
+            event("L1", start - 3.hours, watchedSec = 180, completed = true),
+        )
+
+        val feed = homeFeed()(CHILD).first()
+        val shown = feed.everythingShown()
+
+        assertEquals("S1", feed.continueWatching?.video?.youtubeId)
+        assertEquals(shown.distinct(), shown)
+        assertTrue(feed.shelves.all { it.videos.size <= GetHomeFeedUseCase.SHELF_SIZE })
     }
 
     @Test
