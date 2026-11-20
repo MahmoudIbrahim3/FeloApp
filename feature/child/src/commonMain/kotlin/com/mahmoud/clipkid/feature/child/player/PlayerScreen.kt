@@ -62,9 +62,6 @@ import org.jetbrains.compose.resources.stringResource
 /** YouTube's minimum embedded player viewport (RMF): 200×200. */
 private val MIN_PLAYER_SIZE = 200.dp
 
-/** Below this height in landscape we're on a phone: only the back button and the player show. */
-private val PHONE_LANDSCAPE_MAX_HEIGHT = 500.dp
-
 /** Player screen: route wiring. */
 @Composable
 fun PlayerRoute(
@@ -96,11 +93,12 @@ fun PlayerScreen(
             .statusBarsPadding()
             .navigationBarsPadding(),
     ) {
-        val phoneLandscape = maxWidth > maxHeight && maxHeight < PHONE_LANDSCAPE_MAX_HEIGHT
-        val compactWidth = maxWidth < 600.dp
+        // Landscape (phone or tablet): the player fills the height under the top bar, and the
+        // top bar carries the title and the favorite button instead of the card under the player.
         // Read here: inside the Column below, BoxWithConstraints' maxWidth/maxHeight aren't reachable
         // implicitly (both scopes are @LayoutScopeMarker).
-        val portrait = maxHeight > maxWidth
+        val landscape = maxWidth > maxHeight
+        val compactWidth = maxWidth < 600.dp
         Column(Modifier.fillMaxSize()) {
             Row(
                 Modifier
@@ -115,6 +113,21 @@ fun PlayerScreen(
                     tone = IconButtonTone.OnDark,
                     compact = true,
                 )
+                if (landscape && state is PlayerUiState.Ready) {
+                    Spacer(Modifier.width(ClipKidTheme.spacing.md))
+                    Text(
+                        text = state.video.titleAr,
+                        style = ClipKidTheme.typography.titleMedium,
+                        color = colors.onDark,
+                        maxLines = 1,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Spacer(Modifier.width(ClipKidTheme.spacing.md))
+                    FavoriteToggle(
+                        isFavorite = state.isFavorite,
+                        onToggle = { onEvent(PlayerEvent.ToggleFavorite) },
+                    )
+                }
             }
 
             when (state) {
@@ -123,8 +136,8 @@ fun PlayerScreen(
                 is PlayerUiState.Ready -> PlayerBody(
                     state = state,
                     onEvent = onEvent,
-                    phoneLandscape = phoneLandscape,
-                    showRotateHint = !phoneLandscape && compactWidth && portrait,
+                    landscape = landscape,
+                    showRotateHint = !landscape && compactWidth,
                 )
             }
         }
@@ -145,7 +158,7 @@ private fun CenteredMessage(text: String) {
 private fun ColumnScope.PlayerBody(
     state: PlayerUiState.Ready,
     onEvent: (PlayerEvent) -> Unit,
-    phoneLandscape: Boolean,
+    landscape: Boolean,
     showRotateHint: Boolean,
 ) {
     val slot = state.player
@@ -158,8 +171,8 @@ private fun ColumnScope.PlayerBody(
 
     // Same place in the tree in portrait and landscape, so rotating never reloads the player.
     PlayerFrame(
-        fillHeight = phoneLandscape,
-        modifier = if (phoneLandscape) Modifier.weight(1f).fillMaxWidth() else Modifier.fillMaxWidth(),
+        fillHeight = landscape,
+        modifier = if (landscape) Modifier.weight(1f).fillMaxWidth() else Modifier.fillMaxWidth(),
     ) {
         val problem = slot.problem
         when {
@@ -174,7 +187,7 @@ private fun ColumnScope.PlayerBody(
         }
     }
 
-    if (!phoneLandscape) {
+    if (!landscape) {
         Column(
             Modifier
                 .weight(1f)

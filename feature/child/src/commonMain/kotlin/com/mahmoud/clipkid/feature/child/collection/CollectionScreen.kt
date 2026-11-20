@@ -99,9 +99,9 @@ private fun CollectionEmpty(onEvent: (CollectionEvent) -> Unit) {
 @Composable
 private fun CollectionBody(page: CollectionPage, onEvent: (CollectionEvent) -> Unit) {
     val gutter = ClipKidTheme.spacing.gutter
-    // Phone: one full-width card per row (YouTube Kids style). Tablet: two per row,
+    // Phone: one full-width card per row (YouTube Kids style). Tablet: three per row, like Home,
     // so a 16:9 thumbnail never fills the whole screen height.
-    val columns = if (LocalWindowSize.current == WindowSize.Expanded) 2 else 1
+    val columns = if (LocalWindowSize.current == WindowSize.Expanded) 3 else 1
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns),
