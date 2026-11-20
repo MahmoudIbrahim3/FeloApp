@@ -7,10 +7,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,6 +20,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -44,6 +47,8 @@ import org.jetbrains.compose.resources.stringResource
 /**
  * Collection cover: unified color tile with a glyph or an icon — never a thumbnail.
  * The tile is [size] square (84dp default, ≥ 56dp child touch target) with the title under it.
+ * The whole cover is exactly [size] wide, so a row of covers is evenly spaced whatever the
+ * titles; a title longer than the tile ends with "…".
  */
 @Composable
 fun CollectionCover(
@@ -56,6 +61,7 @@ fun CollectionCover(
     val interaction = remember { MutableInteractionSource() }
     Column(
         modifier = modifier
+            .width(size)
             .pressScale(interaction)
             .clickable(interactionSource = interaction, indication = null, role = Role.Button, onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -63,7 +69,15 @@ fun CollectionCover(
         CoverTile(style = style, size = size)
         if (title != null) {
             Spacer(Modifier.height(ClipKidTheme.spacing.xs))
-            Text(text = title, style = ClipKidTheme.typography.labelLarge, color = ClipKidTheme.colors.ink, maxLines = 1)
+            Text(
+                text = title,
+                style = ClipKidTheme.typography.labelLarge,
+                color = ClipKidTheme.colors.ink,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }

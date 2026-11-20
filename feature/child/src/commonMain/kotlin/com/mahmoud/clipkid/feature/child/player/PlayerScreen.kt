@@ -1,7 +1,6 @@
 package com.mahmoud.clipkid.feature.child.player
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -18,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,7 +25,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mahmoud.clipkid.core.designsystem.component.Icon
@@ -181,7 +183,7 @@ private fun ColumnScope.PlayerBody(
         ) {
             Spacer(Modifier.height(ClipKidTheme.spacing.lg))
             ProgressSection(playerState, state.video.durationSec)
-            Spacer(Modifier.height(ClipKidTheme.spacing.xl))
+            Spacer(Modifier.height(ClipKidTheme.spacing.lg))
             VideoInfo(state, onEvent)
             Spacer(Modifier.weight(1f))
             if (showRotateHint) RotateHint()
@@ -300,24 +302,36 @@ private fun ProgressSection(player: YouTubePlayerState, catalogDurationSec: Int)
     }
 }
 
+/**
+ * The video's card under the progress bar: collection chip and title on the start side (right in
+ * RTL), favorite toggle on the end side, both from the top so a 2–3 line title never pushes the
+ * heart around.
+ */
 @Composable
 private fun VideoInfo(state: PlayerUiState.Ready, onEvent: (PlayerEvent) -> Unit) {
     val colors = ClipKidTheme.colors
+    val spacing = ClipKidTheme.spacing
     val cover = state.collectionStyle
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(colors.darkSurface, ClipKidTheme.shapes.card)
+            .padding(spacing.lg),
+        verticalAlignment = Alignment.Top,
+    ) {
         Column(
             Modifier.weight(1f),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.xs),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(spacing.sm),
         ) {
             Box(
                 Modifier
                     .background(Color(cover.bg), ClipKidTheme.shapes.pill)
-                    .padding(horizontal = ClipKidTheme.spacing.md, vertical = ClipKidTheme.spacing.xxs),
+                    .padding(horizontal = spacing.md, vertical = spacing.xs),
             ) {
                 Text(
                     text = state.collectionTitle,
-                    style = ClipKidTheme.typography.labelMedium,
+                    style = ClipKidTheme.typography.labelLarge,
                     color = Color(cover.fg),
                     maxLines = 1,
                 )
@@ -326,27 +340,38 @@ private fun VideoInfo(state: PlayerUiState.Ready, onEvent: (PlayerEvent) -> Unit
                 text = state.video.titleAr,
                 style = ClipKidTheme.typography.titleLarge,
                 color = colors.onDark,
-                maxLines = 2,
+                maxLines = 3,
+                modifier = Modifier.fillMaxWidth(),
             )
         }
-        Spacer(Modifier.width(ClipKidTheme.spacing.md))
-        val favoriteLabel = stringResource(
-            if (state.isFavorite) Res.string.child_favorite_remove else Res.string.child_favorite_add,
+        Spacer(Modifier.width(spacing.md))
+        FavoriteToggle(
+            isFavorite = state.isFavorite,
+            onToggle = { onEvent(PlayerEvent.ToggleFavorite) },
         )
-        Box(
-            Modifier
-                .size(56.dp)
-                .background(colors.darkSurface, ClipKidTheme.shapes.iconButton)
-                .clickable { onEvent(PlayerEvent.ToggleFavorite) },
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                icon = if (state.isFavorite) ClipKidIcons.HeartFilled else ClipKidIcons.Heart,
-                contentDescription = favoriteLabel,
-                tint = if (state.isFavorite) colors.danger else colors.onDark,
-                size = 26.dp,
-            )
-        }
+    }
+}
+
+/** 56dp heart button (primary child action): filled red on a soft red tile when it's a favorite. */
+@Composable
+private fun FavoriteToggle(isFavorite: Boolean, onToggle: () -> Unit) {
+    val colors = ClipKidTheme.colors
+    val shape = ClipKidTheme.shapes.iconButton
+    val label = stringResource(if (isFavorite) Res.string.child_favorite_remove else Res.string.child_favorite_add)
+    Box(
+        Modifier
+            .size(ClipKidTheme.sizes.childTouchTarget)
+            .clip(shape)
+            .background(if (isFavorite) colors.danger.copy(alpha = 0.18f) else colors.darkSurfaceHigh)
+            .toggleable(value = isFavorite, role = Role.Switch, onValueChange = { onToggle() }),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            icon = if (isFavorite) ClipKidIcons.HeartFilled else ClipKidIcons.Heart,
+            contentDescription = label,
+            tint = if (isFavorite) colors.danger else colors.onDark,
+            size = 26.dp,
+        )
     }
 }
 

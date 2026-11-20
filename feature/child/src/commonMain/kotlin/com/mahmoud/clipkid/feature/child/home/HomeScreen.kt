@@ -38,7 +38,6 @@ import com.mahmoud.clipkid.core.designsystem.component.Icon
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonLarge
 import com.mahmoud.clipkid.core.designsystem.component.IconButtonTone
 import com.mahmoud.clipkid.core.designsystem.component.PrimaryButton
-import com.mahmoud.clipkid.core.designsystem.component.QuotaDots
 import com.mahmoud.clipkid.core.designsystem.component.QuotaPill
 import com.mahmoud.clipkid.core.designsystem.component.ShelfHeader
 import com.mahmoud.clipkid.core.designsystem.component.Text
@@ -56,7 +55,6 @@ import com.mahmoud.clipkid.feature.child.common.ChildTab
 import com.mahmoud.clipkid.feature.child.common.ChildTabsScaffold
 import com.mahmoud.clipkid.feature.child.common.WideVideoCard
 import com.mahmoud.clipkid.feature.child.common.quotaLabel
-import com.mahmoud.clipkid.feature.child.common.remainingLabel
 import com.mahmoud.clipkid.feature.child.resources.Res
 import com.mahmoud.clipkid.feature.child.resources.child_greeting
 import com.mahmoud.clipkid.feature.child.resources.child_home_continue_label
@@ -65,7 +63,6 @@ import com.mahmoud.clipkid.feature.child.resources.child_home_empty_title
 import com.mahmoud.clipkid.feature.child.resources.child_home_lock_description
 import com.mahmoud.clipkid.feature.child.resources.child_home_new_today
 import com.mahmoud.clipkid.feature.child.resources.child_home_play
-import com.mahmoud.clipkid.feature.child.resources.child_home_tablet_quota_title
 import com.mahmoud.clipkid.feature.child.resources.child_loading
 import org.jetbrains.compose.resources.stringResource
 
@@ -112,7 +109,8 @@ fun HomeLoading(modifier: Modifier = Modifier) {
  * covers (the only sideways row), the continue card, today's 3 picks, then one section per
  * collection (its name, "الكل", and its next 3 videos). No video appears twice, and the list
  * ends after the last section (no infinite feed). Tablet: the same order in three columns, so
- * every 3-video section is one row, with the wide continue card beside the quota card on top.
+ * every 3-video section is one row; the header stays one line and the continue card is a short
+ * horizontal one, so at least two rows of videos fit on screen.
  */
 @Composable
 fun HomeContent(
@@ -124,16 +122,23 @@ fun HomeContent(
     val gutter = ClipKidTheme.spacing.gutter
     val spacing = ClipKidTheme.spacing
     val fullLine: LazyGridItemSpanScope.() -> GridItemSpan = { GridItemSpan(maxLineSpan) }
+    // Rows are 12dp apart; every block except a section title adds 12dp under itself (24dp
+    // between blocks), and a section title adds 8dp above itself. So a title sits close to
+    // its own videos (12dp) and farther from what comes before it (32dp).
+    val blockGap = Modifier.padding(bottom = spacing.sm)
+    val titleGap = Modifier.padding(top = spacing.xs)
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(if (expanded) 3 else 1),
         modifier = modifier.fillMaxSize().statusBarsPadding(),
         contentPadding = PaddingValues(start = gutter, end = gutter, top = spacing.md, bottom = spacing.xxl),
         horizontalArrangement = Arrangement.spacedBy(spacing.lg),
-        verticalArrangement = Arrangement.spacedBy(spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(spacing.sm),
     ) {
         item(key = "top", span = fullLine) {
-            if (expanded) TabletTop(state, onEvent) else PhoneHeader(state, onEvent)
+            // Tablet: the rail already shows the avatar and the lock, so the line keeps
+            // only the greeting and the quota pill.
+            HomeHeader(state, onEvent, showAvatarAndLock = !expanded, modifier = blockGap)
         }
 
         if (state.isEmpty) {
@@ -150,7 +155,7 @@ fun HomeContent(
         item(key = "collections", span = fullLine) {
             // Scrolls edge to edge, so it ignores the grid's side padding.
             LazyRow(
-                modifier = Modifier.bleedHorizontally(gutter),
+                modifier = blockGap.bleedHorizontally(gutter),
                 contentPadding = PaddingValues(horizontal = gutter),
                 horizontalArrangement = Arrangement.spacedBy(spacing.md),
             ) {
@@ -164,14 +169,19 @@ fun HomeContent(
             }
         }
 
-        if (!expanded) {
-            state.continueWatching?.let { cw ->
-                item(key = "continue", span = fullLine) {
+        state.continueWatching?.let { cw ->
+            item(key = "continue", span = fullLine) {
+                val onClick = { onEvent(HomeEvent.VideoClicked(cw.video.youtubeId, WatchSource.ContinueWatching)) }
+                if (expanded) {
+                    // A full-width 16:9 card would fill a tablet screen: a short horizontal one instead.
+                    ContinueHeroWide(cw = cw, onClick = onClick, modifier = blockGap.fillMaxWidth())
+                } else {
                     WideVideoCard(
                         video = cw.video,
                         progress = cw.progress,
-                        onClick = { onEvent(HomeEvent.VideoClicked(cw.video.youtubeId, WatchSource.ContinueWatching)) },
+                        onClick = onClick,
                         titleTrailing = { ContinueChip() },
+                        modifier = blockGap,
                     )
                 }
             }
@@ -179,12 +189,13 @@ fun HomeContent(
 
         if (state.newToday.isNotEmpty()) {
             item(key = "new-today-title", span = fullLine) {
-                ShelfHeader(title = stringResource(Res.string.child_home_new_today))
+                ShelfHeader(title = stringResource(Res.string.child_home_new_today), modifier = titleGap)
             }
             gridItems(state.newToday, key = { it.youtubeId }) { video ->
                 WideVideoCard(
                     video = video,
                     onClick = { onEvent(HomeEvent.VideoClicked(video.youtubeId, WatchSource.NewToday)) },
+                    modifier = blockGap,
                 )
             }
         }
@@ -196,12 +207,14 @@ fun HomeContent(
                     title = collection.titleAr,
                     accentColor = Color(collection.cover.fg),
                     onSeeAll = { onEvent(HomeEvent.CollectionClicked(collection.id)) },
+                    modifier = titleGap,
                 )
             }
             gridItems(shelf.videos, key = { "${collection.id}/${it.youtubeId}" }) { video ->
                 WideVideoCard(
                     video = video,
                     onClick = { onEvent(HomeEvent.VideoClicked(video.youtubeId, WatchSource.Home)) },
+                    modifier = blockGap,
                 )
             }
         }
@@ -216,16 +229,24 @@ private fun Modifier.bleedHorizontally(bleed: Dp): Modifier = layout { measurabl
     layout(constraints.maxWidth, placeable.height) { placeable.place(-bleedPx, 0) }
 }
 
+/** One line: avatar, greeting, quota pill and lock (avatar and lock only when no rail shows them). */
 @Composable
-private fun PhoneHeader(state: HomeUiState.Content, onEvent: (HomeEvent) -> Unit) {
+private fun HomeHeader(
+    state: HomeUiState.Content,
+    onEvent: (HomeEvent) -> Unit,
+    showAvatarAndLock: Boolean,
+    modifier: Modifier = Modifier,
+) {
     Row(
-        Modifier.fillMaxWidth(),
+        modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        ChildAvatar(state.childName, state.avatarColor, size = 56.dp)
-        Spacer(Modifier.width(ClipKidTheme.spacing.md))
+        if (showAvatarAndLock) {
+            ChildAvatar(state.childName, state.avatarColor, size = 56.dp)
+            Spacer(Modifier.width(ClipKidTheme.spacing.md))
+        }
         Text(
-            text = stringResource(Res.string.child_greeting),
+            text = stringResource(Res.string.child_greeting, state.childName),
             style = ClipKidTheme.typography.displayMedium,
             color = ClipKidTheme.colors.ink,
             modifier = Modifier.weight(1f),
@@ -236,63 +257,16 @@ private fun PhoneHeader(state: HomeUiState.Content, onEvent: (HomeEvent) -> Unit
             total = state.quota.total,
             label = quotaLabel(state.quota),
         )
-        Spacer(Modifier.width(ClipKidTheme.spacing.sm))
-        IconButtonLarge(
-            icon = ClipKidIcons.Lock,
-            contentDescription = stringResource(Res.string.child_home_lock_description),
-            onClick = { onEvent(HomeEvent.LockClicked) },
-            tone = IconButtonTone.Surface,
-            compact = true,
-        )
-    }
-}
-
-@Composable
-private fun TabletTop(state: HomeUiState.Content, onEvent: (HomeEvent) -> Unit) {
-    Row(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.md),
-    ) {
-        state.continueWatching?.let { cw ->
-            ContinueHeroWide(
-                cw = cw,
-                onClick = { onEvent(HomeEvent.VideoClicked(cw.video.youtubeId, WatchSource.ContinueWatching)) },
-                modifier = Modifier.weight(2f),
+        if (showAvatarAndLock) {
+            Spacer(Modifier.width(ClipKidTheme.spacing.sm))
+            IconButtonLarge(
+                icon = ClipKidIcons.Lock,
+                contentDescription = stringResource(Res.string.child_home_lock_description),
+                onClick = { onEvent(HomeEvent.LockClicked) },
+                tone = IconButtonTone.Surface,
+                compact = true,
             )
         }
-        QuotaCard(state, Modifier.weight(1f))
-    }
-}
-
-@Composable
-private fun QuotaCard(state: HomeUiState.Content, modifier: Modifier = Modifier) {
-    val colors = ClipKidTheme.colors
-    val shape = ClipKidTheme.shapes.card
-    Column(
-        modifier
-            .background(colors.surface, shape)
-            .padding(ClipKidTheme.spacing.lg),
-        verticalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.sm),
-    ) {
-        Text(
-            text = stringResource(Res.string.child_greeting),
-            style = ClipKidTheme.typography.displayMedium,
-            color = colors.ink,
-            maxLines = 1,
-        )
-        Text(
-            text = stringResource(Res.string.child_home_tablet_quota_title),
-            style = ClipKidTheme.typography.bodyMedium,
-            color = colors.muted,
-        )
-        if (state.quota.unit == com.mahmoud.clipkid.core.model.QuotaUnit.Videos) {
-            QuotaDots(used = state.quota.used, total = state.quota.total)
-        }
-        Text(
-            text = remainingLabel(state.quota),
-            style = ClipKidTheme.typography.titleMedium,
-            color = colors.ink,
-        )
     }
 }
 

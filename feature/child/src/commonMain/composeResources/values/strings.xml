@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Home -->
-    <string name="child_greeting">أهلاً يا بطل!</string>
+    <string name="child_greeting">أهلاً يا %1$s!</string>
     <string name="child_home_lock_description">للأهل بس</string>
     <string name="child_home_new_today">جديد النهارده</string>
     <string name="child_home_continue_label">كمّل اتفرج</string>
     <string name="child_home_play">شغّل</string>
-    <string name="child_home_tablet_quota_title">فيديوهات النهارده</string>
     <string name="child_home_empty_title">مفيش فيديوهات دلوقتي</string>
     <string name="child_home_empty_message">جرّب تاني بعد شوية.</string>
     <string name="child_loading">بنحمّل الفيديوهات...</string>
