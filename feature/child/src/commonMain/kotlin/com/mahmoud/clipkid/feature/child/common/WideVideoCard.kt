@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.mahmoud.clipkid.core.designsystem.component.VideoCard
-import com.mahmoud.clipkid.core.designsystem.component.YouTubeBadgePlaceholder
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.model.Video
 
@@ -26,7 +25,6 @@ internal fun WideVideoCard(
         thumbnailUrl = video.thumbnailUrl,
         durationSec = video.durationSec,
         onClick = onClick,
-        youtubeBadge = { YouTubeBadgePlaceholder() },
         progress = progress,
         aspectRatio = 16f / 9f,
         thumbnailShape = ClipKidTheme.shapes.thumbnail,

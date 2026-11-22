@@ -1,0 +1,13 @@
+YouTube Icon
+
+YouTube and the YouTube Icon are trademarks of Google LLC. They are not covered by this
+project's license and are used only as YouTube attribution, as the YouTube API Services
+Branding Guidelines require:
+https://developers.google.com/youtube/terms/branding-guidelines
+
+composeResources/drawable/yt_icon_red.xml is the official "Core YouTube icon" (Digital, 01 Red)
+from YouTube's brand resources (https://brand.youtube/). Its paths and colours were copied
+unmodified from design/youtube-brand/Digital/01 Red/yt_icon_red_digital.ai, and the viewport is
+the official artboard, clear space included.
+
+Do not recolour, tint, redraw, crop or animate it. Show it on a solid background.

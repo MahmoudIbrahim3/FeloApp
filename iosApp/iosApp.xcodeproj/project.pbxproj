@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		0A0A7DF18DC495CFEFD6F1CF /* Exceptions for "iosApp" folder in "iosApp" target */ = {
+		0A0A7DF18DC495CFEFD6F1CF /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -24,13 +24,21 @@
 		59C3CB45CE1A822FCFFDAF81 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0A0A7DF18DC495CFEFD6F1CF /* Exceptions for "iosApp" folder in "iosApp" target */,
+				0A0A7DF18DC495CFEFD6F1CF /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
 			);
 			path = iosApp;
 			sourceTree = "<group>";
 		};
 		BCD26C96B64BF0095E9FF0AB /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
 			path = Configuration;
 			sourceTree = "<group>";
 		};
@@ -47,6 +55,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		411D73E0CA79F7A0E542C266 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5DD7940772810833DCB03EF8 /* ClipKid.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		E52AA0D22F576A8C6B9CC0F2 = {
 			isa = PBXGroup;
 			children = (
@@ -54,14 +70,6 @@
 				59C3CB45CE1A822FCFFDAF81 /* iosApp */,
 				411D73E0CA79F7A0E542C266 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		411D73E0CA79F7A0E542C266 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				5DD7940772810833DCB03EF8 /* ClipKid.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

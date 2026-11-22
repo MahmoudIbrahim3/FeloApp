@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
@@ -41,19 +42,17 @@ import com.mahmoud.clipkid.core.designsystem.resources.ds_duration
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_remove_favorite
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_video_letter_baa
 import com.mahmoud.clipkid.core.designsystem.resources.showcase_video_moon
-import com.mahmoud.clipkid.core.designsystem.resources.showcase_youtube_placeholder
 import com.mahmoud.clipkid.core.designsystem.text.formatDuration
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * Video card: real YouTube thumbnail, YouTube attribution, duration badge,
- * optional watch progress, and the title underneath.
+ * Video card: real YouTube thumbnail, the official YouTube attribution (always drawn, see
+ * [VideoThumbnail]), duration badge, optional watch progress, and the title underneath.
  *
  * Layout in RTL (matches HomeFeed / Favorites): attribution top-end, optional [action]
  * (e.g. favorite heart) top-start, duration bottom-start, progress fills from the start edge.
  *
- * @param youtubeBadge YouTube attribution. Must render the official YouTube brand asset (CLAUDE.md rule 6).
  * @param progress 0..1 watch progress, or null to hide the bar.
  * @param placeholderColor background shown while the thumbnail loads or when [thumbnailUrl] is null.
  * @param supportingContent optional content under the title (e.g. a collection tag).
@@ -67,7 +66,6 @@ fun VideoCard(
     thumbnailUrl: String?,
     durationSec: Int,
     onClick: () -> Unit,
-    youtubeBadge: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     progress: Float? = null,
     placeholderColor: Color = ClipKidTheme.colors.thumbnailPlaceholder,
@@ -91,7 +89,6 @@ fun VideoCard(
         VideoThumbnail(
             thumbnailUrl = thumbnailUrl,
             durationSec = durationSec,
-            youtubeBadge = youtubeBadge,
             progress = progress,
             placeholderColor = placeholderColor,
             action = action,
@@ -123,18 +120,23 @@ fun VideoCard(
 /**
  * The thumbnail part of [VideoCard], reusable by list rows, Up Next and the hero card.
  * Size comes from [modifier].
+ *
+ * Always draws [YouTubeAttribution] at the top-end corner: every YouTube thumbnail carries the
+ * official YouTube Icon (CLAUDE.md rule 6), so no caller can forget it.
+ *
+ * @param attributionHeight height of the YouTube attribution chip; larger cards may pass more.
  */
 @Composable
 fun VideoThumbnail(
     thumbnailUrl: String?,
     durationSec: Int?,
-    youtubeBadge: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     progress: Float? = null,
     placeholderColor: Color = ClipKidTheme.colors.thumbnailPlaceholder,
     shape: Shape = ClipKidTheme.shapes.cardSmall,
     action: (@Composable () -> Unit)? = null,
     center: (@Composable BoxScope.() -> Unit)? = null,
+    attributionHeight: Dp = DefaultYouTubeAttributionHeight,
 ) {
     val spacing = ClipKidTheme.spacing
     Box(
@@ -158,7 +160,10 @@ fun VideoThumbnail(
             )
         }
         center?.invoke(this)
-        Box(Modifier.align(Alignment.TopEnd).padding(spacing.xs)) { youtubeBadge() }
+        YouTubeAttribution(
+            height = attributionHeight,
+            modifier = Modifier.align(Alignment.TopEnd).padding(spacing.xs),
+        )
         if (action != null) {
             Box(Modifier.align(Alignment.TopStart).padding(spacing.xs)) { action() }
         }
@@ -206,26 +211,6 @@ fun DurationBadge(durationSec: Int, modifier: Modifier = Modifier) {
 
 // region Showcase
 
-/**
- * TEMPORARY stand-in for the YouTube attribution, used by showcases and the gallery only.
- * Replace with the official YouTube brand asset before any screen ships (CLAUDE.md rule 6).
- */
-@Composable
-fun YouTubeBadgePlaceholder() {
-    Box(
-        Modifier
-            .background(ClipKidTheme.colors.badgeScrim, ClipKidTheme.shapes.badge)
-            .padding(horizontal = ClipKidTheme.spacing.xs, vertical = 2.dp),
-    ) {
-        Text(
-            text = stringResource(Res.string.showcase_youtube_placeholder),
-            style = ClipKidTheme.typography.badge,
-            color = ClipKidTheme.colors.onDark,
-            maxLines = 1,
-        )
-    }
-}
-
 @Composable
 private fun FavoriteHeart() {
     Box(
@@ -258,7 +243,6 @@ fun VideoCardShowcase() {
                 thumbnailUrl = null,
                 durationSec = 220,
                 onClick = {},
-                youtubeBadge = { YouTubeBadgePlaceholder() },
                 modifier = Modifier.width(160.dp),
             )
             VideoCard(
@@ -268,7 +252,6 @@ fun VideoCardShowcase() {
                 progress = 0.45f,
                 placeholderColor = Color(0xFFD8CFC6),
                 onClick = {},
-                youtubeBadge = { YouTubeBadgePlaceholder() },
                 action = { FavoriteHeart() },
                 modifier = Modifier.width(160.dp),
             )
@@ -279,7 +262,6 @@ fun VideoCardShowcase() {
             durationSec = 3723,
             progress = 0.7f,
             onClick = {},
-            youtubeBadge = { YouTubeBadgePlaceholder() },
             aspectRatio = 2f,
             modifier = Modifier.fillMaxWidth(),
         )

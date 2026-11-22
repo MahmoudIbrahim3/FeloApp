@@ -70,7 +70,7 @@
     <string name="act_subtitle">%1$s · آخر 7 أيام</string>
     <string name="act_subtitle_today">%1$s · النهارده</string>
     <string name="act_week_locked_title">شوف الأسبوع كله لكل طفل</string>
-    <string name="act_week_locked_message">اعرف كل يوم في آخر 7 أيام اتفرج كام فيديو وكام دقيقة، مع ClipKid كامل.</string>
+    <string name="act_week_locked_message">اعرف كل يوم في آخر 7 أيام اتفرج كام فيديو وكام دقيقة، مع فيلو كامل.</string>
     <string name="act_week_locked_button">اعرف أكتر</string>
     <string name="act_avg_label">متوسط اليوم</string>
     <string name="act_avg_value">%1$s دقيقة</string>
@@ -106,7 +106,7 @@
     <!-- Paywall (Paywall.png). Every price comes from the store; %1$s is always store-formatted. -->
     <string name="paywall_close">اقفل</string>
     <string name="paywall_restore">استرجاع الاشتراك</string>
-    <string name="paywall_badge">ClipKid كامل</string>
+    <string name="paywall_badge">فيلو كامل</string>
     <string name="paywall_title">تابع ولادك كلهم بسهولة</string>
     <string name="paywall_benefit_children">لحد %1$s أطفال، كل واحد بإعداداته</string>
     <string name="paywall_benefit_activity">سجل مشاهدة الأسبوع كله لكل طفل</string>
@@ -147,8 +147,8 @@
     <string name="paywall_msg_not_available">الباقة دي مش متاحة دلوقتي. جرّب تاني بعدين.</string>
     <string name="paywall_msg_already_owned">الحساب ده مشترك بالفعل. دوس على «استرجاع الاشتراك».</string>
     <string name="paywall_msg_failed">حصلت مشكلة. جرّب تاني.</string>
-    <string name="paywall_subscribed_title">إنت مشترك في ClipKid كامل</string>
-    <string name="paywall_welcome_title">أهلاً بيك في ClipKid كامل!</string>
+    <string name="paywall_subscribed_title">إنت مشترك في فيلو كامل</string>
+    <string name="paywall_welcome_title">أهلاً بيك في فيلو كامل!</string>
     <string name="paywall_welcome_message">دلوقتي تقدر تضيف لحد %1$s أطفال وتشوف سجل الأسبوع كله لكل واحد.</string>
     <string name="paywall_trial_status">إنت في التجربة المجانية.</string>
     <string name="paywall_renews_on">بيتجدد يوم %1$s.</string>

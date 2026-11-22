@@ -1,0 +1,16 @@
+<!-- YouTube Icon (red, digital). Official YouTube brand asset, converted unmodified from
+     design/youtube-brand/Digital/01 Red/yt_icon_red_digital.ai (paths and colours copied as-is).
+     The viewport is the official artboard, so it includes YouTube's clear space.
+     YouTube is a trademark of Google LLC. Never tint, recolour or redraw. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28.016dp"
+    android:height="24dp"
+    android:viewportWidth="602.187"
+    android:viewportHeight="515.868">
+    <path
+        android:fillColor="#FFFF0033"
+        android:pathData="M261.556,317.457L364.383,257.789L261.556,198.411ZM146.276,388.422C129.186,383.787 115.862,370.174 110.938,353.374C102.828,322.381 102.828,257.789 102.828,257.789C102.828,257.789 102.828,193.197 110.938,162.494C115.862,145.405 129.186,132.08 146.276,127.446C176.979,119.046 300.949,119.046 300.949,119.046C300.949,119.046 425.209,119.046 455.913,127.446C473.292,132.08 486.326,145.405 490.961,162.494C499.36,193.197 499.36,257.789 499.36,257.789C499.36,257.789 499.36,322.381 490.961,353.374C486.326,370.174 473.292,383.787 455.913,388.422C425.209,396.822 300.949,396.822 300.949,396.822C300.949,396.822 176.979,396.822 146.276,388.422" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M261.556,317.457L364.383,257.789L261.556,198.411Z" />
+</vector>

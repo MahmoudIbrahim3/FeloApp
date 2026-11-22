@@ -149,7 +149,6 @@ fun ShelfShowcase() {
                     durationSec = duration,
                     placeholderColor = tint,
                     onClick = {},
-                    youtubeBadge = { YouTubeBadgePlaceholder() },
                     modifier = Modifier.width(160.dp),
                 )
             }
@@ -162,7 +161,6 @@ fun ShelfShowcase() {
                     durationSec = duration,
                     placeholderColor = tint,
                     onClick = {},
-                    youtubeBadge = { YouTubeBadgePlaceholder() },
                     modifier = Modifier.width(160.dp),
                 )
             }

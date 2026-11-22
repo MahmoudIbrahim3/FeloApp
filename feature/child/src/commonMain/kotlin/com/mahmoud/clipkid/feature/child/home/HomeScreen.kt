@@ -42,7 +42,6 @@ import com.mahmoud.clipkid.core.designsystem.component.QuotaPill
 import com.mahmoud.clipkid.core.designsystem.component.ShelfHeader
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.component.VideoThumbnail
-import com.mahmoud.clipkid.core.designsystem.component.YouTubeBadgePlaceholder
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.LocalWindowSize
@@ -325,7 +324,6 @@ private fun ThumbWithPlay(video: Video, progress: Float, modifier: Modifier) {
     VideoThumbnail(
         thumbnailUrl = video.thumbnailUrl,
         durationSec = video.durationSec,
-        youtubeBadge = { YouTubeBadgePlaceholder() },
         progress = progress,
         shape = ClipKidTheme.shapes.thumbnail,
         modifier = modifier,

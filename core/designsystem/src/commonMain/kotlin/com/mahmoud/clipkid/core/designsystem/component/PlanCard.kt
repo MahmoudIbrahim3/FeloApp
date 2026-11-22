@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,7 +60,7 @@ fun PlanCard(
                 .background(colors.surface)
                 .border(if (selected) 3.dp else 1.5.dp, borderColor, shape)
                 .selectable(selected = selected, enabled = enabled, role = Role.RadioButton, onClick = onClick)
-                .alpha(if (enabled) 1f else DisabledAlpha)
+                .disabledFade(enabled)
                 .padding(horizontal = ClipKidTheme.spacing.xl, vertical = ClipKidTheme.spacing.md),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(ClipKidTheme.spacing.md),

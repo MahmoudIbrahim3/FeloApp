@@ -21,10 +21,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -179,7 +179,7 @@ fun IconButtonLarge(
                 onClickLabel = contentDescription,
                 onClick = onClick,
             )
-            .alpha(if (enabled) 1f else DisabledAlpha),
+            .disabledFade(enabled),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -192,6 +192,15 @@ fun IconButtonLarge(
 }
 
 internal const val DisabledAlpha = 0.4f
+
+/**
+ * Fades a disabled control. Always the same layer, only its alpha changes: `Modifier.alpha()`
+ * adds a layer below 1f and removes it at 1f, and removing it while a parent layer (the press
+ * squish) stays could leave that parent drawing nothing, so a control that just became enabled
+ * looked invisible while still taking taps.
+ */
+internal fun Modifier.disabledFade(enabled: Boolean): Modifier =
+    graphicsLayer { alpha = if (enabled) 1f else DisabledAlpha }
 
 /** The subtle card shadow used across light surfaces in the reference screens. */
 internal fun Modifier.softShadow(shape: Shape, elevation: Dp = 2.dp): Modifier = shadow(
@@ -230,7 +239,7 @@ private fun ButtonFrame(
                 role = Role.Button,
                 onClick = onClick,
             )
-            .alpha(if (enabled) 1f else DisabledAlpha)
+            .disabledFade(enabled)
             .padding(horizontal = ClipKidTheme.spacing.md, vertical = ClipKidTheme.spacing.sm),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,

@@ -30,7 +30,6 @@ import com.mahmoud.clipkid.core.designsystem.component.EmptyState
 import com.mahmoud.clipkid.core.designsystem.component.Icon
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.component.VideoCard
-import com.mahmoud.clipkid.core.designsystem.component.YouTubeBadgePlaceholder
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.LocalWindowSize
@@ -133,7 +132,6 @@ private fun FavoriteCard(favorite: FavoriteItem, onEvent: (FavoritesEvent) -> Un
         thumbnailUrl = favorite.video.thumbnailUrl,
         durationSec = favorite.video.durationSec,
         onClick = { onEvent(FavoritesEvent.VideoClicked(favorite.video.youtubeId)) },
-        youtubeBadge = { YouTubeBadgePlaceholder() },
         modifier = Modifier.fillMaxWidth(),
         action = {
             Box(

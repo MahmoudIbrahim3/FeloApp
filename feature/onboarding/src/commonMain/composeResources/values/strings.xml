@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Welcome (Onboard.png) -->
-    <string name="onb_brand">ClipKid</string>
+    <string name="onb_brand">فيلو</string>
     <string name="onb_mosaic_letter">أ</string>
     <string name="onb_welcome_title">فيديوهات مفيدة لطفلك،\nمتنقية بإيد ولها آخر</string>
     <string name="onb_welcome_subtitle">انت اللي بتحدد يتفرج على إيه وقد إيه.</string>

@@ -31,7 +31,6 @@ import com.mahmoud.clipkid.core.designsystem.component.SecondaryButton
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.component.VideoThumbnail
 import com.mahmoud.clipkid.core.designsystem.component.WeekBarChart
-import com.mahmoud.clipkid.core.designsystem.component.YouTubeBadgePlaceholder
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.preview.ClipKidPreview
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
@@ -255,7 +254,6 @@ private fun WatchedRow(row: WatchedToday, onHide: () -> Unit) {
         VideoThumbnail(
             thumbnailUrl = row.video.thumbnailUrl,
             durationSec = null,
-            youtubeBadge = { YouTubeBadgePlaceholder() },
             modifier = Modifier.size(width = 96.dp, height = 64.dp),
         )
         Spacer(Modifier.size(ClipKidTheme.spacing.md))

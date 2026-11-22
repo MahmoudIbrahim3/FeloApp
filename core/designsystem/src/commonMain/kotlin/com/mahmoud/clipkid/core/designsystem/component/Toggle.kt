@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAbsoluteAlignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.semantics.Role
@@ -58,7 +57,7 @@ fun Toggle(
                 role = Role.Switch,
                 onValueChange = onCheckedChange,
             )
-            .alpha(if (enabled) 1f else DisabledAlpha),
+            .disabledFade(enabled),
         contentAlignment = Alignment.Center,
     ) {
         Box(

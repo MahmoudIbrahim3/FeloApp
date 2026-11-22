@@ -33,7 +33,6 @@ import com.mahmoud.clipkid.core.designsystem.component.QuotaPill
 import com.mahmoud.clipkid.core.designsystem.component.Text
 import com.mahmoud.clipkid.core.designsystem.component.VideoCard
 import com.mahmoud.clipkid.core.designsystem.component.VideoThumbnail
-import com.mahmoud.clipkid.core.designsystem.component.YouTubeBadgePlaceholder
 import com.mahmoud.clipkid.core.designsystem.icon.ClipKidIcons
 import com.mahmoud.clipkid.core.designsystem.theme.ClipKidTheme
 import com.mahmoud.clipkid.core.designsystem.theme.CoverPalettes
@@ -148,7 +147,6 @@ private fun ColumnScope.UpNextBody(state: UpNextUiState.Ready, onEvent: (UpNextE
                         thumbnailUrl = video.thumbnailUrl,
                         durationSec = video.durationSec,
                         onClick = { onEvent(UpNextEvent.ChoiceClicked(video.youtubeId)) },
-                        youtubeBadge = { YouTubeBadgePlaceholder() },
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -179,7 +177,6 @@ private fun FinishedRow(video: Video, onReplay: () -> Unit) {
         VideoThumbnail(
             thumbnailUrl = video.thumbnailUrl,
             durationSec = null,
-            youtubeBadge = { YouTubeBadgePlaceholder() },
             modifier = Modifier.width(96.dp).aspectRatio(16f / 10f),
         )
         Spacer(Modifier.width(ClipKidTheme.spacing.md))
@@ -232,7 +229,6 @@ private fun PrimaryChoice(video: Video, collectionTitle: String, onClick: () -> 
         VideoThumbnail(
             thumbnailUrl = video.thumbnailUrl,
             durationSec = video.durationSec,
-            youtubeBadge = { YouTubeBadgePlaceholder() },
             modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f),
             center = {
                 Box(

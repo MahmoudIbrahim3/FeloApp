@@ -8,6 +8,8 @@
     <string name="ds_step_of">خطوة %1$s من %2$s</string>
     <string name="ds_pin_progress">اتكتب %1$s من %2$s</string>
     <string name="ds_duration">المدة %1$s</string>
+    <!-- Screen-reader label of the official YouTube Icon on every video thumbnail. Brand name: keep in Latin letters. -->
+    <string name="ds_youtube_attribution">YouTube</string>
     <string name="ds_by_time">بالوقت</string>
     <string name="ds_minutes_short">%1$s د</string>
     <string name="ds_age_years">%1$s–%2$s سنين</string>
@@ -45,8 +47,6 @@
     <string name="showcase_video_count_fruits">نعد الفواكه لحد 5</string>
     <string name="showcase_video_letter_baa">أغنية حرف الباء</string>
     <string name="showcase_video_rabbit">الأرنب والسلحفاة</string>
-    <!-- Placeholder only: replace with the official YouTube brand asset before release (CLAUDE.md rule 6). -->
-    <string name="showcase_youtube_placeholder">YouTube</string>
     <string name="showcase_remove_favorite">شيل من المفضلة</string>
     <string name="showcase_one_left">فاضلك فيديو واحد</string>
     <string name="showcase_empty_title">لسه مفيش مفضلة</string>
@@ -60,7 +60,7 @@
     <string name="showcase_plan_monthly">شهري</string>
     <string name="showcase_plan_monthly_price">1.500 د.ك</string>
     <!-- Consent (onboarding step and paywall) -->
-    <string name="ds_consent_intro">ClipKid مش بيجمع أي بيانات عن ولادك، ومفيش تتبع ولا إعلانات مننا. بس فيه خدمتين لازم تعرفهم:</string>
+    <string name="ds_consent_intro">فيلو مش بيجمع أي بيانات عن ولادك، ومفيش تتبع ولا إعلانات مننا. بس فيه خدمتين لازم تعرفهم:</string>
     <string name="ds_consent_youtube_title">الفيديوهات من YouTube</string>
     <string name="ds_consent_youtube_body">الفيديوهات بتشتغل في مشغّل YouTube الرسمي، وجوجل بتستقبل بيانات الجهاز العادية اللي أي متصفح بيبعتها. YouTube ممكن يعرض إعلاناته جوه المشغّل.</string>
     <string name="ds_consent_store_title">الاشتراك عن طريق المتجر</string>
