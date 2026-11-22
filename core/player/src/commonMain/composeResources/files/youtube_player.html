@@ -60,6 +60,8 @@
 
   window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player('player', {
+      // Privacy-enhanced mode (compliance A19): views here don't personalize YouTube or its ads.
+      host: 'https://www.youtube-nocookie.com',
       width: '100%',
       height: '100%',
       videoId: CONFIG.videoId,

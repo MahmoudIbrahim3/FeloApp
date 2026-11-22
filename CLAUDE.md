@@ -12,7 +12,7 @@ ClipKid is a curated video app for children aged 3–12, Arabic-first (Egyptian 
 1. Never download, cache, store or play YouTube audio/video outside the official embedded player. No background playback, no offline playback, no audio-only.
 2. Never modify, hide, cover or block the player, its controls, YouTube branding, links or ads. Player viewport is never smaller than 200x200.
 3. Always send an HTTP Referer: load the player HTML with a base URL (Android `loadDataWithBaseURL`, iOS `loadHTMLString(_:baseURL:)`) set to `https://com.mahmoud.clipkid` (`PlayerConfig.BASE_URL`). YouTube's Required Minimum Functionality asks native apps to identify as `https://<app ID>`, stable across versions. Missing Referer = error 153.
-4. Player params: `rel=0`, `playsinline=1`, `enablejsapi=1`, `origin` = the base URL. Never autoplay the next video.
+4. Player params: `host` = `https://www.youtube-nocookie.com` (privacy-enhanced mode), `rel=0`, `playsinline=1`, `enablejsapi=1`, `origin` = the base URL. Never autoplay the next video.
 5. YouTube API data (title, thumbnail URL, duration, madeForKids, embeddable) is fetched by the backend only, stored max 30 days and refreshed by a scheduled job. The app caches images only through Coil/HTTP cache.
 6. Wherever a YouTube thumbnail or player is shown, show YouTube attribution using official brand assets.
 7. The YouTube Data API key never ships in the app. It lives only in Supabase Edge Function secrets. The app only has the Supabase URL and **publishable** key, from `local.properties` / env at build time (BuildKonfig), never committed.
