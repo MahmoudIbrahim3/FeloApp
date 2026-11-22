@@ -34,6 +34,9 @@ internal object PreferenceKeys {
     /** The parent agreed to YouTube's player and the store/RevenueCat (see SettingsRepository.consentGiven). */
     val ConsentGiven = booleanPreferencesKey("consent_given")
 
+    /** Last time the thumbnail disk cache was cleared, epoch ms (PruneImageCacheUseCase, compliance A10). */
+    val ImageCacheClearedAt = longPreferencesKey("image_cache_cleared_at")
+
     /** Last subscription status from the store (EntitlementCache). No ids: only what the UI shows. */
     val EntitlementFull = booleanPreferencesKey("entitlement_full")
     val EntitlementExpiresAt = longPreferencesKey("entitlement_expires_at")

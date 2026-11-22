@@ -22,7 +22,8 @@ import com.mahmoud.clipkid.navigation.ClipKidNavHost
 @Composable
 fun App() {
     setSingletonImageLoaderFactory { context ->
-        // Thumbnails only; Coil's memory + HTTP cache is the only image cache (CLAUDE.md rule 5).
+        // Thumbnails only; Coil's memory + disk cache is the only image cache (CLAUDE.md rule 5).
+        // The disk cache is wiped every 7 days at launch (PruneImageCacheUseCase, compliance A10).
         ImageLoader.Builder(context)
             .components { add(KtorNetworkFetcherFactory()) }
             .crossfade(true)

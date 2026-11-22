@@ -80,6 +80,13 @@ internal class DataStoreSettingsRepository(
         prefs.edit { it[PreferenceKeys.ConsentGiven] = given }
     }
 
+    override suspend fun getImageCacheClearedAt(): Instant? =
+        prefs.data.first()[PreferenceKeys.ImageCacheClearedAt]?.let { Instant.fromEpochMilliseconds(it) }
+
+    override suspend fun setImageCacheClearedAt(at: Instant) {
+        prefs.edit { it[PreferenceKeys.ImageCacheClearedAt] = at.toEpochMilliseconds() }
+    }
+
     companion object {
         internal const val PIN_HASH_KEY = "parent_pin_hash"
     }

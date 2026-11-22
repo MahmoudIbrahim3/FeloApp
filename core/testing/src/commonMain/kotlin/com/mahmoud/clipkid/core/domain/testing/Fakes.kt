@@ -5,6 +5,7 @@ import com.mahmoud.clipkid.core.domain.repository.FavoritesRepository
 import com.mahmoud.clipkid.core.domain.repository.VideoReporter
 import com.mahmoud.clipkid.core.domain.repository.HiddenVideosRepository
 import com.mahmoud.clipkid.core.domain.repository.IdGenerator
+import com.mahmoud.clipkid.core.domain.repository.ImageDiskCache
 import com.mahmoud.clipkid.core.domain.repository.NetworkMonitor
 import com.mahmoud.clipkid.core.domain.repository.ProfileRepository
 import com.mahmoud.clipkid.core.domain.repository.WatchHistoryRepository
@@ -129,6 +130,18 @@ class FakeVideoReporter : VideoReporter {
 class SequentialIdGenerator(private val prefix: String = "event-") : IdGenerator {
     private var next = 1
     override fun newId(): String = prefix + next++
+}
+
+/** Counts clears; set [error] to make the next clear fail. */
+class FakeImageDiskCache : ImageDiskCache {
+    var clears: Int = 0
+        private set
+    var error: Exception? = null
+
+    override suspend fun clear() {
+        error?.let { throw it }
+        clears++
+    }
 }
 
 /** Online unless a test says otherwise; flip [isOnline] to simulate losing the network. */

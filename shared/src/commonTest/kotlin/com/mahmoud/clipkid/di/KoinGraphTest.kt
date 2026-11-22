@@ -37,6 +37,7 @@ import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ObserveAccessUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ReportVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
+import com.mahmoud.clipkid.core.domain.usecase.PruneImageCacheUseCase
 import com.mahmoud.clipkid.core.domain.usecase.SyncCatalogUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateChildSettingsUseCase
@@ -99,6 +100,7 @@ class KoinGraphTest {
             koin.get<HideVideoUseCase>(),
             koin.get<ToggleFavoriteUseCase>(),
             koin.get<SyncCatalogUseCase>(),
+            koin.get<PruneImageCacheUseCase>(),
             // Phase 2 (child screens) and Phase 3 (onboarding, gate, parent mode).
             koin.get<GetCollectionUseCase>(),
             koin.get<GetFavoritesUseCase>(),

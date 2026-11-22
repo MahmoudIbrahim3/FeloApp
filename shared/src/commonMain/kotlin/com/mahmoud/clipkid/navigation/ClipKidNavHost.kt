@@ -15,6 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import coil3.compose.LocalPlatformContext
+import com.mahmoud.clipkid.CoilImageDiskCache
 import com.mahmoud.clipkid.core.domain.parent.ParentSession
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
 import com.mahmoud.clipkid.core.domain.usecase.ConnectBillingUseCase
@@ -45,8 +47,9 @@ import org.koin.mp.KoinPlatform
 @Composable
 fun ClipKidNavHost() {
     val koin = remember { KoinPlatform.getKoin() }
+    val platformContext = LocalPlatformContext.current
     val appStart by produceState<AppStart?>(initialValue = null) {
-        value = prepareApp(koin)
+        value = prepareApp(koin, CoilImageDiskCache(platformContext))
     }
     val start = appStart ?: return
 

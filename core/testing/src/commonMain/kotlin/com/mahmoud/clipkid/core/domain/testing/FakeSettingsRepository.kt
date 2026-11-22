@@ -2,6 +2,7 @@ package com.mahmoud.clipkid.core.domain.testing
 
 import com.mahmoud.clipkid.core.domain.parent.PinLockout
 import com.mahmoud.clipkid.core.domain.repository.SettingsRepository
+import kotlin.time.Instant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -54,5 +55,13 @@ class FakeSettingsRepository(
 
     override suspend fun setConsentGiven(given: Boolean) {
         consent.value = given
+    }
+
+    val imageCacheClearedAt = MutableStateFlow<Instant?>(null)
+
+    override suspend fun getImageCacheClearedAt(): Instant? = imageCacheClearedAt.value
+
+    override suspend fun setImageCacheClearedAt(at: Instant) {
+        imageCacheClearedAt.value = at
     }
 }

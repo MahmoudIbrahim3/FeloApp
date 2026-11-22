@@ -20,6 +20,7 @@ import com.mahmoud.clipkid.core.domain.usecase.HideVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ObserveAccessUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ReportVideoUseCase
 import com.mahmoud.clipkid.core.domain.usecase.StartWatchUseCase
+import com.mahmoud.clipkid.core.domain.usecase.PruneImageCacheUseCase
 import com.mahmoud.clipkid.core.domain.usecase.SyncCatalogUseCase
 import com.mahmoud.clipkid.core.domain.usecase.ToggleFavoriteUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateChildSettingsUseCase
@@ -54,6 +55,7 @@ val domainModule: Module = module {
     factoryOf(::GetResumePositionUseCase)
     factoryOf(::ReportVideoUseCase)
     factoryOf(::SyncCatalogUseCase)
+    factoryOf(::PruneImageCacheUseCase)
 
     // Onboarding and parent mode
     factoryOf(::GetCollectionsForAgeUseCase)

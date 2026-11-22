@@ -1,6 +1,7 @@
 package com.mahmoud.clipkid.core.domain.repository
 
 import com.mahmoud.clipkid.core.domain.parent.PinLockout
+import kotlin.time.Instant
 import kotlinx.coroutines.flow.Flow
 
 /** Device-level settings. The PIN is only ever stored hashed, in secure storage. */
@@ -32,4 +33,9 @@ interface SettingsRepository {
     val consentGiven: Flow<Boolean>
 
     suspend fun setConsentGiven(given: Boolean)
+
+    /** When the thumbnail disk cache was last cleared (see PruneImageCacheUseCase), or null if never. */
+    suspend fun getImageCacheClearedAt(): Instant?
+
+    suspend fun setImageCacheClearedAt(at: Instant)
 }
