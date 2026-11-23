@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.clipkid.kmp.compose)
+    alias(libs.plugins.feelo.kmp.compose)
 }
 
 kotlin {

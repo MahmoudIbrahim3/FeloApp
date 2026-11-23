@@ -17,11 +17,11 @@ dependencies {
 }
 
 android {
-    namespace = "com.mahmoud.clipkid"
+    namespace = "com.mahmoud.feelo"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.mahmoud.clipkid"
+        applicationId = "com.mahmoud.feelo"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

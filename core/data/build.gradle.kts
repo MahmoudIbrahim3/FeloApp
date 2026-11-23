@@ -2,7 +2,7 @@ import com.codingfeline.buildkonfig.compiler.FieldSpec
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.clipkid.kmp.library)
+    alias(libs.plugins.feelo.kmp.library)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
@@ -49,7 +49,7 @@ dependencies {
 // Supabase config. Never committed: put it in local.properties (gitignored)
 //   supabase.url=https://<project-ref>.supabase.co
 //   supabase.publishableKey=sb_publishable_...
-// or set CLIPKID_SUPABASE_URL / CLIPKID_SUPABASE_PUBLISHABLE_KEY (CI). Empty values still build;
+// or set FEELO_SUPABASE_URL / FEELO_SUPABASE_PUBLISHABLE_KEY (CI). Empty values still build;
 // the app then uses the fake catalog and logs a warning.
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
@@ -61,14 +61,14 @@ fun supabaseSetting(property: String, env: String): String =
         ?: localProperties.getProperty(property)?.trim().orEmpty()
 
 buildkonfig {
-    packageName = "com.mahmoud.clipkid.core.data.config"
+    packageName = "com.mahmoud.feelo.core.data.config"
     objectName = "SupabaseBuildConfig"
     defaultConfigs {
-        buildConfigField(FieldSpec.Type.STRING, "SUPABASE_URL", supabaseSetting("supabase.url", "CLIPKID_SUPABASE_URL"))
+        buildConfigField(FieldSpec.Type.STRING, "SUPABASE_URL", supabaseSetting("supabase.url", "FEELO_SUPABASE_URL"))
         buildConfigField(
             FieldSpec.Type.STRING,
             "SUPABASE_PUBLISHABLE_KEY",
-            supabaseSetting("supabase.publishableKey", "CLIPKID_SUPABASE_PUBLISHABLE_KEY"),
+            supabaseSetting("supabase.publishableKey", "FEELO_SUPABASE_PUBLISHABLE_KEY"),
         )
     }
 }

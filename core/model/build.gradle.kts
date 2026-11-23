@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.clipkid.kmp.library)
+    alias(libs.plugins.feelo.kmp.library)
     alias(libs.plugins.kotlinSerialization)
 }
 

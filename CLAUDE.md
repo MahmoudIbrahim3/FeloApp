@@ -1,7 +1,7 @@
-# ClipKid — Project Guide
+# Feelo — Project Guide
 
 ## Product
-ClipKid is a curated video app for children aged 3–12, Arabic-first (Egyptian colloquial UI copy, RTL), on Android and iOS.
+Feelo is a curated video app for children aged 3–12, Arabic-first (Egyptian colloquial UI copy, RTL), on Android and iOS.
 - Every video is hand-picked and reviewed by the team. Videos play through the official YouTube embedded player (IFrame API). We never host, download or cache video.
 - Parents set a daily limit (N videos or N minutes). No infinite feed, no autoplay, no countdowns.
 - One app, two modes: Child mode (default) and Parent mode behind a PIN gate.
@@ -11,7 +11,7 @@ ClipKid is a curated video app for children aged 3–12, Arabic-first (Egyptian 
 ## Non-negotiable rules (YouTube, Google Families, Apple Kids)
 1. Never download, cache, store or play YouTube audio/video outside the official embedded player. No background playback, no offline playback, no audio-only.
 2. Never modify, hide, cover or block the player, its controls, YouTube branding, links or ads. Player viewport is never smaller than 200x200.
-3. Always send an HTTP Referer: load the player HTML with a base URL (Android `loadDataWithBaseURL`, iOS `loadHTMLString(_:baseURL:)`) set to `https://com.mahmoud.clipkid` (`PlayerConfig.BASE_URL`). YouTube's Required Minimum Functionality asks native apps to identify as `https://<app ID>`, stable across versions. Missing Referer = error 153.
+3. Always send an HTTP Referer: load the player HTML with a base URL (Android `loadDataWithBaseURL`, iOS `loadHTMLString(_:baseURL:)`) set to `https://com.mahmoud.feelo` (`PlayerConfig.BASE_URL`). YouTube's Required Minimum Functionality asks native apps to identify as `https://<app ID>`, stable across versions. Missing Referer = error 153.
 4. Player params: `host` = `https://www.youtube-nocookie.com` (privacy-enhanced mode), `rel=0`, `playsinline=1`, `enablejsapi=1`, `origin` = the base URL. Never autoplay the next video.
 5. YouTube API data (title, thumbnail URL, duration, madeForKids, embeddable) is fetched by the backend only, stored max 30 days and refreshed by a scheduled job. The app caches images only through Coil/HTTP cache.
 6. Wherever a YouTube thumbnail or player is shown, show YouTube attribution using official brand assets.

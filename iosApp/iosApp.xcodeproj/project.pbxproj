@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		5DD7940772810833DCB03EF8 /* ClipKid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClipKid.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5DD7940772810833DCB03EF8 /* Feelo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Feelo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -58,7 +58,7 @@
 		411D73E0CA79F7A0E542C266 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5DD7940772810833DCB03EF8 /* ClipKid.app */,
+				5DD7940772810833DCB03EF8 /* Feelo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,7 +95,7 @@
 			packageProductDependencies = (
 			);
 			productName = iosApp;
-			productReference = 5DD7940772810833DCB03EF8 /* ClipKid.app */;
+			productReference = 5DD7940772810833DCB03EF8 /* Feelo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

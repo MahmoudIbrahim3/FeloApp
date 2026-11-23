@@ -2,7 +2,7 @@ plugins {
     `kotlin-dsl`
 }
 
-group = "com.mahmoud.clipkid.buildlogic"
+group = "com.mahmoud.feelo.buildlogic"
 
 kotlin {
     jvmToolchain(21)
@@ -25,11 +25,11 @@ tasks {
 gradlePlugin {
     plugins {
         register("kmpLibrary") {
-            id = libs.plugins.clipkid.kmp.library.get().pluginId
+            id = libs.plugins.feelo.kmp.library.get().pluginId
             implementationClass = "KmpLibraryConventionPlugin"
         }
         register("kmpCompose") {
-            id = libs.plugins.clipkid.kmp.compose.get().pluginId
+            id = libs.plugins.feelo.kmp.compose.get().pluginId
             implementationClass = "KmpComposeConventionPlugin"
         }
     }

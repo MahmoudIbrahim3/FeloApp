@@ -103,5 +103,5 @@ room = { id = "androidx.room3", version.ref = "androidx-room" }
 buildKonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildKonfig" }
 
 # Convention plugins (build-logic)
-clipkid-kmp-library = { id = "clipkid.kmp.library" }
-clipkid-kmp-compose = { id = "clipkid.kmp.compose" }
+feelo-kmp-library = { id = "feelo.kmp.library" }
+feelo-kmp-compose = { id = "feelo.kmp.compose" }

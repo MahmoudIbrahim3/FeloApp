@@ -1,4 +1,4 @@
-# ClipKid backend (Supabase)
+# Feelo backend (Supabase)
 
 Everything the backend needs lives here and is versioned with the app.
 
@@ -71,7 +71,7 @@ enable "YouTube Data API v3" → Credentials → API key → restrict it to YouT
    supabase.url=https://<project-ref>.supabase.co
    supabase.publishableKey=sb_publishable_...
    ```
-   CI can use env vars `CLIPKID_SUPABASE_URL` and `CLIPKID_SUPABASE_PUBLISHABLE_KEY` instead.
+   CI can use env vars `FEELO_SUPABASE_URL` and `FEELO_SUPABASE_PUBLISHABLE_KEY` instead.
    Without them the app builds and uses the fake catalog (it logs a warning).
 
 ---

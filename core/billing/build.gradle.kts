@@ -2,7 +2,7 @@ import com.codingfeline.buildkonfig.compiler.FieldSpec
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.clipkid.kmp.library)
+    alias(libs.plugins.feelo.kmp.library)
     // RevenueCat public SDK keys as build-time constants (from local.properties or env).
     alias(libs.plugins.buildKonfig)
 }
@@ -28,7 +28,7 @@ kotlin {
 //   revenuecat.androidApiKey=goog_...
 //   revenuecat.iosApiKey=appl_...
 //   revenuecat.testStoreApiKey=test_...   (optional, debug builds only)
-// or set CLIPKID_RC_ANDROID_KEY / CLIPKID_RC_IOS_KEY / CLIPKID_RC_TEST_KEY (CI). Empty values
+// or set FEELO_RC_ANDROID_KEY / FEELO_RC_IOS_KEY / FEELO_RC_TEST_KEY (CI). Empty values
 // still build; the app then uses a fake store and logs a warning.
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
@@ -40,11 +40,11 @@ fun billingSetting(property: String, env: String): String =
         ?: localProperties.getProperty(property)?.trim().orEmpty()
 
 buildkonfig {
-    packageName = "com.mahmoud.clipkid.core.billing.config"
+    packageName = "com.mahmoud.feelo.core.billing.config"
     objectName = "BillingBuildConfig"
     defaultConfigs {
-        buildConfigField(FieldSpec.Type.STRING, "RC_ANDROID_KEY", billingSetting("revenuecat.androidApiKey", "CLIPKID_RC_ANDROID_KEY"))
-        buildConfigField(FieldSpec.Type.STRING, "RC_IOS_KEY", billingSetting("revenuecat.iosApiKey", "CLIPKID_RC_IOS_KEY"))
-        buildConfigField(FieldSpec.Type.STRING, "RC_TEST_STORE_KEY", billingSetting("revenuecat.testStoreApiKey", "CLIPKID_RC_TEST_KEY"))
+        buildConfigField(FieldSpec.Type.STRING, "RC_ANDROID_KEY", billingSetting("revenuecat.androidApiKey", "FEELO_RC_ANDROID_KEY"))
+        buildConfigField(FieldSpec.Type.STRING, "RC_IOS_KEY", billingSetting("revenuecat.iosApiKey", "FEELO_RC_IOS_KEY"))
+        buildConfigField(FieldSpec.Type.STRING, "RC_TEST_STORE_KEY", billingSetting("revenuecat.testStoreApiKey", "FEELO_RC_TEST_KEY"))
     }
 }

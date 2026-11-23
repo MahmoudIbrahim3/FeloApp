@@ -16,8 +16,8 @@ internal fun VersionCatalog.version(alias: String): String =
         .requiredVersion
 
 /**
- * ":core:designsystem" -> "com.mahmoud.clipkid.core.designsystem".
+ * ":core:designsystem" -> "com.mahmoud.feelo.core.designsystem".
  * Used for the Android namespace and as the base package of each module.
  */
-internal val Project.clipKidNamespace: String
-    get() = "com.mahmoud.clipkid" + path.replace(':', '.').replace('-', '_')
+internal val Project.feeloNamespace: String
+    get() = "com.mahmoud.feelo" + path.replace(':', '.').replace('-', '_')

@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
- * Base setup for every ClipKid KMP module:
+ * Base setup for every Feelo KMP module:
  * Android (AGP 9 `com.android.kotlin.multiplatform.library`) + iosArm64 + iosSimulatorArm64,
  * shared SDK levels from the version catalog, and the common test stack.
  */
@@ -23,7 +23,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
             iosSimulatorArm64()
 
             (this as ExtensionAware).extensions.configure<KotlinMultiplatformAndroidLibraryTarget>("android") {
-                namespace = clipKidNamespace
+                namespace = feeloNamespace
                 compileSdk = libs.version("android-compileSdk").toInt()
                 minSdk = libs.version("android-minSdk").toInt()
                 compilerOptions {

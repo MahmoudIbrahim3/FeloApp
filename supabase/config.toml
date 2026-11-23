@@ -1,7 +1,7 @@
-# Supabase CLI config for ClipKid (local development).
-# Only the settings ClipKid depends on are listed; everything else uses the CLI defaults.
+# Supabase CLI config for Feelo (local development).
+# Only the settings Feelo depends on are listed; everything else uses the CLI defaults.
 # Run `supabase init` once in a scratch folder to compare with the full default file if needed.
-project_id = "clipkid"
+project_id = "feelo"
 
 [api]
 enabled = true

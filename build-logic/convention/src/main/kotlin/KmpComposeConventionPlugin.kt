@@ -9,12 +9,12 @@ import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
- * `clipkid.kmp.library` + Compose Multiplatform: compiler, core UI artifacts,
+ * `feelo.kmp.library` + Compose Multiplatform: compiler, core UI artifacts,
  * Compose resources (module-private `Res` class) and multiplatform @Preview support.
  */
 class KmpComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project): Unit = with(target) {
-        pluginManager.apply("clipkid.kmp.library")
+        pluginManager.apply("feelo.kmp.library")
         pluginManager.apply("org.jetbrains.compose")
         pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
@@ -38,7 +38,7 @@ class KmpComposeConventionPlugin : Plugin<Project> {
         }
 
         extensions.getByType<ComposeExtension>().extensions.configure<ResourcesExtension> {
-            packageOfResClass = "$clipKidNamespace.resources"
+            packageOfResClass = "$feeloNamespace.resources"
             publicResClass = false
             generateResClass = ResourcesExtension.ResourceClassGeneration.Auto
         }

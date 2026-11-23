@@ -1,4 +1,4 @@
-# ClipKid
+# Feelo
 
 Curated, Arabic-first (RTL) video app for children aged 2–12, built with Kotlin Multiplatform and
 Compose Multiplatform for Android and iOS. Product rules, stack and architecture live in
@@ -19,31 +19,31 @@ Divide pixel sizes by 2 to get dp. When code and an image disagree, ask before c
 | Module | Purpose |
 | --- | --- |
 | `shared` | App shell: `App()`, root navigation, Koin start, iOS framework `Shared` |
-| `androidApp` | Android application (`ClipKidApplication`, `MainActivity`) hosting `App()` |
+| `androidApp` | Android application (`FeeloApplication`, `MainActivity`) hosting `App()` |
 | `iosApp` | Thin Xcode / SwiftUI host |
 | `core:model` | Pure Kotlin data classes |
 | `core:domain` | Repository interfaces and use cases |
 | `core:data` | Room, DataStore, Supabase, repository implementations, fakes |
-| `core:designsystem` | Tokens, fonts, icons and components (`ClipKidTheme`, `VideoCard`, `PinPad`, …) |
+| `core:designsystem` | Tokens, fonts, icons and components (`FeeloTheme`, `VideoCard`, `PinPad`, …) |
 | `core:player` | expect/actual YouTube embedded player |
 | `core:billing` | RevenueCat wrapper behind an interface |
 | `feature:onboarding`, `feature:child`, `feature:parent` | Screens; depend only on core modules |
 
 Gradle conventions live in [`build-logic`](build-logic):
 
-- `clipkid.kmp.library`: Android (`com.android.kotlin.multiplatform.library`) + `iosArm64` +
+- `feelo.kmp.library`: Android (`com.android.kotlin.multiplatform.library`) + `iosArm64` +
   `iosSimulatorArm64`, SDK levels from `gradle/libs.versions.toml`, commonTest stack
   (kotlin.test, coroutines-test, Turbine).
-- `clipkid.kmp.compose`: the above + Compose Multiplatform, Compose resources
+- `feelo.kmp.compose`: the above + Compose Multiplatform, Compose resources
   (module-private `Res` in `<module package>.resources`) and `@Preview`.
 
 All versions are in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 
 ## Design system
 
-`core:designsystem` holds the ClipKid look:
+`core:designsystem` holds the Feelo look:
 
-- `ClipKidTheme` provides colors, typography (Baloo Bhaijaan 2 + Cairo, bundled), shapes,
+- `FeeloTheme` provides colors, typography (Baloo Bhaijaan 2 + Cairo, bundled), shapes,
   spacing and sizes. Touch targets: ≥ 48dp everywhere, ≥ 56dp for primary child actions.
 - `ProvideRtl` forces right-to-left. `App()` applies it once at the root.
 - Numbers are shown with Western digits (0–9). `formatDuration()` formats video durations.
@@ -87,17 +87,17 @@ The app only knows these names, so product ids can change freely in the stores:
 | Offering (Current) | `default` |
 | Packages | `$rc_monthly`, `$rc_annual` |
 
-Products used in the consoles: App Store `clipkid_full_monthly` / `clipkid_full_annual` (one
+Products used in the consoles: App Store `feelo_full_monthly` / `feelo_full_annual` (one
 subscription group, annual = level 1, intro offer: free 1 week); Google Play subscription
-`clipkid_full` with base plans `monthly` / `annual`, each with a 7-day free-trial offer
+`feelo_full` with base plans `monthly` / `annual`, each with a 7-day free-trial offer
 (new customers only).
 
 Keys go in `local.properties` (gitignored) or CI env, never in git:
 
 ```properties
-revenuecat.androidApiKey=goog_...     # CLIPKID_RC_ANDROID_KEY
-revenuecat.iosApiKey=appl_...         # CLIPKID_RC_IOS_KEY
-revenuecat.testStoreApiKey=test_...   # CLIPKID_RC_TEST_KEY, optional, debug builds only
+revenuecat.androidApiKey=goog_...     # FEELO_RC_ANDROID_KEY
+revenuecat.iosApiKey=appl_...         # FEELO_RC_IOS_KEY
+revenuecat.testStoreApiKey=test_...   # FEELO_RC_TEST_KEY, optional, debug builds only
 ```
 
 - No key: billing is off (`NoStoreBillingRepository`): the app stays on the free plan and the

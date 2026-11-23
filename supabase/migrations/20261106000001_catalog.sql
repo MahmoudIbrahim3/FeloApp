@@ -1,4 +1,4 @@
--- ClipKid catalog: curated collections and videos, plus anonymous video reports.
+-- Feelo catalog: curated collections and videos, plus anonymous video reports.
 -- YouTube API fields (yt_*) are written only by the refresh-youtube-data Edge Function and are
 -- never kept longer than 30 days (see 20261106000003_refresh.sql).
 

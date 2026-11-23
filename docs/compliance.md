@@ -1,4 +1,4 @@
-# ClipKid: compliance audit and release checklist
+# Feelo: compliance audit and release checklist
 
 Phase 7 audit. Branch `phase-6-billing` at `40b04ce`, audited 2026-11-06. Every policy item below was checked against the official page **as published today**. The sources are listed at the end with the "last updated" date each page showed.
 
@@ -26,7 +26,7 @@ The 9 NEEDS DECISION rows map to 9 questions, D1–D9 (A18 and A21 share D1; C7 
 
 **Update 2026-11-07 (Phase 8, branch `phase-8-parent-plan`).** Mahmoud decided D1, D4 and D8; Phase 8 implemented D1 and D4. The table above now counts A18, C4, C9 and E2 as OK (C9 was unrated before). Still open: D2, D3, D5, D6, D7, D9, D1's sub-question (b) (A21), and all 16 FIX items.
 
-- **D1 → A.** Every video is free. ClipKid كامل sells parent features only: up to 4 child profiles (free: 1) and the 7-day activity report (free: today's list). `is_premium` is gone from the backend, Room and the app.
+- **D1 → A.** Every video is free. Feelo كامل sells parent features only: up to 4 child profiles (free: 1) and the 7-day activity report (free: today's list). `is_premium` is gone from the backend, Room and the app.
 - **D4 → A.** Onboarding consent step right after the PIN; RevenueCat only after consent, from parent mode or to re-check an ended subscription; child mode reads an on-device entitlement cache. Older installs get the consent card on the paywall.
 - **D8 → B.** The "forgot PIN" multiplication stays as it is.
 
@@ -36,7 +36,7 @@ The 9 NEEDS DECISION rows map to 9 questions, D1–D9 (A18 and A21 share D1; C7 
 
 | ID | Requirement (source) | Status | Evidence | Notes / proposed change |
 |---|---|---|---|---|
-| A1 | The player identifies the app through the HTTP Referer: `https://<app ID>`, stable across versions (RMF) | OK | `core/player/.../PlayerConfig.kt:12`; `PlayerPlatform.android.kt:129` (`loadDataWithBaseURL`); `PlayerPlatform.ios.kt:114` (`loadHTMLString(baseURL:)`) | The value must equal the store app ID. Android `com.mahmoud.clipkid` matches. **The iOS bundle id does not match (F3).** |
+| A1 | The player identifies the app through the HTTP Referer: `https://<app ID>`, stable across versions (RMF) | OK | `core/player/.../PlayerConfig.kt:12`; `PlayerPlatform.android.kt:129` (`loadDataWithBaseURL`); `PlayerPlatform.ios.kt:114` (`loadHTMLString(baseURL:)`) | The value must equal the store app ID. Android `com.mahmoud.feelo` matches. **The iOS bundle id does not match (F3).** |
 | A2 | Player params; no autoplay of the next video | OK | `youtube_player.html:53-58` (`rel:0, playsinline:1, enablejsapi:1, origin`); `PlayerScreen.kt:168` (the player is removed on end, then Up Next waits for the child's tap) | |
 | A3 | Autoplay only once the player is visible, one autoplaying player per screen (RMF) | OK | `PlayerPlatform.android.kt:111` (the first play only, for the video the child just tapped); the player is full width, one per screen | |
 | A4 | Viewport at least 200×200 (RMF) | OK | `PlayerScreen.kt:62` (`MIN_PLAYER_SIZE = 200.dp`), `:191-200` | Needs a visual check in your release screenshots. |
@@ -55,7 +55,7 @@ The 9 NEEDS DECISION rows map to 9 questions, D1–D9 (A18 and A21 share D1; C7 
 | A17 | Quota extension / API Compliance Audit | OK (not needed) | One `videos.list` call per 50 videos per day at 1 unit each (Phase 5) vs the 10,000-unit default ([quota page](https://developers.google.com/youtube/v3/guides/quota_and_compliance_audits): an audit is needed "If you would like to request additional quota") | YouTube can still audit at any time (III.H). D1 option B needs YouTube's written approval, which goes through the same audit form. |
 | A18 | Don't charge to watch content in an embedded player; don't gate a video behind any action other than "play" (III.F.3.a-b; policy guide: "cannot charge people a fee for services that are offered free of charge on YouTube") | OK (Phase 8) | `VisibleCatalog.kt` has no subscription input; `collections.is_premium` dropped (`20261107000001_drop_is_premium.sql`); child mode has no locks or paywall route | D1 decided: every video is free; the subscription sells parent features only. |
 | A19 | Privacy-enhanced mode for a child-directed embed ([YouTube Help 171780](https://support.google.com/youtube/answer/171780): views don't personalize YouTube or ads; still requires self-designation) | OK (2026-11-22, needs device test) | `youtube_player.html`: `new YT.Player(..., { host: 'https://www.youtube-nocookie.com', ... })`; the `iframe_api` loader stays on `www.youtube.com`. Link blocking is by navigation type, not host, so the gate still catches YouTube links. | Mahmoud to confirm on Android and iOS: plays with no error 152/153, pause/resume and Up Next (bridge events) work, the in-player YouTube link opens the gate. |
-| A20 | Brand rules for the listing: no "YouTube" in the app name; no implied endorsement | OK | App name "ClipKid"; the listing drafts below don't use the YouTube name or logo | |
+| A20 | Brand rules for the listing: no "YouTube" in the app name; no implied endorsement | OK | App name "Feelo"; the listing drafts below don't use the YouTube name or logo | |
 | A21 | Gating by parental controls (daily limit / PIN / locks) | **NEEDS DECISION** | `DoneTodayScreen` (daily limit). The premium locks and `AskParentScreen` are gone (Phase 8). | Part of **D1** (question b). |
 | A22 | Data deletion when access ends (ToS §24.3) | OK | All API data lives in Supabase (one SQL `delete`) and in each device's cache, which is wiped on the next sync. | |
 
@@ -66,7 +66,7 @@ The 9 NEEDS DECISION rows map to 9 questions, D1–D9 (A18 and A21 share D1; C7 
 | B1 | Every SDK must be appropriate for a child-directed app; ads only from Families self-certified ad SDKs ([Families policy](https://support.google.com/googleplay/android-developer/answer/9893335)) | OK | `gradle/libs.versions.toml`. SDKs: Compose/AndroidX, Koin, Room 3 + bundled SQLite, DataStore, Ktor (OkHttp), Coil 3, supabase-kt (PostgREST only), kotlinx.*, BuildKonfig (build time), RevenueCat `purchases-kmp-core` (Play Billing). **No ads, analytics, crash, attribution or messaging SDK.** | RevenueCat isn't an ads SDK, so the Families self-certified ads list doesn't apply; with an anonymous user it sends no AAID ([RevenueCat Data safety](https://www.revenuecat.com/docs/platform-resources/google-platform-resources/google-plays-data-safety): device identifiers only with ad-ID integrations, which we don't use). |
 | B2 | No AAID, persistent device ids, location or phone number from children | OK | `AndroidManifest.xml:5-7`: only `INTERNET` and `ACCESS_NETWORK_STATE` | |
 | B3 | No `AD_ID` permission (child-directed, API 33+) | **FIX** | Not declared by us; a library could merge it in. Can't be confirmed without building. | **Fix B3:** `<uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>` in the app manifest. Then confirm in the merged release manifest. |
-| B4 | In-app purchases: no manipulative tactics, nothing aimed at the child | OK | The paywall exists only in parent mode (`ParentNavigation.kt:130-145`, `ParentScreen` renders nothing while locked, `:196`). Children see "اسأل بابا أو ماما" with no price (`ClipKidNavHost.kt:236-241`). | |
+| B4 | In-app purchases: no manipulative tactics, nothing aimed at the child | OK | The paywall exists only in parent mode (`ParentNavigation.kt:130-145`, `ParentScreen` renders nothing while locked, `:196`). Children see "اسأل بابا أو ماما" with no price (`FeeloNavHost.kt:236-241`). | |
 | B5 | Ads shown to children / "Contains ads" declaration | **NEEDS DECISION** | We show no ads ourselves. YouTube can run its own (non-personalized) ads inside the embedded player on Made for Kids videos, and we may not block them (A6). | See **D3**. |
 | B6 | Not merely a webview of a website | OK | Native Compose app; the webview hosts only the player | |
 | B7 | Target API level | OK | `libs.versions.toml`: targetSdk 37 | |
@@ -78,8 +78,8 @@ The 9 NEEDS DECISION rows map to 9 questions, D1–D9 (A18 and A21 share D1; C7 
 
 | ID | Requirement | Status | Evidence | Notes / proposed change |
 |---|---|---|---|---|
-| C1 | Purchases only behind a parental gate (1.3; [Kids apps](https://developer.apple.com/app-store/kids-apps/): an "adult-level task") | OK | `ClipKidNavHost.kt:94` (`GatePurpose.Paywall` → unlock), `AskParentScreen` → `GateDest(Paywall)` (`:240`); purchases run only in `PaywallViewModel` | The PIN is a parental gate. The "forgot PIN" reset is weaker: see **D8**. |
-| C2 | Links out only behind the gate (1.3) | OK | Player links → `GateDest(GatePurpose.ExternalLink)` (`ClipKidNavHost.kt:208-209`); webview navigation blocked (`PlayerPlatform.android.kt:178`, `PlayerPlatform.ios.kt:135-156`); paywall/terms links only inside parent mode (`ParentNavigation.kt:141`) | A14 adds links only inside parent mode. |
+| C1 | Purchases only behind a parental gate (1.3; [Kids apps](https://developer.apple.com/app-store/kids-apps/): an "adult-level task") | OK | `FeeloNavHost.kt:94` (`GatePurpose.Paywall` → unlock), `AskParentScreen` → `GateDest(Paywall)` (`:240`); purchases run only in `PaywallViewModel` | The PIN is a parental gate. The "forgot PIN" reset is weaker: see **D8**. |
+| C2 | Links out only behind the gate (1.3) | OK | Player links → `GateDest(GatePurpose.ExternalLink)` (`FeeloNavHost.kt:208-209`); webview navigation blocked (`PlayerPlatform.android.kt:178`, `PlayerPlatform.ios.kt:135-156`); paywall/terms links only inside parent mode (`ParentNavigation.kt:141`) | A14 adds links only inside parent mode. |
 | C3 | No third-party analytics or advertising SDKs (1.3, 5.1.4) | OK (SDKs) | Same SDK list as B1 | YouTube's in-player ads are **D2**. |
 | C4 | No personal or device information sent to third parties, "even in sections intended for adults", unless the parent explicitly consents ([Kids apps](https://developer.apple.com/app-store/kids-apps/)) | OK (Phase 8) | Onboarding consent step after the PIN (`ConsentScreen`); `ConnectBillingUseCase` configures RevenueCat only after consent, from parent mode, or to re-check an ended subscription; child mode reads `EntitlementCache`. The paywall shows the same consent card on older installs. | D4 decided (option A). The YouTube player (Google) is covered by the same consent text. supabase-kt sends no ids. |
 | C5 | Auto-renewable subscription disclosure (3.1.2(c), Schedule 2) | OK | Paywall: store price per period, trial length, the "after the trial" line, auto-renew text, restore, terms, privacy (`PaywallScreen.kt` `LegalText`, `BottomActions`) | The URLs are placeholders (D7). The content changes with D1. |
@@ -130,8 +130,8 @@ Apple's reason-code page didn't render as text for me, so the code meanings abov
 | ID | Item | Status | Evidence | Notes / proposed change |
 |---|---|---|---|---|
 | F1 | R8 shrinking and obfuscation | **FIX** | `androidApp/build.gradle.kts:37` `isMinifyEnabled = false`; `androidApp/proguard-rules.pro` is the template | **Fix F1:** `isMinifyEnabled = true`, `isShrinkResources = true`, plus the rules in "R8 rules" below. Then you smoke-test the release build (onboarding, player, paywall, sync). |
-| F2 | Android release signing | **FIX** | No `signingConfigs` in `androidApp/build.gradle.kts` | **Fix F2:** a `release` signing config read from a gitignored `keystore.properties` (or env `CLIPKID_KEYSTORE_*`). You create the upload key and enroll in Play App Signing. |
-| F3 | iOS bundle id = store app ID = player Referer | **FIX** | `iosApp/Configuration/Config.xcconfig:4` `com.mahmoud.clipkid.ClipKid$(TEAM_ID)` (wizard default); `TEAM_ID` is empty (`:1`) | **Fix F3:** `PRODUCT_BUNDLE_IDENTIFIER=com.mahmoud.clipkid`. You set `TEAM_ID`. It must match App Store Connect, RevenueCat and `PlayerConfig.BASE_URL` (A1). |
+| F2 | Android release signing | **FIX** | No `signingConfigs` in `androidApp/build.gradle.kts` | **Fix F2:** a `release` signing config read from a gitignored `keystore.properties` (or env `FEELO_KEYSTORE_*`). You create the upload key and enroll in Play App Signing. |
+| F3 | iOS bundle id = store app ID = player Referer | **FIX** | `iosApp/Configuration/Config.xcconfig:4` `com.mahmoud.feelo.Feelo$(TEAM_ID)` (wizard default); `TEAM_ID` is empty (`:1`) | **Fix F3:** `PRODUCT_BUNDLE_IDENTIFIER=com.mahmoud.feelo`. You set `TEAM_ID`. It must match App Store Connect, RevenueCat and `PlayerConfig.BASE_URL` (A1). |
 | F4 | A release must never ship without backend or billing keys | **FIX** | `DataModule.kt:74` and `BillingModule.kt:53` quietly fall back to the fake catalog / no billing when a key is missing | **Fix F4:** a Gradle check that fails release builds (`assembleRelease`/`bundleRelease`, and the iOS Release framework) when `supabase.*` or this platform's RevenueCat key is empty, or when the Test Store key is the only one set. |
 | F5 | Versioning scheme | **FIX** | `androidApp/build.gradle.kts:27-28` (`1` / `"1.0"`), `Config.xcconfig:6-7` (`1` / `1.0`), set separately | **Fix F5:** one source, `iosApp/Configuration/Version.xcconfig` (`MARKETING_VERSION = 1.0.0`, `CURRENT_PROJECT_VERSION = 10000`); Android Gradle reads the same file. SemVer `MAJOR.MINOR.PATCH`; build number = `MAJOR*10000 + MINOR*100 + PATCH` (1.0.0 → 10000, 1.2.3 → 10203), same on both stores. A re-upload of the same version bumps PATCH. |
 | F6 | Launch screens | **FIX** | iOS: `project.pbxproj:309,337` generated blank launch screen (white); Android: `AndroidManifest.xml:16` plain framework theme, so the API 31+ system splash uses defaults | **Fix F6:** iOS `UILaunchScreen` with background color asset `LaunchBackground` (#F4F7FB) and the app icon image; Android `values/themes.xml` + `values-v31/themes.xml` with `windowSplashScreenBackground` #F4F7FB and the launcher icon. No new dependency. |
@@ -153,7 +153,7 @@ Most of our libraries ship consumer rules inside their AARs (AndroidX/Room, Comp
 # kotlinx.serialization: navigation routes, Supabase rows and the player bridge are @Serializable.
 # The library's embedded rules cover @Serializable classes; this keeps their companions when they
 # are only reached through generic code (Navigation's typed routes).
--keepclassmembers @kotlinx.serialization.Serializable class com.mahmoud.clipkid.** {
+-keepclassmembers @kotlinx.serialization.Serializable class com.mahmoud.feelo.** {
     *** Companion;
     kotlinx.serialization.KSerializer serializer(...);
 }
@@ -226,7 +226,7 @@ Whatever the first R8 run still reports under `missing_rules.txt` (`androidApp/b
   - RevenueCat is configured at every launch (`AppStartup.kt:42`). Its requests carry an anonymous app user id plus OS, app version and locale.
   - The YouTube player is Google, our content provider, and is unavoidable.
 - **Options:**
-  - **A (recommended):** in onboarding, right after the PIN, a parent consent step: "ClipKid uses Apple/Google and RevenueCat to handle subscriptions, and YouTube's player to play videos", with Agree. RevenueCat is configured **only after consent, and lazily the first time the parent opens the paywall**. The last known entitlement is cached on the device, so content unlocks without contacting RevenueCat at every launch; a refresh happens only in parent mode, or once a day after consent. This also keeps RevenueCat's anonymous id out of child sessions (COPPA internal-operations framing).
+  - **A (recommended):** in onboarding, right after the PIN, a parent consent step: "Feelo uses Apple/Google and RevenueCat to handle subscriptions, and YouTube's player to play videos", with Agree. RevenueCat is configured **only after consent, and lazily the first time the parent opens the paywall**. The last known entitlement is cached on the device, so content unlocks without contacting RevenueCat at every launch; a refresh happens only in parent mode, or once a day after consent. This also keeps RevenueCat's anonymous id out of child sessions (COPPA internal-operations framing).
   - **B:** keep it as it is (RevenueCat at launch). Simpler; higher Apple review risk.
 - If D1 = C (no subscription), RevenueCat is removed and this question goes away for RevenueCat.
 
@@ -243,7 +243,7 @@ Whatever the first R8 run still reports under `missing_rules.txt` (`androidApp/b
 **D6. App icon.** (F8)
 
 - Both platforms still ship the template icons.
-- Do you have a ClipKid icon? If yes, send a 1024×1024 PNG plus a foreground/background split for the Android adaptive icon.
+- Do you have a Feelo icon? If yes, send a 1024×1024 PNG plus a foreground/background split for the Android adaptive icon.
 - If not, I can draw an original vector icon from the design tokens (play-button shape in a rounded square, primary #2563D9 with accent #FFB627) and generate every size. You approve it before it ships.
 
 **D7. Legal details for the privacy policy and the stores.** (A14, C5, C6, E3)
@@ -286,7 +286,7 @@ Every network call the app makes, and what it sends. All of them use HTTPS.
 | 1 | Every app start (catalog sync) | `<project>.supabase.co` (PostgREST) | `GET collections` (fixed columns), `GET videos?select=youtube_id,updated_at` paged, `GET videos?youtube_id=in.(…)`. Headers: publishable `apikey`, `X-Client-Info: supabase-kt/<ver>`, standard User-Agent. **No user, child or device identifier.** | Catalog rows | `SupabaseCatalogDataSource.kt:20-49`, `SupabaseClientFactory.kt:15-21` |
 | 2 | A parent hides a video, or YouTube reports error 100/101/150 | same | `POST video_reports {youtube_id, reason}`, reason ∈ `parent_hidden`, `video_removed`, `embed_disabled`. Nothing else (anon can't read the table). | — | `SupabaseVideoReporter.kt:14`, `PlayerViewModel.kt:311-312` |
 | 3 | Thumbnails on screen | `i.ytimg.com` (URL from the catalog) | Image GET (IP, User-Agent) | JPEG | `App.kt:24-27` (Coil + Ktor) |
-| 4 | The player screen | `www.youtube.com` (iframe API loader), `www.youtube-nocookie.com` (the player, A19), `*.googlevideo.com`, `*.ytimg.com` | YouTube's own iframe traffic. Referer `https://com.mahmoud.clipkid`; YouTube's cookies/storage in the webview | Player, stream, YouTube's ads | `youtube_player.html:85`, platform players |
+| 4 | The player screen | `www.youtube.com` (iframe API loader), `www.youtube-nocookie.com` (the player, A19), `*.googlevideo.com`, `*.ytimg.com` | YouTube's own iframe traffic. Referer `https://com.mahmoud.feelo`; YouTube's cookies/storage in the webview | Player, stream, YouTube's ads | `youtube_player.html:85`, platform players |
 | 5 | Only after the parent's consent: parent mode (dashboard, paywall), purchase, restore; at launch / foreground only to re-check a cached subscription whose period ended | `api.revenuecat.com` | Anonymous app user id (`$RCAnonymousID:…`), store purchase token/receipt, product ids, platform/OS/app version, locale, storefront. **No attributes, no ad ids** | Entitlement `full_access`, offering | `core/billing/...`, `ConnectBillingUseCase` |
 | 6 | Purchase / restore | Google Play Billing / Apple StoreKit | Handled by the OS store with the parent's store account | Transactions | — |
 | — | Never from the app | YouTube Data API | Only our backend's scheduled `videos.list` (server-to-server, no user data) | | `supabase/functions/refresh-youtube-data/index.ts:94` |
@@ -326,22 +326,22 @@ Placeholders in `[brackets]` come from D7. The text describes the app **as of Ph
 
 ### English
 
-> **ClipKid Privacy Policy**
+> **Feelo Privacy Policy**
 > Last updated: [date]
 >
-> ClipKid is made by [publisher], [country] ("we"). Contact: [email].
+> Feelo is made by [publisher], [country] ("we"). Contact: [email].
 >
-> **The short version.** ClipKid has no accounts, no ads from us, and no analytics or tracking. Your children's names, ages, settings and viewing history stay on your device. We never sell data.
+> **The short version.** Feelo has no accounts, no ads from us, and no analytics or tracking. Your children's names, ages, settings and viewing history stay on your device. We never sell data.
 >
 > **What stays on your device.** The nickname, avatar color and age group you enter for each child; their daily limit and allowed collections; which videos they watched, liked or that you hid; and your parent PIN, stored only as a salted, one-way hash in the device's secure storage. None of this is sent to us or anyone else. Uninstalling the app deletes it. On Android it is excluded from device backups.
 >
 > **What leaves your device, and why**
 > 1. **Catalog updates.** The app downloads the list of reviewed videos from our server (hosted by Supabase in [region]). These requests contain no information about you or your children.
 > 2. **Anonymous video reports.** When you hide a video, or a video stops working, the app sends us only the video's YouTube ID and the reason (for example "hidden by a parent"). No device, user or child identifier is included, so a report can't be linked to you. We keep reports for [12 months] to improve the catalog, then delete them.
-> 3. **Videos.** Videos play in YouTube's official embedded player, in [privacy-enhanced mode]. ClipKid uses YouTube API Services. When a video plays, YouTube (Google) receives the information any web player receives, such as your IP address and device/browser details, and may show its own non-personalized ads on Made for Kids videos. We have told Google that ClipKid is directed to children. YouTube's use of this information is covered by the Google Privacy Policy (https://policies.google.com/privacy), and by using ClipKid you agree to the YouTube Terms of Service (https://www.youtube.com/t/terms).
-> 4. **Subscriptions (optional).** Every video in ClipKid is free. The optional subscription adds parent features: more child profiles and the weekly activity report. Purchases are handled by Apple (App Store) or Google (Google Play) with your store account; we never see your payment details. To check whether a subscription is active we use RevenueCat (https://www.revenuecat.com/privacy), which receives a random app-generated ID, your purchase receipt, the product bought and basic app/OS information. The app contacts RevenueCat only after you agree to it in the app, and only from the parent section (or to check a subscription that has reached its renewal date). We don't send RevenueCat any names, emails or other attributes.
+> 3. **Videos.** Videos play in YouTube's official embedded player, in [privacy-enhanced mode]. Feelo uses YouTube API Services. When a video plays, YouTube (Google) receives the information any web player receives, such as your IP address and device/browser details, and may show its own non-personalized ads on Made for Kids videos. We have told Google that Feelo is directed to children. YouTube's use of this information is covered by the Google Privacy Policy (https://policies.google.com/privacy), and by using Feelo you agree to the YouTube Terms of Service (https://www.youtube.com/t/terms).
+> 4. **Subscriptions (optional).** Every video in Feelo is free. The optional subscription adds parent features: more child profiles and the weekly activity report. Purchases are handled by Apple (App Store) or Google (Google Play) with your store account; we never see your payment details. To check whether a subscription is active we use RevenueCat (https://www.revenuecat.com/privacy), which receives a random app-generated ID, your purchase receipt, the product bought and basic app/OS information. The app contacts RevenueCat only after you agree to it in the app, and only from the parent section (or to check a subscription that has reached its renewal date). We don't send RevenueCat any names, emails or other attributes.
 >
-> **Children.** ClipKid is designed for children aged 2–12 to use under a parent's supervision. We do not knowingly collect personal information from children. Anything a parent enters about a child stays on the device. Purchases, settings and links that leave the app are behind the parent PIN.
+> **Children.** Feelo is designed for children aged 2–12 to use under a parent's supervision. We do not knowingly collect personal information from children. Anything a parent enters about a child stays on the device. Purchases, settings and links that leave the app are behind the parent PIN.
 >
 > **Retention and deletion.** On-device data: until you delete it in the app or uninstall. Video reports: [12 months]. RevenueCat purchase records: as long as needed to provide the subscription, or until you ask us to delete them. Email [email] with your purchase receipt ID and we'll delete them within 30 days. Catalog data from YouTube is refreshed or deleted within 30 days, as YouTube requires.
 >
@@ -353,22 +353,22 @@ Placeholders in `[brackets]` come from D7. The text describes the app **as of Ph
 
 ### العربي (مصري)
 
-> **سياسة الخصوصية لتطبيق ClipKid**
+> **سياسة الخصوصية لتطبيق Feelo**
 > آخر تحديث: [التاريخ]
 >
-> ClipKid من [الناشر]، [البلد] ("إحنا"). للتواصل: [الإيميل].
+> Feelo من [الناشر]، [البلد] ("إحنا"). للتواصل: [الإيميل].
 >
-> **باختصار.** ClipKid مفيهوش حسابات، ومفيهوش إعلانات مننا، ولا أي أدوات تحليل أو تتبّع. أسامي ولادك وأعمارهم وإعداداتهم واللي اتفرجوا عليه بيفضلوا على جهازك بس. وعمرنا ما بنبيع أي بيانات.
+> **باختصار.** Feelo مفيهوش حسابات، ومفيهوش إعلانات مننا، ولا أي أدوات تحليل أو تتبّع. أسامي ولادك وأعمارهم وإعداداتهم واللي اتفرجوا عليه بيفضلوا على جهازك بس. وعمرنا ما بنبيع أي بيانات.
 >
 > **اللي بيفضل على جهازك.** اسم الدلع واللون والسن اللي بتكتبهم لكل طفل، والحد اليومي والكوليكشنز المسموحة، والفيديوهات اللي اتفرجوا عليها أو حبّوها أو اللي إنت خبّيتها، والرقم السري بتاعك، ودا بيتخزن بس كبصمة مشفّرة ما ينفعش ترجع رقم، في التخزين الآمن بتاع الجهاز. مفيش حاجة من دي بتتبعت لنا ولا لأي حد. لو مسحت التطبيق بتتمسح كلها، وعلى أندرويد مش بتدخل في الباك أب.
 >
 > **اللي بيخرج من جهازك وليه**
 > ١. **تحديث الكتالوج.** التطبيق بينزّل قايمة الفيديوهات اللي راجعناها من السيرفر بتاعنا (على Supabase في [المنطقة]). الطلبات دي مفيهاش أي معلومة عنك أو عن ولادك.
 > ٢. **بلاغات من غير أسماء.** لما تخبّي فيديو أو فيديو يبطّل يشتغل، التطبيق بيبعت لنا رقم الفيديو على YouTube والسبب بس (زي "الأهل خبّوه"). مفيش أي رقم للجهاز أو للمستخدم أو للطفل، فمستحيل نعرف البلاغ جاي من مين. بنحتفظ بالبلاغات [١٢ شهر] علشان نحسّن الكتالوج، وبعدين بنمسحها.
-> ٣. **الفيديوهات.** الفيديوهات بتشتغل في المشغّل الرسمي المدمج بتاع YouTube، [في وضع الخصوصية المحسّن]. ClipKid بيستخدم خدمات YouTube API. وقت تشغيل الفيديو، YouTube (جوجل) بيوصله اللي بيوصل لأي مشغّل ويب، زي عنوان الـIP ونوع الجهاز والمتصفح، وممكن يعرض إعلاناته غير المخصّصة على فيديوهات الأطفال. إحنا بلّغنا جوجل إن ClipKid موجّه للأطفال. استخدام YouTube للمعلومات دي خاضع لسياسة خصوصية جوجل (https://policies.google.com/privacy)، وباستخدامك لـ ClipKid إنت موافق على شروط خدمة YouTube (https://www.youtube.com/t/terms).
-> ٤. **الاشتراك (اختياري).** كل الفيديوهات في ClipKid مجانية. الاشتراك الاختياري بيضيف مميزات للأهل: أطفال أكتر، وسجل مشاهدة الأسبوع كله. الشراء بيتم عن طريق أبل (App Store) أو جوجل (Google Play) بحسابك في المتجر، وإحنا عمرنا ما بنشوف بيانات الدفع. علشان نعرف الاشتراك شغال ولا لأ بنستخدم RevenueCat (https://www.revenuecat.com/privacy)، وبيوصله رقم عشوائي بيعمله التطبيق، وإيصال الشراء، والباقة اللي اشتريتها، ومعلومات بسيطة عن التطبيق ونظام التشغيل. التطبيق مش بيكلّم RevenueCat غير بعد ما توافق جوه التطبيق، ومن قسم الأهل بس (أو علشان يتأكد من اشتراك وصل لميعاد تجديده). مش بنبعت لـ RevenueCat أي أسامي أو إيميلات أو بيانات تانية.
+> ٣. **الفيديوهات.** الفيديوهات بتشتغل في المشغّل الرسمي المدمج بتاع YouTube، [في وضع الخصوصية المحسّن]. Feelo بيستخدم خدمات YouTube API. وقت تشغيل الفيديو، YouTube (جوجل) بيوصله اللي بيوصل لأي مشغّل ويب، زي عنوان الـIP ونوع الجهاز والمتصفح، وممكن يعرض إعلاناته غير المخصّصة على فيديوهات الأطفال. إحنا بلّغنا جوجل إن Feelo موجّه للأطفال. استخدام YouTube للمعلومات دي خاضع لسياسة خصوصية جوجل (https://policies.google.com/privacy)، وباستخدامك لـ Feelo إنت موافق على شروط خدمة YouTube (https://www.youtube.com/t/terms).
+> ٤. **الاشتراك (اختياري).** كل الفيديوهات في Feelo مجانية. الاشتراك الاختياري بيضيف مميزات للأهل: أطفال أكتر، وسجل مشاهدة الأسبوع كله. الشراء بيتم عن طريق أبل (App Store) أو جوجل (Google Play) بحسابك في المتجر، وإحنا عمرنا ما بنشوف بيانات الدفع. علشان نعرف الاشتراك شغال ولا لأ بنستخدم RevenueCat (https://www.revenuecat.com/privacy)، وبيوصله رقم عشوائي بيعمله التطبيق، وإيصال الشراء، والباقة اللي اشتريتها، ومعلومات بسيطة عن التطبيق ونظام التشغيل. التطبيق مش بيكلّم RevenueCat غير بعد ما توافق جوه التطبيق، ومن قسم الأهل بس (أو علشان يتأكد من اشتراك وصل لميعاد تجديده). مش بنبعت لـ RevenueCat أي أسامي أو إيميلات أو بيانات تانية.
 >
-> **الأطفال.** ClipKid معمول لأطفال من سنتين لـ١٢ سنة يستخدموه تحت إشراف الأهل. إحنا مش بنجمع عن قصد أي بيانات شخصية من الأطفال، وأي حاجة الأهل بيكتبوها عن الطفل بتفضل على الجهاز. الشراء والإعدادات وأي لينك بيخرج برّه التطبيق كلهم ورا الرقم السري بتاع الأهل.
+> **الأطفال.** Feelo معمول لأطفال من سنتين لـ١٢ سنة يستخدموه تحت إشراف الأهل. إحنا مش بنجمع عن قصد أي بيانات شخصية من الأطفال، وأي حاجة الأهل بيكتبوها عن الطفل بتفضل على الجهاز. الشراء والإعدادات وأي لينك بيخرج برّه التطبيق كلهم ورا الرقم السري بتاع الأهل.
 >
 > **مدة الحفظ والمسح.** البيانات اللي على الجهاز: لحد ما تمسحها من التطبيق أو تمسح التطبيق. البلاغات: [١٢ شهر]. سجلات الشراء عند RevenueCat: طول ما الاشتراك محتاجها، أو لحد ما تطلب مسحها: ابعت لنا على [الإيميل] رقم إيصال الشراء وهنمسحها خلال ٣٠ يوم. بيانات الكتالوج اللي جاية من YouTube بتتحدّث أو تتمسح كل ٣٠ يوم زي ما YouTube بيطلب.
 >
@@ -386,9 +386,9 @@ Counts are characters as the stores count them (Unicode code points), measured w
 
 | Field | Text | Count / limit |
 |---|---|---|
-| Play title (Kids) | ClipKid: فيديوهات للأطفال | 25 / 30 |
-| Play title (General) | ClipKid: فيديوهات مختارة | 24 / 30 |
-| App Store name | ClipKid: فيديوهات مختارة | 24 / 30 |
+| Play title (Kids) | Feelo: فيديوهات للأطفال | 25 / 30 |
+| Play title (General) | Feelo: فيديوهات مختارة | 24 / 30 |
+| App Store name | Feelo: فيديوهات مختارة | 24 / 30 |
 | App Store subtitle (Kids) | فيديوهات هادية لولادك بحد يومي | 30 / 30 |
 | App Store subtitle (General) | فيديوهات مختارة بإشراف الأهل | 28 / 30 |
 | Play short description (Kids) | فيديوهات بنختارها بإيدينا لولادك من ٢ لـ١٢ سنة، بحد يومي ورقم سري للأهل. | 72 / 80 |
@@ -400,7 +400,7 @@ Counts are characters as the stores count them (Unicode code points), measured w
 **Full description (Kids variant, about 960 / 4000 characters (the Phase 7 count + 97 for the Phase 8 edits)).** For the General variant, drop the age line and say "للعيلة" instead of "لولادك".
 
 ```
-ClipKid بيقدّم لولادك فيديوهات بنختارها ونراجعها واحد واحد، علشان تبقى مطمّن على اللي بيتفرجوا عليه.
+Feelo بيقدّم لولادك فيديوهات بنختارها ونراجعها واحد واحد، علشان تبقى مطمّن على اللي بيتفرجوا عليه.
 
 • كل فيديو بيعدّي على مراجعة من فريقنا قبل ما يظهر في التطبيق.
 • كوليكشنز مرتّبة: الحروف، الأرقام، قرآن وأدعية، أخلاق، حواديت، علوم.

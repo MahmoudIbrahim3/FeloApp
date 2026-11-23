@@ -1,4 +1,4 @@
-rootProject.name = "ClipKid"
+rootProject.name = "Feelo"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 

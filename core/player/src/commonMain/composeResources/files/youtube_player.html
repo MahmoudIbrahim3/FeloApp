@@ -18,16 +18,16 @@
 <div id="player"></div>
 <script>
   // Filled in by the app (JSON): { videoId, origin, startSec }.
-  var CONFIG = __CLIPKID_CONFIG__;
+  var CONFIG = __FEELO_CONFIG__;
   var player = null;
   var tickTimer = null;
 
   function send(message) {
     var json = JSON.stringify(message);
-    if (window.ClipKidAndroid && window.ClipKidAndroid.postMessage) {
-      window.ClipKidAndroid.postMessage(json);
-    } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.clipkid) {
-      window.webkit.messageHandlers.clipkid.postMessage(json);
+    if (window.FeeloAndroid && window.FeeloAndroid.postMessage) {
+      window.FeeloAndroid.postMessage(json);
+    } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.feelo) {
+      window.webkit.messageHandlers.feelo.postMessage(json);
     }
   }
 
@@ -90,7 +90,7 @@
   };
 
   // Commands from the app. Playback only starts from a child's tap (the video they chose).
-  window.clipkid = {
+  window.feelo = {
     play: function () { if (player && player.playVideo) { player.playVideo(); } },
     pause: function () { if (player && player.pauseVideo) { player.pauseVideo(); } },
     seekTo: function (seconds) { if (player && player.seekTo) { player.seekTo(seconds, true); } }
