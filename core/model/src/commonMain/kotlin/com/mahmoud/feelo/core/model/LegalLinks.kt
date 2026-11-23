@@ -6,8 +6,9 @@ package com.mahmoud.feelo.core.model
  * Terms of Service and Google's Privacy Policy (YouTube API Services Terms III.A.2), and the
  * support email shown on the About screen.
  *
- * TODO(Mahmoud): replace [Default]'s terms, privacy and supportEmail with the real ones before
- * release (D7); the same URLs go into App Store Connect (App Information) and Play Console (Store listing).
+ * The pages are the static files in `legal-site/`, served from Cloudflare at feelo.clipdownapp.com.
+ * The same URLs go into App Store Connect (App Information) and Play Console (Store listing); if
+ * they ever move, keep the old addresses working for older app versions.
  */
 data class LegalLinks(
     val terms: String,
@@ -21,8 +22,8 @@ data class LegalLinks(
         const val GOOGLE_PRIVACY: String = "https://policies.google.com/privacy"
 
         val Default: LegalLinks = LegalLinks(
-            terms = "https://feelo.app/terms",
-            privacy = "https://feelo.app/privacy",
+            terms = "https://feelo.clipdownapp.com/terms",
+            privacy = "https://feelo.clipdownapp.com/privacy",
             supportEmail = "feelokids@gmail.com",
         )
     }
