@@ -71,6 +71,9 @@ sealed interface DashboardEvent {
     data object ActivityClicked : DashboardEvent
     data object SubscriptionClicked : DashboardEvent
 
+    /** "عن التطبيق والخصوصية": policies, terms and contact. */
+    data object AboutClicked : DashboardEvent
+
     /** Lock button: back to child mode. */
     data object LockClicked : DashboardEvent
 }
@@ -79,6 +82,7 @@ sealed interface DashboardEffect {
     data object OpenAddChild : DashboardEffect
     data class OpenActivity(val childId: String) : DashboardEffect
     data object OpenSubscription : DashboardEffect
+    data object OpenAbout : DashboardEffect
     data object Lock : DashboardEffect
 }
 
@@ -169,6 +173,7 @@ class DashboardViewModel(
             }
             DashboardEvent.ActivityClicked -> content?.let { effectChannel.trySend(DashboardEffect.OpenActivity(it.selected.id)) }
             DashboardEvent.SubscriptionClicked -> effectChannel.trySend(DashboardEffect.OpenSubscription)
+            DashboardEvent.AboutClicked -> effectChannel.trySend(DashboardEffect.OpenAbout)
             DashboardEvent.LockClicked -> effectChannel.trySend(DashboardEffect.Lock)
         }
     }

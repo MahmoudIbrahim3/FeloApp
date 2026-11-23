@@ -97,6 +97,10 @@ data object SubscriptionDest
 @Serializable
 data class GrantDest(val childId: String)
 
+/** "عن التطبيق والخصوصية": summary, policies, terms, contact (compliance A14). */
+@Serializable
+data object AboutDest
+
 @Serializable
 data object AddChildGraph
 

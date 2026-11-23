@@ -62,6 +62,7 @@
     <string name="dash_activity">سجل المشاهدة</string>
     <string name="dash_subscription">الاشتراك</string>
     <string name="dash_subscribed">إنت مشترك</string>
+    <string name="dash_about">عن التطبيق والخصوصية</string>
     <string name="dash_child_locked">%1$s · مقفول، محتاج الاشتراك</string>
     <string name="dash_no_children">لسه مفيش أطفال. ضيف أول طفل.</string>
 
@@ -155,4 +156,19 @@
     <string name="paywall_ends_on">شغال لحد يوم %1$s.</string>
     <string name="paywall_manage">إدارة الاشتراك</string>
     <string name="paywall_done">تمام</string>
+
+    <!-- About and privacy (parent mode) -->
+    <string name="about_title">عن التطبيق والخصوصية</string>
+    <string name="about_summary_title">باختصار</string>
+    <string name="about_summary_no_tracking">مفيش حسابات، ولا إعلانات ولا تتبع مننا.</string>
+    <string name="about_summary_on_device">أسامي ولادك وإعداداتهم واللي اتفرجوا عليه بيفضلوا على الجهاز ده بس.</string>
+    <string name="about_summary_network">التطبيق بينزّل قايمة الفيديوهات بس، ولو خبّيت فيديو بيبعتلنا رقمه من غير أي حاجة تعرّف بيك.</string>
+    <string name="about_summary_youtube">الفيديوهات بتشتغل في مشغّل YouTube الرسمي، في وضع الخصوصية المحسّن.</string>
+    <string name="about_links_title">الشروط والسياسات</string>
+    <string name="about_privacy">سياسة الخصوصية</string>
+    <string name="about_terms">شروط الاستخدام</string>
+    <string name="about_youtube_terms">شروط خدمة YouTube</string>
+    <string name="about_google_privacy">سياسة خصوصية Google</string>
+    <string name="about_contact">تواصل معانا</string>
+    <string name="about_version">فيلو · الإصدار %1$s</string>
 </resources>

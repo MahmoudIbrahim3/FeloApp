@@ -37,7 +37,7 @@ class PaywallViewModelTest {
 
     /** The parent agreed in onboarding; the consent tests turn it off. */
     private val settings = FakeSettingsRepository(consentGiven = true)
-    private val links = LegalLinks(terms = "https://example.com/terms", privacy = "https://example.com/privacy")
+    private val links = LegalLinks(terms = "https://example.com/terms", privacy = "https://example.com/privacy", supportEmail = "help@example.com")
 
     private fun TestScope.paywall(): Pair<PaywallViewModel, ParentSession> {
         val clock = TestClock(testScheduler, kuwait(2026, 11, 6, 20, 0))

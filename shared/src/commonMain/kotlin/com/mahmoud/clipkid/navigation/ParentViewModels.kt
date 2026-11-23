@@ -24,6 +24,7 @@ import com.mahmoud.clipkid.core.domain.usecase.ObserveAccessUseCase
 import com.mahmoud.clipkid.core.domain.usecase.UpdateChildSettingsUseCase
 import com.mahmoud.clipkid.feature.onboarding.OnboardingMode
 import com.mahmoud.clipkid.feature.onboarding.OnboardingViewModel
+import com.mahmoud.clipkid.feature.parent.about.AboutViewModel
 import com.mahmoud.clipkid.feature.parent.activity.ActivityViewModel
 import com.mahmoud.clipkid.feature.parent.dashboard.DashboardViewModel
 import com.mahmoud.clipkid.feature.parent.gate.GateViewModel
@@ -129,6 +130,10 @@ fun rememberActivityViewModel(childId: String): ActivityViewModel {
         },
     )
 }
+
+@Composable
+fun rememberAboutViewModel(appVersion: String): AboutViewModel =
+    viewModel(key = "about", factory = viewModelFactory { initializer { AboutViewModel(appVersion) } })
 
 @Composable
 fun rememberGrantViewModel(childId: String): GrantViewModel {

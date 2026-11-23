@@ -40,7 +40,7 @@ class OnboardingViewModelTest {
     private val billing = FakeBillingRepository()
     private val addChild = AddChildUseCase(profiles, settings, SequentialIdGenerator("kid-"), billing)
 
-    private val links = LegalLinks(terms = "https://example.com/terms", privacy = "https://example.com/privacy")
+    private val links = LegalLinks(terms = "https://example.com/terms", privacy = "https://example.com/privacy", supportEmail = "help@example.com")
 
     private fun TestScope.viewModel(mode: OnboardingMode = OnboardingMode.FirstRun) = OnboardingViewModel(
         mode,

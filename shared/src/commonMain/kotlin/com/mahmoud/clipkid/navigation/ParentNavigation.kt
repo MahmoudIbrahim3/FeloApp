@@ -24,6 +24,8 @@ import com.mahmoud.clipkid.feature.onboarding.OnboardingEffect
 import com.mahmoud.clipkid.feature.onboarding.OnboardingMode
 import com.mahmoud.clipkid.feature.onboarding.OnboardingRoute
 import com.mahmoud.clipkid.feature.onboarding.OnboardingStep
+import com.mahmoud.clipkid.feature.parent.about.AboutEffect
+import com.mahmoud.clipkid.feature.parent.about.AboutRoute
 import com.mahmoud.clipkid.feature.parent.activity.ActivityEffect
 import com.mahmoud.clipkid.feature.parent.activity.ActivityRoute
 import com.mahmoud.clipkid.feature.parent.dashboard.DashboardEffect
@@ -114,6 +116,7 @@ internal fun NavGraphBuilder.parentGraph(nav: NavHostController, session: Parent
                             DashboardEffect.OpenAddChild -> nav.navigate(AddChildGraph) { launchSingleTop = true }
                             is DashboardEffect.OpenActivity -> nav.navigate(ActivityDest(effect.childId)) { launchSingleTop = true }
                             DashboardEffect.OpenSubscription -> nav.navigate(SubscriptionDest) { launchSingleTop = true }
+                            DashboardEffect.OpenAbout -> nav.navigate(AboutDest) { launchSingleTop = true }
                             // ParentModeGuard sees the lock and goes back to child Home.
                             DashboardEffect.Lock -> session.lock()
                         }
@@ -145,6 +148,22 @@ internal fun NavGraphBuilder.parentGraph(nav: NavHostController, session: Parent
                             PaywallEffect.Close -> nav.popBackStack()
                             // Store, terms, privacy: the parent is already past the PIN here.
                             is PaywallEffect.OpenUrl -> uriHandler.openUri(effect.url)
+                        }
+                    },
+                )
+            }
+        }
+        composable<AboutDest> {
+            val uriHandler = LocalUriHandler.current
+            val appVersion = rememberAppVersion()
+            ParentScreen(session) {
+                AboutRoute(
+                    viewModel = rememberAboutViewModel(appVersion),
+                    onEffect = { effect ->
+                        when (effect) {
+                            AboutEffect.Back -> nav.popBackStack()
+                            // Policies, terms, mail: the parent is already past the PIN here.
+                            is AboutEffect.OpenUrl -> uriHandler.openUri(effect.url)
                         }
                     },
                 )

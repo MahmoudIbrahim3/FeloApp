@@ -62,6 +62,7 @@ import com.mahmoud.clipkid.core.model.CoverStyle
 import com.mahmoud.clipkid.core.model.DailyLimit
 import com.mahmoud.clipkid.core.model.DailyQuota
 import com.mahmoud.clipkid.feature.parent.resources.Res
+import com.mahmoud.clipkid.feature.parent.resources.dash_about
 import com.mahmoud.clipkid.feature.parent.resources.dash_activity
 import com.mahmoud.clipkid.feature.parent.resources.dash_add_child
 import com.mahmoud.clipkid.feature.parent.resources.dash_child_chip
@@ -186,6 +187,9 @@ private fun Content(state: DashboardUiState.Content, onEvent: (DashboardEvent) -
                 onEvent(DashboardEvent.SubscriptionClicked)
             }
         }
+    }
+    LinkCard(ClipKidIcons.Info, ClipKidTheme.colors.muted, stringResource(Res.string.dash_about), Modifier.fillMaxWidth()) {
+        onEvent(DashboardEvent.AboutClicked)
     }
 }
 

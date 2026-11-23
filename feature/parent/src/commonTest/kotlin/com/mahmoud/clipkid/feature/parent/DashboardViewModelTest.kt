@@ -181,4 +181,13 @@ class DashboardViewModelTest {
         assertEquals(AddChildAction.Hidden, vm.content.addChild)
         assertTrue(vm.content.lockedChildIds.isEmpty())
     }
+
+    @Test
+    fun aboutOpensTheAboutScreen() = runViewModelTest {
+        val (vm, _) = dashboard()
+        vm.effects.test {
+            vm.onEvent(DashboardEvent.AboutClicked)
+            assertEquals(DashboardEffect.OpenAbout, awaitItem())
+        }
+    }
 }
