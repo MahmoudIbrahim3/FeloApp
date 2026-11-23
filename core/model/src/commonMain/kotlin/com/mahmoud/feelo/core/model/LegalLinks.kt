@@ -23,7 +23,7 @@ data class LegalLinks(
         val Default: LegalLinks = LegalLinks(
             terms = "https://feelo.app/terms",
             privacy = "https://feelo.app/privacy",
-            supportEmail = "support@feelo.app",
+            supportEmail = "feelokids@gmail.com",
         )
     }
 }
