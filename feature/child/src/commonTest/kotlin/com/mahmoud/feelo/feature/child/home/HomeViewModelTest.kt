@@ -27,7 +27,7 @@ class HomeViewModelTest {
         val vm = viewModel(f)
 
         val state = assertIs<HomeUiState.Content>(vm.state.value)
-        assertEquals("يوسف", state.childName)
+        assertEquals("عُمر", state.childName)
         assertEquals(0, state.quota.used)
         assertEquals(3, state.quota.total)
         // science is 9-12 only, so a 6-8 child never sees it.

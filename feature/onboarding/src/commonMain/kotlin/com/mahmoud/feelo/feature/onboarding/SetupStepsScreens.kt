@@ -353,7 +353,7 @@ private fun NicknameField(value: String, onValueChange: (String) -> Unit, placeh
 // region Previews
 
 // Sample data for previews only (never shown in the app).
-private const val PREVIEW_NICKNAME = "يوسف"
+private const val PREVIEW_NICKNAME = "عُمر"
 
 private val previewCollections = listOf(
     CollectionOption(Collection("letters", "letters", "الحروف", CoverStyle(0xFFFFE6B0, 0xFF8A5A00, CoverMark.Glyph("أ")), setOf(AgeBand.A6_8), 1), true),

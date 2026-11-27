@@ -32,13 +32,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mahmoud.feelo.core.designsystem.component.CollectionCover
 import com.mahmoud.feelo.core.designsystem.component.EmptyState
 import com.mahmoud.feelo.core.designsystem.component.Icon
 import com.mahmoud.feelo.core.designsystem.component.IconButtonLarge
 import com.mahmoud.feelo.core.designsystem.component.IconButtonTone
 import com.mahmoud.feelo.core.designsystem.component.PrimaryButton
-import com.mahmoud.feelo.core.designsystem.component.QuotaPill
+import com.mahmoud.feelo.core.designsystem.component.QuotaDots
 import com.mahmoud.feelo.core.designsystem.component.ShelfHeader
 import com.mahmoud.feelo.core.designsystem.component.Text
 import com.mahmoud.feelo.core.designsystem.component.VideoThumbnail
@@ -47,13 +48,14 @@ import com.mahmoud.feelo.core.designsystem.theme.FeeloTheme
 import com.mahmoud.feelo.core.designsystem.theme.LocalWindowSize
 import com.mahmoud.feelo.core.designsystem.theme.WindowSize
 import com.mahmoud.feelo.core.domain.usecase.ContinueWatching
+import com.mahmoud.feelo.core.model.QuotaUnit
 import com.mahmoud.feelo.core.model.Video
 import com.mahmoud.feelo.core.model.WatchSource
 import com.mahmoud.feelo.feature.child.common.ChildAvatar
 import com.mahmoud.feelo.feature.child.common.ChildTab
 import com.mahmoud.feelo.feature.child.common.ChildTabsScaffold
 import com.mahmoud.feelo.feature.child.common.WideVideoCard
-import com.mahmoud.feelo.feature.child.common.quotaLabel
+import com.mahmoud.feelo.feature.child.common.remainingLabel
 import com.mahmoud.feelo.feature.child.resources.Res
 import com.mahmoud.feelo.feature.child.resources.child_greeting
 import com.mahmoud.feelo.feature.child.resources.child_home_continue_label
@@ -82,7 +84,7 @@ fun HomeRoute(
         onSelectTab = onSelectTab,
         onLock = { viewModel.onEvent(HomeEvent.LockClicked) },
         railHeader = {
-            content?.let { ChildAvatar(it.childName, it.avatarColor, size = 56.dp) }
+            content?.let { ChildAvatar(it.childName, it.avatarColor, size = 48.dp) }
         },
     ) {
         when (val s = state) {
@@ -94,7 +96,7 @@ fun HomeRoute(
 
 @Composable
 fun HomeLoading(modifier: Modifier = Modifier) {
-    Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier.fillMaxSize().background(FeeloTheme.colors.childBackground), contentAlignment = Alignment.Center) {
         Text(
             text = stringResource(Res.string.child_loading),
             style = FeeloTheme.typography.bodyLarge,
@@ -129,14 +131,14 @@ fun HomeContent(
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(if (expanded) 3 else 1),
-        modifier = modifier.fillMaxSize().statusBarsPadding(),
+        modifier = modifier.fillMaxSize().background(FeeloTheme.colors.childBackground).statusBarsPadding(),
         contentPadding = PaddingValues(start = gutter, end = gutter, top = spacing.md, bottom = spacing.xxl),
         horizontalArrangement = Arrangement.spacedBy(spacing.lg),
         verticalArrangement = Arrangement.spacedBy(spacing.sm),
     ) {
         item(key = "top", span = fullLine) {
-            // Tablet: the rail already shows the avatar and the lock, so the line keeps
-            // only the greeting and the quota pill.
+            // Tablet: the rail already shows the avatar and the lock, so the
+            // header keeps only the greeting and today's quota.
             HomeHeader(state, onEvent, showAvatarAndLock = !expanded, modifier = blockGap)
         }
 
@@ -228,7 +230,11 @@ private fun Modifier.bleedHorizontally(bleed: Dp): Modifier = layout { measurabl
     layout(constraints.maxWidth, placeable.height) { placeable.place(-bleedPx, 0) }
 }
 
-/** One line: avatar, greeting, quota pill and lock (avatar and lock only when no rail shows them). */
+/**
+ * Avatar, then the greeting with today's quota under it (dots for a video limit, "فاضلك X دقيقة"
+ * for a minutes limit), then the lock to parent mode on the end side (left in RTL). Avatar
+ * and lock only when no rail shows them.
+ */
 @Composable
 private fun HomeHeader(
     state: HomeUiState.Content,
@@ -236,26 +242,41 @@ private fun HomeHeader(
     showAvatarAndLock: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val colors = FeeloTheme.colors
     Row(
         modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (showAvatarAndLock) {
-            ChildAvatar(state.childName, state.avatarColor, size = 56.dp)
+            ChildAvatar(state.childName, state.avatarColor, size = 48.dp)
             Spacer(Modifier.width(FeeloTheme.spacing.md))
         }
-        Text(
-            text = stringResource(Res.string.child_greeting, state.childName),
-            style = FeeloTheme.typography.displayMedium,
-            color = FeeloTheme.colors.ink,
+        Column(
             modifier = Modifier.weight(1f),
-            maxLines = 1,
-        )
-        QuotaPill(
-            used = state.quota.used,
-            total = state.quota.total,
-            label = quotaLabel(state.quota),
-        )
+            verticalArrangement = Arrangement.spacedBy(FeeloTheme.spacing.xxs),
+        ) {
+            Text(
+                text = stringResource(Res.string.child_greeting, state.childName),
+                // A step under displayMedium (28sp) so the greeting fits beside the two 48dp circles.
+                style = FeeloTheme.typography.displayMedium.copy(fontSize = 24.sp, lineHeight = 34.sp),
+                color = colors.ink,
+                maxLines = 1,
+            )
+            when (state.quota.unit) {
+                QuotaUnit.Videos -> QuotaDots(
+                    used = state.quota.used,
+                    total = state.quota.total,
+                    dotSize = 10.dp,
+                )
+                // A minutes limit has no countable steps (total is in seconds): text instead.
+                QuotaUnit.Seconds -> Text(
+                    text = remainingLabel(state.quota),
+                    style = FeeloTheme.typography.titleSmall,
+                    color = colors.muted,
+                    maxLines = 1,
+                )
+            }
+        }
         if (showAvatarAndLock) {
             Spacer(Modifier.width(FeeloTheme.spacing.sm))
             IconButtonLarge(
@@ -263,7 +284,9 @@ private fun HomeHeader(
                 contentDescription = stringResource(Res.string.child_home_lock_description),
                 onClick = { onEvent(HomeEvent.LockClicked) },
                 tone = IconButtonTone.Surface,
+                // Round and the avatar's size (48dp), so both ends of the header match.
                 compact = true,
+                shape = FeeloTheme.shapes.pill,
             )
         }
     }

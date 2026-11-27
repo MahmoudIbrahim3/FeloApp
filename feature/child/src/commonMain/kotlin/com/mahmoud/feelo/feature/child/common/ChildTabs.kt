@@ -43,7 +43,7 @@ enum class ChildTab { Home, Favorites }
 
 /**
  * Tab shell for Home and Favorites. Phone: bottom bar. Tablet: navigation rail on the start side
- * (right in RTL) with the lock at the bottom. Other screens do not use this shell.
+ * (right in RTL) with the round lock (parent mode) at the bottom. Other screens do not use this shell.
  */
 @Composable
 fun ChildTabsScaffold(
@@ -123,6 +123,7 @@ private fun ChildRail(
             onClick = onLock,
             tone = IconButtonTone.Surface,
             compact = true,
+            shape = FeeloTheme.shapes.pill,
         )
     }
 }

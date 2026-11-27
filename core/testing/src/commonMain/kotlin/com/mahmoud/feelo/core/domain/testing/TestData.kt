@@ -58,7 +58,7 @@ fun child(
     id: String = CHILD,
 ) = ChildProfile(
     id = id,
-    nickname = "يوسف",
+    nickname = "عُمر",
     avatarColor = 0xFFFFB627,
     ageBand = ageBand,
     allowedCollectionIds = allowed,

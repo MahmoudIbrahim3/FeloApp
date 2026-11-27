@@ -37,9 +37,9 @@ import com.mahmoud.feelo.core.designsystem.icon.FeeloIcons
 import com.mahmoud.feelo.core.designsystem.theme.FeeloTheme
 import com.mahmoud.feelo.core.designsystem.theme.CoverPalettes
 import com.mahmoud.feelo.core.designsystem.theme.SurfaceTone
+import com.mahmoud.feelo.core.model.QuotaUnit
 import com.mahmoud.feelo.core.model.Video
 import com.mahmoud.feelo.feature.child.common.DarkOutlineButton
-import com.mahmoud.feelo.feature.child.common.quotaLabel
 import com.mahmoud.feelo.feature.child.common.remainingLabel
 import com.mahmoud.feelo.feature.child.resources.Res
 import com.mahmoud.feelo.feature.child.resources.child_back
@@ -112,6 +112,8 @@ private fun ColumnScope.UpNextBody(state: UpNextUiState.Ready, onEvent: (UpNextE
             total = state.quota.total,
             label = remainingLabel(state.quota),
             tone = SurfaceTone.Dark,
+            // A minutes limit counts seconds: one dot per second would overflow the screen.
+            showDots = state.quota.unit == QuotaUnit.Videos,
         )
     }
 

@@ -31,7 +31,7 @@
     <string name="onb_child_title">مين هيتفرج؟</string>
     <string name="onb_child_subtitle">اسم دلع يكفي. مش محتاجين أي بيانات تانية.</string>
     <string name="onb_child_name_label">اسم الطفل</string>
-    <string name="onb_child_name_placeholder">مثلاً: يوسف</string>
+    <string name="onb_child_name_placeholder">مثلاً: عُمر</string>
     <string name="onb_child_avatar_label">اختار صورة</string>
     <string name="onb_child_age_label">السن</string>
     <string name="onb_child_age_hint">السن بيحدد الكوليكشنز اللي هتظهر.</string>

@@ -68,7 +68,8 @@ fun QuotaDots(
 
 /**
  * Quota pill: dots on the start side, then a label ("2 من 3" by default, or e.g. "فاضلك فيديو واحد").
- * Informational only (not clickable).
+ * [showDots] = false keeps only the label (a minutes limit, where [used] and [total] are not
+ * countable steps). Informational only (not clickable).
  */
 @Composable
 fun QuotaPill(
@@ -77,6 +78,7 @@ fun QuotaPill(
     modifier: Modifier = Modifier,
     label: String = stringResource(Res.string.ds_quota_of, used.toString(), total.toString()),
     tone: SurfaceTone = SurfaceTone.Light,
+    showDots: Boolean = true,
 ) {
     val colors = FeeloTheme.colors
     val shape = FeeloTheme.shapes.pill
@@ -88,8 +90,10 @@ fun QuotaPill(
             .padding(horizontal = FeeloTheme.spacing.md),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        QuotaDots(used = used, total = total, tone = tone)
-        Spacer(Modifier.width(FeeloTheme.spacing.xs))
+        if (showDots) {
+            QuotaDots(used = used, total = total, tone = tone)
+            Spacer(Modifier.width(FeeloTheme.spacing.xs))
+        }
         Text(
             text = label,
             style = FeeloTheme.typography.titleSmall,

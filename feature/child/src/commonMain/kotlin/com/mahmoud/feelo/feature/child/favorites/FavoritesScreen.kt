@@ -78,7 +78,7 @@ fun FavoritesScreen(
     val colors = FeeloTheme.colors
     val columns = if (expanded) 3 else 2
 
-    Box(modifier.fillMaxSize().background(colors.background).statusBarsPadding()) {
+    Box(modifier.fillMaxSize().background(colors.childBackground).statusBarsPadding()) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(columns),
             contentPadding = PaddingValues(start = gutter, end = gutter, bottom = FeeloTheme.spacing.xxl),

@@ -102,7 +102,7 @@ private fun label(videos: Int, minutesMode: Boolean): String = when {
 }
 
 // Sample data for previews only (never shown in the app).
-private const val PREVIEW_CHILD = "يوسف"
+private const val PREVIEW_CHILD = "عُمر"
 
 @Preview
 @Composable

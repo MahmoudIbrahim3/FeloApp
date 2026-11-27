@@ -362,7 +362,7 @@ private fun CardHeader(title: String, caption: String) {
 // region Previews
 
 // Sample data for previews only (never shown in the app).
-private const val PREVIEW_CHILD = "يوسف"
+private const val PREVIEW_CHILD = "عُمر"
 private const val PREVIEW_COLLECTION = "الحروف"
 
 private val previewChild = ChildProfile("c1", PREVIEW_CHILD, 0xFFFFB627, AgeBand.A6_8, setOf("letters"), DailyLimit.Minutes(30))

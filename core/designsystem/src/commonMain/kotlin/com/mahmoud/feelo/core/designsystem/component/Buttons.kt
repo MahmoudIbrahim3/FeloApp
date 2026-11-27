@@ -141,7 +141,8 @@ enum class IconButtonTone {
 
 /**
  * Square icon button. 56dp by default (child actions); [compact] = 48dp,
- * the minimum touch target, for parent-side chrome.
+ * the minimum touch target, for parent-side chrome. [shape] = `FeeloTheme.shapes.pill` makes it
+ * a circle (the child Home lock, matching the round avatar).
  */
 @Composable
 fun IconButtonLarge(
@@ -153,10 +154,10 @@ fun IconButtonLarge(
     compact: Boolean = false,
     iconTint: Color = Color.Unspecified,
     enabled: Boolean = true,
+    shape: Shape = FeeloTheme.shapes.iconButton,
 ) {
     val colors = FeeloTheme.colors
     val sizes = FeeloTheme.sizes
-    val shape = FeeloTheme.shapes.iconButton
     val (background, content) = when (tone) {
         IconButtonTone.Surface -> colors.surface to colors.ink
         IconButtonTone.Ink -> colors.ink to colors.onPrimary

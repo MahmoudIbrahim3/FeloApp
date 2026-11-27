@@ -93,7 +93,7 @@ class OnboardingViewModelTest {
     @Test
     fun firstRunCannotFinishWithoutConsent() = runViewModelTest {
         val vm = viewModel()
-        vm.onEvent(OnboardingEvent.NicknameChanged("يوسف"))
+        vm.onEvent(OnboardingEvent.NicknameChanged("عُمر"))
         vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A6_8))
         runCurrent()
         assertFalse(vm.state.value.canFinish)
@@ -175,7 +175,7 @@ class OnboardingViewModelTest {
         runCurrent()
         assertFalse(vm.state.value.canContinueChild)
 
-        vm.onEvent(OnboardingEvent.NicknameChanged("يوسف"))
+        vm.onEvent(OnboardingEvent.NicknameChanged("عُمر"))
         runCurrent()
         assertTrue(vm.state.value.canContinueChild)
         assertEquals("ي", vm.state.value.initial)
@@ -189,7 +189,7 @@ class OnboardingViewModelTest {
         vm.typePin("2468")
         vm.onEvent(OnboardingEvent.PinNext)
         vm.onEvent(OnboardingEvent.ConsentAgreed)
-        vm.onEvent(OnboardingEvent.NicknameChanged("يوسف"))
+        vm.onEvent(OnboardingEvent.NicknameChanged("عُمر"))
         vm.onEvent(OnboardingEvent.AgePicked(AgeBand.A6_8))
         vm.onEvent(OnboardingEvent.LimitChanged(DailyLimit.Minutes(30)))
         runCurrent()
@@ -206,7 +206,7 @@ class OnboardingViewModelTest {
             assertTrue(settings.onboardingDone.first())
             assertEquals(finished.childId, settings.activeChildId.first())
             val saved = assertNotNull(profiles.getProfile(finished.childId))
-            assertEquals("يوسف", saved.nickname)
+            assertEquals("عُمر", saved.nickname)
             assertEquals(DailyLimit.Minutes(30), saved.dailyLimit)
             assertEquals(setOf("letters", "numbers", "stories"), saved.allowedCollectionIds)
         }

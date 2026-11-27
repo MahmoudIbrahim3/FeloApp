@@ -57,12 +57,12 @@ fun ChildAvatar(nickname: String, avatarColor: Long, size: Dp = 56.dp, modifier:
     Box(
         modifier
             .size(size)
-            .background(Color(avatarColor), FeeloTheme.shapes.iconButton),
+            .background(Color(avatarColor), FeeloTheme.shapes.pill),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = nickname.take(1),
-            style = FeeloTheme.typography.displayMedium,
+            style = if (size < 56.dp) FeeloTheme.typography.titleLarge else FeeloTheme.typography.displayMedium,
             color = FeeloTheme.colors.ink,
         )
     }

@@ -49,7 +49,7 @@ class RoomRepositoriesTest {
         override fun now(): Instant = now
     }
     private val catalog = OfflineFirstCatalogRepository(db.catalogDao(), FakeCatalogDataSource(), prefs, fixedClock)
-    private val child = ChildProfile("c1", "يوسف", 0xFFFFB627, AgeBand.A6_8, setOf("letters", "numbers"), DailyLimit.Videos(3))
+    private val child = ChildProfile("c1", "عُمر", 0xFFFFB627, AgeBand.A6_8, setOf("letters", "numbers"), DailyLimit.Videos(3))
 
     @AfterTest
     fun tearDown() = db.close()

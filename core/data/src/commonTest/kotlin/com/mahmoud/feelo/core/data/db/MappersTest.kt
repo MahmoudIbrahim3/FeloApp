@@ -16,7 +16,7 @@ class MappersTest {
 
     @Test
     fun profileRoundTripsBothLimitKinds() {
-        val videos = ChildProfile("c1", "يوسف", 0xFFFFB627, AgeBand.A6_8, setOf("letters", "numbers"), DailyLimit.Videos(3))
+        val videos = ChildProfile("c1", "عُمر", 0xFFFFB627, AgeBand.A6_8, setOf("letters", "numbers"), DailyLimit.Videos(3))
         val minutes = videos.copy(id = "c2", ageBand = AgeBand.A9_12, allowedCollectionIds = emptySet(), dailyLimit = DailyLimit.Minutes(30))
 
         assertEquals(videos, videos.toEntity().toModel())

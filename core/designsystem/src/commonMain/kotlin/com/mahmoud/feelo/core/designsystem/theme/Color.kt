@@ -24,6 +24,8 @@ data class FeeloColors(
     val success: Color = Color(0xFF1F7A4A),
     val danger: Color = Color(0xFFB23A26),
     val celebrate: Color = Color(0xFFFFF4D6),
+    /** Warm background of the child tabs (Home, Favorites). */
+    val childBackground: Color = Color(0xFFFFF8EC),
 
     /** Player / post-video background. */
     val darkBackground: Color = Color(0xFF0F1724),

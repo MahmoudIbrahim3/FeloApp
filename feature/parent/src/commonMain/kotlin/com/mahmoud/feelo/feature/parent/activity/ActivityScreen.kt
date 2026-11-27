@@ -303,7 +303,7 @@ private fun timeLabel(time: LocalTime): String {
 // region Previews
 
 // Sample data for previews only (never shown in the app).
-private const val PREVIEW_CHILD = "يوسف"
+private const val PREVIEW_CHILD = "عُمر"
 
 @Preview
 @Composable
