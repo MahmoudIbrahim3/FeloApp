@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Thumbnails (Coil) and, later, the YouTube embedded player and catalog sync. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Knowing when the device is offline: the player shows "مفيش نت" at once and retries when it's back. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Child-directed app (Families policy, Play "Advertising ID: No"): never use the advertising
+         ID. Strips AD_ID even if a library's manifest merges it in. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
 
     <application
         android:name=".FeeloApplication"
